@@ -14,7 +14,8 @@ penmodelEM <- function(parms, vbeta, data, design="pop", base.dist="Weibull", me
     i <- i+1
     est0 <- est
     lval0 <- lval
-    nlm.est <- nlm(loglikem, est0, theta0=est0, data=newdata, design=design, base.dist=base.dist, agemin=agemin, vec=FALSE, hessian=T)
+    nlm.est <- nlm(loglikem, est0, theta0=est0, data=newdata, design=design, base.dist=base.dist, agemin=agemin, 
+                   vec=FALSE, hessian=T)
     lval <- nlm.est$minimum
     est <- nlm.est$estimate
     dd <- abs(lval0-lval)
@@ -24,19 +25,23 @@ penmodelEM <- function(parms, vbeta, data, design="pop", base.dist="Weibull", me
 cat("Iterations = ", i, "\n")
   
   EST <- c(exp(nlm.est$estimate[1:2]), nlm.est$estimate[3:4])
-  Var <- solve(nlm.est$hessian)
+  Var <- try(solve(nlm.est$hessian), TRUE)
+  if(!is.null(attr(Var,"class"))) { stop("Model didn't converge.\nTry again with different initial values")
+   }
+  else{  
   se <- sqrt(diag(Var))
   se.exp <-exp(nlm.est$estimate)*se
   SE <- c(se.exp[1:2], se[3:4])
-  
+    
   grad <- numericGradient(loglikem, nlm.est$estimate, theta0=nlm.est$estimate, data=newdata, design=design, base.dist=base.dist, agemin=agemin, vec=TRUE)
   Jscore <- t(grad)%*%grad
   H <- nlm.est$hessian
   #H <- numericNHessian(llik.retro.NF.noasc.vector, est, dat=cc.dat)
-  RobustVar <- solve(H)%*%(Jscore)%*%solve(H)
+  RobustVar <- Var%*%(Jscore)%*%Var
   RobustSE <- sqrt(diag(RobustVar))
   RobustSE[1:2] <- RobustSE[1:2]*exp(nlm.est$estimate[1:2]) 
-  
+  }
+    
   
   parms.cov <- Var
   parms.se <- SE

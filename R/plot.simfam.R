@@ -10,12 +10,14 @@ plot.simfam <- function(x, famid=NULL, pdf=FALSE, file=NULL, ...){
   	nrow <- ceiling(length(famid)/5)
 	}
 
-if(pdf){
-	 par(mfrow=c(1,1))
-	 if(is.null(file)) pdf("pedigreeplot.pdf")
-	 else pdf(file=file)
-}
-else par(mfrow=c(nrow, ncol))
+  if(is.character(file)) pdf=TRUE
+
+  if(pdf){
+	  par(mfrow=c(1,1))
+	  if(is.null(file)) pdf("pedigreeplot.pdf")
+	  else pdf(file=file)
+  }
+  else par(mfrow=c(nrow, ncol))
 
 
   for(i in famid){

@@ -1,4 +1,4 @@
-2245c5c1bf9f4b3182a2f3ecfca48391 *DESCRIPTION
+7ae4fc3d2ad20871f57436bdd03ffd52 *DESCRIPTION
 c51cc1b7d4b16f773aa24239e1774c0d *NAMESPACE
 96c1a1d54a606e109de6603f1542eaf7 *R/FamilyData-internal.R
 de57bf104926ca6dcb1f3087f862a11f *R/Pgene.R
@@ -11,7 +11,7 @@ de57bf104926ca6dcb1f3087f862a11f *R/Pgene.R
 3ac113d7baf7ef548a0a456eb486eb6c *R/fgene.R
 c83d0d69263de509615ef2e8ade30b1c *R/gh.R
 8b4de573cb34571e39daf4ec8a3935d2 *R/hazards.R
-ea526f451ea75180f6023b19ed5d0909 *R/inv.surv.R
+a215d6c1a1a2ec300e01f47c3dd5a6b4 *R/inv.surv.R
 fa9b903cd5a340713c381bb40a0fa4f5 *R/kids.g.R
 5d74f0fce86cca2cc5398a1957365397 *R/laplace.R
 54b26e7323a0ee5320f9cbe5cce99a5a *R/loglik.R
@@ -22,10 +22,10 @@ b02bc30801b683c5ec22831e06311ec6 *R/loglikem.R
 b5efa95ef488a3660247795df48fbe2b *R/pen.ci.R
 18cd3926dddefb987dd037c550606d58 *R/penf.R
 029418fd13233675de64a492b7639ea6 *R/penmodel.R
-8d373f0d8eb64bae1988425e54026ff2 *R/penmodelEM.R
+9e1b3d7c6b17c6c93e943198cf85a834 *R/penmodelEM.R
 5375b49d32ec537b7bb9e4c3ae5128b0 *R/penplot.R
 2481872e26a8f192e5b0b0646d9bd56e *R/plot.penmodel.R
-8b51cf938b2830ef8026e83367dbd477 *R/plot.simfam.R
+00c1a988f45a08e8bb4ed342b1b2bff9 *R/plot.simfam.R
 fdb2dbc31fd9ce3133dad3eefa7b5402 *R/simfam.R
 43cd5d2f959ba863daddb7f16e8a78b2 *R/summary.penmodel.R
 ad61486c5a23e3caa2ce7b2f62228d84 *R/summary.simfam.R
@@ -37,7 +37,7 @@ fa6c2781e44234a8e89010ca409ca0ea *man/FamEvent-package.Rd
 125fd8eb8fb06a82e208b49ef76c0fb2 *man/penmodelEM.Rd
 791c7cfd56fc12fb78f79018f45ec7c0 *man/penplot.Rd
 14d182deeddf37784d8e1c361f5fe5f2 *man/plot.penmodel.Rd
-94e73fbf0b4b4622925104848b4db75c *man/plot.simfam.Rd
-19fa2a76af3a3c9af66b4ad9112eb6d2 *man/simfam.Rd
+cacaf631178544f4ef90a26e6b1dde92 *man/plot.simfam.Rd
+7d3bf4b1a46ad50bee5e8517017fdaa5 *man/simfam.Rd
 bfc4fe4ebc3b0afd5d94cb28a2af2bb4 *man/summary.penmodel.Rd
 aeeabcba04bbb2d120bfa1f3dbb7bf66 *man/summary.simfam.Rd
