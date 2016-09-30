@@ -18,7 +18,8 @@ Vector of initial values for baseline parameters.
  \code{vbeta=c(beta.s, beta.g)}.   
 }
 \item{data}{
-Family data that contains specific variables famID, indID, generation, gender, currentage, mgene, time, status, weight; data structure should follow the format of the data generated from \code{\link{simfam}}.
+  Family data structure should follow the format of the data generated from \code{\link{simfam}}.
+  \code{data} should contain specific variables: \code{famID}, \code{indID}, \code{generation}, \code{gender}, \code{currentage}, \code{mgene}, \code{time}, \code{status} and \code{weight}; \code{attr(data,"agemin")} should be specified.
 }
 \item{design}{
 Study design of the family data.  Possible choices are: \code{"pop", "pop+", "cli"}, \code{"cli+"} or \code{"twostage"}, where \code{"pop"} is for the population-based design with affected probands whose mutation status can be either carrier or non-carrier, \code{"pop+"} is similar to \code{"pop"} but with mutation carrier probands, \code{"cli"} is for the clinic-based design that includes affected probands with at least one parent and one sib affected, \code{"cli+"} is similar to \code{"cli"} but with mutation carrier probands, and \code{"twostage"} is for the two-stage design with oversampling of high risks families. Default is \code{"pop"}.
@@ -90,11 +91,9 @@ Yun-Hee Choi
 \examples{
 
 # Family data simulated from population-based design using a Weibull baseline hazard 
-# and inducing residual familial correlation by a shared second gene
 
-fam <- simfam(N.fam=300, design="pop+", variation="secondgene", 
-       base.dist="Weibull", allelefreq=c(0.02, 0.2), 
-       base.parms=c(0.01,3), vbeta=c(-1.13, 2.35, 0.5), agemin=20)
+fam <- simfam(N.fam=300, design="pop+", variation="none", base.dist="Weibull", 
+       base.parms=c(0.01,3), vbeta=c(-1.13, 2.35), agemin=20, allelefreq=0.02)
  
 # Penetrance model fit for simulated family data
 

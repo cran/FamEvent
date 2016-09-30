@@ -45,4 +45,6 @@ for(j in 2:7)  cat(nn[j-1], ans[[j]], "\n")
 cat("\n")
 }
 
+ans
+
 }

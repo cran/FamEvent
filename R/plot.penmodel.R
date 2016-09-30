@@ -5,7 +5,7 @@ plot.penmodel <- function(x, ...){
 
  data <- attr(x, "data")
 
- lines(survfit(Surv(time, status)~gender+mgene, data=data[data$proband==0 & !is.na(data$mgene),]), fun="event",     lty=c(2,1,2,1), col=c("red","red","blue","blue"))
+ lines(survfit(Surv(time, status)~gender+mgene, data=data[data$proband==0 & !is.na(data$mgene),]), fun="event", 
+       lty=c(2,1,2,1), col=c("red","red","blue","blue"))
 
-  
 }

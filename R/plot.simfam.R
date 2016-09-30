@@ -26,7 +26,7 @@ plot.simfam <- function(x, famid=NULL, pdf=FALSE, file=NULL, ...){
   iprob <- rep("",length(obj$indID))
   iprob[obj$proband==1] <- "proband"
   if(!is.null(obj$carrp.pheno)) iprob[is.na(obj$mgene)] <- paste("p=",round(obj$carrp.pheno[is.na(obj$mgene)], 2),sep="")
-  else if(!is.null(obj$carrp)) iprob[is.na(obj$mgene)] <- paste("p=",round(obj$carrp[is.na(obj$mgene)], 2),sep="")
+  else if(!is.null(obj$carrp.geno)) iprob[is.na(obj$mgene)] <- paste("p=",round(obj$carrp.geno[is.na(obj$mgene)], 2),sep="")
 
   ped <- pedigree(id=obj$indID, dadid=obj$fatherID, momid=obj$motherID, sex=obj$gender, affected=cbind(obj$status, obj$mgene))
 

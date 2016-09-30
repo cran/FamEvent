@@ -35,9 +35,8 @@ Yun-Hee Choi
 
 # Simulated family data  
 
-fam <- simfam(N.fam=300, design="pop+", variation="secondgene", 
-       base.dist="Weibull", allelefreq=c(0.02, 0.2), 
-       base.parms=c(0.01,3), vbeta=c(-1.13, 2.35, 0.5), agemin=20)
+fam <- simfam(N.fam=300, design="pop+", base.dist="Weibull", variation="none",
+       base.parms=c(0.01,3), vbeta=c(-1.13, 2.35), allelefreq=0.02, agemin=20)
  
 # Fit family data
 

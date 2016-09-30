@@ -12,9 +12,8 @@ delta <- data$status
 haz<-hazards(base.dist, y, theta)*exp(xbeta)
 Haz <-cumhaz(base.dist, y, theta)*exp(xbeta)
 
-
-if(mut==1) p <- data$carrp
-else p <- 1-data$carrp	
+if(mut==1) p <- data$carrp.geno
+else p <- 1-data$carrp.geno	
 
 return((haz^delta)*exp(-Haz)*p)
 

@@ -1,5 +1,5 @@
 import(MASS,truncnorm, survival, kinship2)
-export(simfam, summary.simfam, plot.simfam, penplot, penmodel, summary.penmodel, plot.penmodel, carrierprobgeno, carrierprobpheno, penmodelEM)
+export(simfam, summary.simfam, plot.simfam, penplot, penmodel, summary.penmodel, plot.penmodel, carrierprob, penmodelEM)
 S3method(summary, simfam)
 S3method(summary, penmodel)
 S3method(plot, simfam)

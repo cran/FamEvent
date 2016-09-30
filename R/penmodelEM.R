@@ -1,7 +1,7 @@
 penmodelEM <- function(parms, vbeta, data, design="pop", base.dist="Weibull", method="data", mode="dominant", q=0.02){
 
   agemin <- attr(data, "agemin")
-  if(is.null(agemin)) stop("specify agemin for data")
+  if(is.null(agemin)) stop("agemin is not found. Specify agemin for data by attr(data,\"agemin\") ")
   
   newdata <- carrierprobgeno(data, method=method, mode=mode, q=q)
   theta = theta0 = c(log(parms), vbeta)
@@ -15,19 +15,18 @@ penmodelEM <- function(parms, vbeta, data, design="pop", base.dist="Weibull", me
     est0 <- est
     lval0 <- lval
     nlm.est <- nlm(loglikem, est0, theta0=est0, data=newdata, design=design, base.dist=base.dist, agemin=agemin, 
-                   vec=FALSE, hessian=T)
+                   vec=FALSE, hessian=TRUE)
     lval <- nlm.est$minimum
     est <- nlm.est$estimate
     dd <- abs(lval0-lval)
     #dd <- abs(sum(est-est0))    
-    #print(c(i, dd, est))
+    #print(c(i, dd, lval, est))
   }
 cat("Iterations = ", i, "\n")
   
   EST <- c(exp(nlm.est$estimate[1:2]), nlm.est$estimate[3:4])
   Var <- try(solve(nlm.est$hessian), TRUE)
-  if(!is.null(attr(Var,"class"))) { stop("Model didn't converge.\nTry again with different initial values")
-   }
+  if(!is.null(attr(Var,"class"))) stop("Model didn't converge.\n  Try again with different initial values")
   else{  
   se <- sqrt(diag(Var))
   se.exp <-exp(nlm.est$estimate)*se
@@ -54,12 +53,12 @@ cat("Iterations = ", i, "\n")
   
   ageonset <- agemin:90
   
-  p1 <- penf(nlm.est$estimate, ageonset, sex=1, mut=1, base.dist, agemin)  
-  p2 <- penf(nlm.est$estimate, ageonset, sex=0, mut=1, base.dist, agemin)  
-  p3 <- penf(nlm.est$estimate, ageonset, sex=1, mut=0, base.dist, agemin)  
-  p4 <- penf(nlm.est$estimate, ageonset, sex=0, mut=0, base.dist, agemin)  
+  p1 <- penf(nlm.est$estimate, ageonset, sex=1, mut=1, base.dist=base.dist, agemin=agemin)  
+  p2 <- penf(nlm.est$estimate, ageonset, sex=0, mut=1, base.dist=base.dist, agemin=agemin)  
+  p3 <- penf(nlm.est$estimate, ageonset, sex=1, mut=0, base.dist=base.dist, agemin=agemin)  
+  p4 <- penf(nlm.est$estimate, ageonset, sex=0, mut=0, base.dist=base.dist, agemin=agemin)  
   
-  pen.est <- pen.ci(nlm.est$estimate, RobustVar, age=70, base.dist, agemin)
+  pen.est <- pen.ci(nlm.est$estimate, RobustVar, age=70, base.dist=base.dist, agemin=agemin)
   pen70.est <- pen.est[1,]
   pen70.se <- pen.est[2,]
   pen70.ci <- pen.est[3:4,] 

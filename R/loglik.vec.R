@@ -31,6 +31,9 @@ loglik.vec<- function(theta, data, design, base.dist, agemin)
   
   logasc <- wt.p*log(1-exp(-bcumhaz.p*exp(xbeta.p)))  
 
+  likelihood<- loglik
+  likelihood[ip] <- loglik[ip]-logasc
+  
   if(design=="cli" | design=="cli+"){
     i.m <- data$generation==1 & data$gender==0
     i.f <- data$generation==1 & data$gender==1
@@ -43,18 +46,17 @@ loglik.vec<- function(theta, data, design, base.dist, agemin)
     cage.f <- data$currentage[i.f]-agemin
     xbeta.f <- beta.sex*data$gender[i.f]+beta.gen*data$mgene[i.f]
     bcumhaz.f <- cumhaz(base.dist, cage.f,c(lambda,rho))
+
+    logasc.p <- wt.p*log(1-exp(-bcumhaz.m*exp(xbeta.m) -bcumhaz.f*exp(xbeta.f) ) )
+    likelihood[i.m] <- loglik[i.m]-logasc.p
     
     cage.s <- data$currentage[i.s]-agemin
     xbeta.s <- beta.sex*data$gender[i.s]+beta.gen*data$mgene[i.s]
     bcumhaz.s <- cumhaz(base.dist, cage.s,c(lambda,rho))
-
-    logasc.s <- wt.p*aggregate(log(1-exp(-bcumhaz.s*exp(xbeta.s))), by=list(data$famID[i.s]), sum)[,2]
-    logasc.p <- wt.p*log(1-exp(-bcumhaz.m*exp(xbeta.m) -bcumhaz.f*exp(xbeta.f) ) )
-    logasc <- logasc + logasc.s+logasc.p
     
-  }
+    logasc.s <- data$weight[i.s]*log(1-exp(-bcumhaz.s*exp(xbeta.s)))
+    likelihood[i.s] <- loglik[i.s]-logasc.s
+  } # close for if(design=="cli" | design=="cli+")
   
-  likelihood<- loglik
-  likelihood[ip] <- loglik[ip]-logasc
   return(-likelihood)
 }

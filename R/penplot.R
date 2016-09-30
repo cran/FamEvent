@@ -54,4 +54,14 @@ else {
   legend("topleft", c("male carrier", "female carrier", "male noncarrier", "female noncarrier"), bty="n", lty=c(1,1,2,2), col=c("blue","red","blue","red"))
 }
 
+pen70=c((pen[[4]])[x==70], (pen[[3]])[x==70],(pen[[2]])[x==70],(pen[[1]])[x==70]) 
+names(pen70)<-c("male-carrier","famale-carrier","male-noncarr","female-noncarr")
+
+if(variation=="secondgene"){ 
+  pen2=c((pen[[8]])[x==70], (pen[[7]])[x==70],(pen[[6]])[x==70],(pen[[5]])[x==70]) 
+  pen70 = rbind(pen70, pen2)
+  row.names(pen70)<-c("secondgene=1","secondgene=0")
+  }
+
+return(list(pen70=pen70))
 }

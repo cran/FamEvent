@@ -1,6 +1,8 @@
 loglik<- function(theta, data, design, base.dist, agemin)
 {
-#data <- data[data$currentage>agemin,]
+
+data <- data[data$currentage>agemin,]
+
 lambda   <- exp(theta[1])
 rho  <- exp(theta[2])
 beta.sex <- theta[3]
@@ -19,7 +21,7 @@ H <- bcumhaz*exp(xbeta)
 logh <- log(bhaz) + xbeta
 
 loglik <-  wt * (- H + status*logh )
-loglik[data$time<=agemin] <- 0
+#loglik[data$time<=agemin] <- 0
 
 # Ascertainment correction by design
 
@@ -29,7 +31,6 @@ if(design=="cli" | design=="cli+"){
   ip <-  data$generation==2  & data$status==1
 }
 else  ip <- data$proband==1
-
 
 cagep <- data$currentage[ip]-agemin
 xbeta.p <- beta.sex*data$gender[ip]+beta.gen*data$mgene[ip]
@@ -51,6 +52,6 @@ wt.p <- data$weight[data$proband==1]
 slogasc <- slogasc + sum(wt.p*log(1-exp(-bcumhaz.m*exp(xbeta.m) -bcumhaz.f*exp(xbeta.f) ) ),na.rm=T)
 }
 
-likelihood  <- try(sum(loglik, na.rm=T) - slogasc)
+likelihood  <- try(sum(loglik[loglik!=-Inf], na.rm=T) - slogasc)
 return(-likelihood)
 }

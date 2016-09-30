@@ -14,6 +14,8 @@ if(!is.element(variation, c("none", "frailty", "secondgene"))) stop("variation s
  
 if(!is.element(design, c("pop","pop+","cli","cli+","twostage"))) stop("Unrecognized design; should be one of pop, pop+, cli, cli+ or twostage")  
 
+if(variation!="frailty") frailty.dist=NULL
+
 if(design=="pop") {affectnum=1; m.carrier=0}
 if(design=="pop+"){affectnum=1; m.carrier=1}
 if(design=="cli") {affectnum=3; m.carrier=0}
@@ -30,7 +32,7 @@ dat <- data.frame(familyDesign(n=N.fam, affectnum=affectnum, m.carrier=m.carrier
         parms=base.parms, variation=variation, allelefreq=allelefreq, 
         mrate=mrate, age1=age1, age2=age2, agemin=agemin))
 
-if(hr==0){ # One stage sampling 
+if(hr==0){ # One stage sampling x
 dat$weight <- 1
         }
 else { # Two stage sampling 

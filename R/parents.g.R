@@ -1,5 +1,4 @@
-parents.g <-
-function(gene, g, allelefreq){
+parents.g <- function(gene, g, allelefreq){
 ## input gene as a vector of (1,2,3) : AA==1, Aa==2, aa==3
 if(length(allelefreq)==1) allelefreq <- c(allelefreq,0)
 qgene <- allelefreq

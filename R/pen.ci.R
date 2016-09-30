@@ -1,19 +1,19 @@
-pen.ci <- function(est, cov, age=70, base.dist, agemin){
+pen.ci <- function(est, cov, age=70, base.dist, frailty.dist=NULL,agemin){
    
   sest <- mvrnorm(n=10000, est, cov) 
   
   
   out <- cbind( 
-    apply(sest, 1, penf, age=70, base.dist=base.dist, agemin=agemin, sex=1, mut=1), 
-    apply(sest, 1, penf, age=70, base.dist=base.dist, agemin=agemin, sex=0, mut=1), 
-    apply(sest, 1, penf, age=70, base.dist=base.dist, agemin=agemin, sex=1, mut=0), 
-    apply(sest, 1, penf, age=70, base.dist=base.dist, agemin=agemin, sex=0, mut=0))
+    apply(sest, 1, penf, age=70, base.dist=base.dist, frailty.dist=frailty.dist, agemin=agemin, sex=1, mut=1), 
+    apply(sest, 1, penf, age=70, base.dist=base.dist, frailty.dist=frailty.dist, agemin=agemin, sex=0, mut=1), 
+    apply(sest, 1, penf, age=70, base.dist=base.dist, frailty.dist=frailty.dist, agemin=agemin, sex=1, mut=0), 
+    apply(sest, 1, penf, age=70, base.dist=base.dist, frailty.dist=frailty.dist, agemin=agemin, sex=0, mut=0))
   
   est.pen <- 100*c(
-    penf(est, age=70, base.dist=base.dist, agemin=agemin, sex=1, mut=1), 
-    penf(est, age=70, base.dist=base.dist, agemin=agemin, sex=0, mut=1), 
-    penf(est, age=70, base.dist=base.dist, agemin=agemin, sex=1, mut=0), 
-    penf(est, age=70, base.dist=base.dist, agemin=agemin, sex=0, mut=0))
+    penf(est, age=70, base.dist=base.dist, frailty.dist=frailty.dist, agemin=agemin, sex=1, mut=1), 
+    penf(est, age=70, base.dist=base.dist, frailty.dist=frailty.dist, agemin=agemin, sex=0, mut=1), 
+    penf(est, age=70, base.dist=base.dist, frailty.dist=frailty.dist, agemin=agemin, sex=1, mut=0), 
+    penf(est, age=70, base.dist=base.dist, frailty.dist=frailty.dist, agemin=agemin, sex=0, mut=0))
 
   
   se.pen <- sqrt(apply(100*out, 2, var))

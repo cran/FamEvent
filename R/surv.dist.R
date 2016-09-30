@@ -1,4 +1,4 @@
-surv.dist <- function(base.dist, t, parms, xbeta, alpha, res){
+surv.dist <- function(t, base.dist, parms, xbeta, alpha, res){
 	if(base.dist=="Weibull") exp(-(parms[1]*t)^parms[2]*exp(xbeta+alpha))-res
 	else if(base.dist=="loglogistic") 1/(1+parms[1]*t^parms[2])*exp(xbeta+alpha) -res
 	else if(base.dist=="Gompertz") exp(-(parms[1]*(exp(parms[2]*t)-1)/parms[2])*exp(xbeta+alpha)) -res

@@ -19,7 +19,8 @@ Vector of initial values for baseline parameters.
  \code{vbeta=c(beta.s, beta.g)}.   
 }
 \item{data}{
-  Family data that contains specific variables: \code{famID}, \code{indID}, \code{generation}, \code{gender}, \code{currentage}, \code{mgene}, \code{time}, \code{status}, \code{weight}. Data structure should follow the format of the data generated from \code{\link{simfam}}.
+  Family data structure should follow the format of the data generated from \code{\link{simfam}}.
+  \code{data} should contain specific variables: \code{famID}, \code{indID}, \code{generation}, \code{gender}, \code{currentage}, \code{mgene}, \code{time}, \code{status} and \code{weight}; \code{attr(data,"agemin")} should be specified.
 }
 \item{design}{
 The study design of the family data. Possible choices are: \code{"pop"}, \code{"pop+"}, \code{"cli"}, \code{"cli+"} or \code{"twostage"}, where \code{"pop"} is for the population-based design with affected probands whose mutation status can be either carrier or non-carrier, \code{"pop+"} is similar to \code{"pop"} but with mutation carrier probands, \code{"cli"} is for the clinic-based design that includes affected probands with at least one parent and one sib affected, \code{"cli+"} is similar to \code{"cli"} but with mutation carrier probands, and \code{"twostage"} is for the two-stage design with oversampling of high risks families. Default is \code{"pop"}.
@@ -109,17 +110,16 @@ Choi, Y.-H., Briollais, L., Green, J., Parfrey, P., and Kopciuk, K. (2014) Estim
 Yun-Hee Choi
 }
 \seealso{
-\code{\link{simfam}, \link{penmodel}, \link{summary.penmodel}, \link{plot.penmodel},}
-
-\code{\link{carrierprobpheno}, \link{carrierprobgeno}} 
+\code{\link{simfam}}, \code{\link{penmodel}}, \code{link{summary.penmodel}}, 
+\code{\link{plot.penmodel}}, \code{\link{carrierprob}} 
 }
+
 \examples{
 
 # Family data simulated with 30\% of members missing their genetic information.
 
-fam <- simfam(N.fam=100, design="pop+", variation="secondgene", 
-       base.dist="Weibull", allelefreq=c(0.02, 0.2), base.parms=c(0.01,3), 
-       vbeta=c(-1.13, 2.35, 0.5), agemin=20, mrate=0.3)
+fam <- simfam(N.fam=100, design="pop+", base.dist="Weibull", base.parms=c(0.01,3),
+       vbeta=c(-1.13, 2.35, 0.5), agemin=20, allelefreq=0.02, mrate=0.3)
  
 # EM algorithm for fitting family data with missing genotypes
 

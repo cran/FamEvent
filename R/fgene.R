@@ -18,7 +18,7 @@ if(variation=="secondgene"){
   Ft <- matrix(0, ncol=2, nrow=2)
   for(i in c(0,1)) for(j in c(0,1)) {
 	xbeta <- affsex*vbeta[1] + i*vbeta[2] + j*vbeta[3]
-  	Ft[(i+1),(j+1)] <- 1- surv.dist(base.dist, affage, parms, xbeta, alpha[2], res=0)
+  	Ft[(i+1),(j+1)] <- 1- surv.dist(affage, base.dist, parms, xbeta, alpha, res=0)
                     }
   if(!dominant.m){
     pAA[1] <- Ft[2,2]*AAq[1]*(AAq[2]+Aaq[2]) + Ft[2, 1]*AAq[1]*aaq[2]
@@ -41,7 +41,7 @@ else{
   Ft <- 0
   for(i in c(0,1)){
   	xbeta <- affsex*vbeta[1] + i*vbeta[2]
-  	Ft[i+1] <- 1 - surv.dist(base.dist, affage, parms, xbeta, alpha[2], res=0)
+  	Ft[i+1] <- 1 - surv.dist(affage, base.dist, parms, xbeta, alpha, res=0)
   } 
 
 pAA <- Ft[2]*AAq[1]
@@ -49,5 +49,5 @@ if(dominant.m) pAa <- Ft[2]*Aaq[1]
 else pAa <- Ft[1]*Aaq[1]
 paa <- Ft[1]*aaq[1]
 }
-return( cbind(pAA, pAa, paa))
+return( cbind(pAA, pAa, paa)/c(pAA+pAa+paa))
 }
