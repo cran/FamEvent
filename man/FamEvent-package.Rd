@@ -52,9 +52,13 @@ Choi, Y.-H. and Briollais (2011) An EM Composite Likelihood Approach for Multist
 }
 \keyword{ package }
 \seealso{
-\code{\link{simfam}, \link{summary.simfam}, \link{plot.simfam}, \link{penplot},}
+\code{\link{simfam}, \link{summary.simfam}, \link{plot.simfam}, \link{penplot},\link{carrierprob},}
 	
-\code{\link{penmodel}, \link{summary.penmodel}, \link{plot.penmodel}} 
+\code{\link{penmodel},  \link{penmodelEM}, \link{print.penmodel}, \link{summary.penmodel},}
+
+\code{\link{print.summary.penmodel}, \link{plot.penmodel}} 
+
+
 }
 \examples{
 

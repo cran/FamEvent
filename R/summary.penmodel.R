@@ -1,12 +1,16 @@
-summary.penmodel <- function(object, ...){
+summary.penmodel <- function(object, correlation=FALSE, ...){
+   
+  ans <- object[c("coefficients")]
+  class(ans) <- "summary.penmodel"
+  tval <-  object$coef/object$se
+  pval <- 2 * pt(abs(tval), 1, lower.tail = FALSE)
+  ans$coefficients <- cbind(object$coef, object$se, tval, pval)
+  dimnames(ans$coefficients) <- list(names(object$coef), c("Estimate", "Std. Error", "t value", "Pr(>|t|)"))
+  
+  ans$pen70 <- rbind(Estimate=object$pen70.est, SE=object$pen70.se, CI=object$pen70.ci)
+  ans$varcov <- object$varcov
+  if(correlation) ans$correlation <- object$varcov/object$se^2
+  return(ans) 
 
-  parms <- round(data.frame(rbind(Estimate=object$parms.est, SE=object$parms.se, RobustSE=object$parms.rse)),4)
 
-  names(parms) <- c("lambda","rho" , "beta.sex","beta.gene")
-
-  pen70 <- round(data.frame(rbind(Estimate=object$pen70.est, SE=object$pen70.se, CI=object$pen70.ci)),4)
-
-  out<-list(parameters=parms, pen70=pen70)
-
-  return(out)
 }

@@ -30,7 +30,7 @@ plot.simfam <- function(x, famid=NULL, pdf=FALSE, file=NULL, ...){
 
   ped <- pedigree(id=obj$indID, dadid=obj$fatherID, momid=obj$motherID, sex=obj$gender, affected=cbind(obj$status, obj$mgene))
 
- pedplot<- plot.pedigree(ped, id=paste(obj$indID, iprob, sep="\n"), col=ifelse(obj$proband==1,2,1))
+ pedplot<- plot.pedigree(ped, id=paste(obj$indID, iprob, sep="\n"), col=ifelse(obj$proband==1,2,1), ...)
 
  title(paste("Family ID:", i))
  pedigree.legend(ped, labels=c("Affected", "Mutation\nCarrier"), location="topright", radius=pedplot$boxw*0.7)

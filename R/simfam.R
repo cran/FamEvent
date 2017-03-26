@@ -1,20 +1,29 @@
 simfam <-
 function(N.fam=500, design="pop", variation="none", depend=1,
-			base.dist="Weibull", frailty.dist="gamma",
-           base.parms=c(0.016,3), vbeta=c(-1.13, 2.35, 0.5), allelefreq=c(0.02, 0.2), 
+			base.dist="Weibull", frailty.dist=NULL,
+           base.parms=c(0.016,3), vbeta=c(-1.13, 2.35), allelefreq=c(0.02, 0.2), 
            dominant.m=TRUE, dominant.s=TRUE, mrate=0, hr=0, age1=c(65,2.5), age2=c(45,2.5), 
            agemin=20)
   {
 	
 
-
-if(!is.element(frailty.dist, c("gamma", "lognormal"))) stop("Unrecognized frailty distribution") 
-
-if(!is.element(variation, c("none", "frailty", "secondgene"))) stop("variation should be one of none, frailty, or secondgene")
+  
+if(!is.element(variation, c("none", "frailty", "secondgene"))) stop("Unrecognized variation; variation should be one of none, frailty, or secondgene")
  
+if(variation=="frailty" & !any(frailty.dist==c("lognormal",  "gamma"))) 
+    stop("Unrecognized frailty distribution; frailty.dist should be either \"gamma\" or \"lognormal\" ")
+else if(variation!="frailty" & any(frailty.dist==c("lognormal",  "gamma")) ) stop("Variation should be specified as variation = \"frailty\".")
+else if(variation!="frailty" & !is.null(frailty.dist) ) stop("frailty.dist can be specified only with variation=\"frailty\" ")
+  
 if(!is.element(design, c("pop","pop+","cli","cli+","twostage"))) stop("Unrecognized design; should be one of pop, pop+, cli, cli+ or twostage")  
 
-if(variation!="frailty") frailty.dist=NULL
+if(variation=="secondgene"){
+  if (length(vbeta)!=3) stop("vbeta should be a vector of length 3.")
+  if (length(allelefreq)!=2) stop("both allele frequencies for major and second gene should be specified as a vector of length 2.")
+}
+else if(length(vbeta)!=2) stop("vbeta should be a vector of length 2.")
+
+
 
 if(design=="pop") {affectnum=1; m.carrier=0}
 if(design=="pop+"){affectnum=1; m.carrier=1}
@@ -23,7 +32,8 @@ if(design=="cli+"){affectnum=3; m.carrier=1}
 if(design=="twostage"){
 	affectnum = 2
 	m.carrier = 0 #proband is not necessary to be a carrier.
-	if(hr==0) stop("Please specify the sampling rate of high risk families (0<hr<1)")
+	if(hr==0) stop("Please specify the sampling rate of high risk families (0 < hr < 1)")
+	else if(hr>1 | hr <0) stop("hr should be between 0 and 1 (0 < hr < 1)")
 	}
 
 dat <- data.frame(familyDesign(n=N.fam, affectnum=affectnum, m.carrier=m.carrier, 
@@ -32,9 +42,7 @@ dat <- data.frame(familyDesign(n=N.fam, affectnum=affectnum, m.carrier=m.carrier
         parms=base.parms, variation=variation, allelefreq=allelefreq, 
         mrate=mrate, age1=age1, age2=age2, agemin=agemin))
 
-if(hr==0){ # One stage sampling x
-dat$weight <- 1
-        }
+if(hr==0) dat$weight <- 1 #one stage sampling
 else { # Two stage sampling 
 	if(design!="twostage") stop ("hr can be used only with twostage design" )
   en.hr <- round(hr*N.fam)  # expected number of high risk families 
@@ -78,6 +86,7 @@ attr(dat, "frailty.dist") <- frailty.dist
 attr(dat, "base.dist") <- base.dist
 attr(dat, "base.parms") <- base.parms
 attr(dat, "vbeta") <- vbeta
+attr(dat, "n.fam") <- N.fam
 attr(dat, "agemin") <- agemin
 return(dat)
 }

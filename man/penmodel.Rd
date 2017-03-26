@@ -2,24 +2,24 @@
 \alias{penmodel}
 \title{Estimate the penetrance model and penetrance curves}
 \description{
-This function fits the penetrance model to the family data based on a prospective likelihood with ascertainment correction and provides parameter estimates as well as the gender- and mutation-specific penetrance estimates. 
+Fits a penetrance model for family data based on a prospective likelihood with ascertainment correction and provides parameter estimates as well as the gender- and mutation-specific penetrance estimates. 
 }
 \usage{
-penmodel(parms, vbeta, data, design="pop", base.dist="Weibull")
+penmodel(parms, vbeta, data, design="pop", base.dist="Weibull", robust=FALSE)
 
 }
 \arguments{
   \item{parms}{
 Vector of initial values for baseline parameters.
-\code{parms=c(lambda, rho)}, where lambda and rho are the initial values for the scale and shape parameters, respectively; lambda > 0, rho > 0.
+\code{parms=c(lambda, rho)}, where lambda and rho are the initial values for the scale and shape parameters, respectively. For the \code{"lognormal"} baseline distribution, \code{rho} > 0; for the other baselinse distributions, \code{lambda} > 0 and \code{rho} > 0.
 }
 \item{vbeta}{
- Vector of initial values for regression coefficients for gender and majorgene.
+ Vector of initial values for regression coefficients for gender and majorgene;
  \code{vbeta=c(beta.s, beta.g)}.   
 }
 \item{data}{
-  Family data structure should follow the format of the data generated from \code{\link{simfam}}.
-  \code{data} should contain specific variables: \code{famID}, \code{indID}, \code{generation}, \code{gender}, \code{currentage}, \code{mgene}, \code{time}, \code{status} and \code{weight}; \code{attr(data,"agemin")} should be specified.
+  Data frame generated from \code{\link{simfam}} or data frame 
+  containing specific variables: \code{famID}, \code{indID}, \code{generation}, \code{gender}, \code{currentage}, \code{mgene}, \code{time}, \code{status} and \code{weight} with \code{attr(data,"agemin")} specified.
 }
 \item{design}{
 Study design of the family data.  Possible choices are: \code{"pop", "pop+", "cli"}, \code{"cli+"} or \code{"twostage"}, where \code{"pop"} is for the population-based design with affected probands whose mutation status can be either carrier or non-carrier, \code{"pop+"} is similar to \code{"pop"} but with mutation carrier probands, \code{"cli"} is for the clinic-based design that includes affected probands with at least one parent and one sib affected, \code{"cli+"} is similar to \code{"cli"} but with mutation carrier probands, and \code{"twostage"} is for the two-stage design with oversampling of high risks families. Default is \code{"pop"}.
@@ -27,6 +27,9 @@ Study design of the family data.  Possible choices are: \code{"pop", "pop+", "cl
  \item{base.dist}{
 Choice of baseline hazard distribution to fit. Possible choices are: \code{"Weibull"}, \code{"loglogistic"}, \code{"Gompertz"}, \code{"lognormal",} or \code{"gamma"}. Default is \code{"Weibull"}.
 }
+ \item{robust}{
+ 	Logical; if TRUE, use robust `sandwich' standard errors and variance covariance matrix, otherwise use conventional standard errors and variance covariance matrix.
+ }
 
 }
 \details{
@@ -39,26 +42,23 @@ For family data arising from population- or clinic-based study designs (\code{de
 
 For family data arising from a two-stage study design (\code{design="twostage"}), model parameters are estimated based on the composite likelihood approach (Choi and Briollais, 2011)
 
+Transformed baseline parameters (\eqn{\lambda, \rho}) were used for estimation; log tranformation was applied to both scale and shape parameters for \code{"Weibull"}, \code{"loglogistic"}, \code{"Gompertz"} and \code{"gamma"} baseline distributions. For \code{"lognormal"} baseline distribution, the log transformation was applied only to shape parameter \eqn{\rho}, not to \eqn{\lambda} which represents the location parameter in log-normal distribution.
+
+Calculations of standard errors and 95\% confidence intervals for penetrance estimates by age 70 were based on the penetrances obtained from 1000 Monte-Carlo simulations of the estimated penetrance model; for more details, see \code{\link{penci}}.
+
 }
 \value{
-An object of class \code{penmodel}, a list including elements
+Returns an object of class \code{'penmodel'}, including the following elements:
 
-\item{parms.est}{
-Parameter estimates of baseline parameters (\eqn{\lambda, \rho}) and regression coefficients for gender and mutation status (\eqn{\beta_s, \beta_g}) including their standard errors and also robust standard errors.
+\item{coefficients}{
+Parameter estimates of transformed baseline parameters (\eqn{\lambda, \rho}) and regression coefficients for gender and mutation status (\eqn{\beta_s, \beta_g}).
 }
-\item{parms.cov}{
-Covariance matrix of parameter estimates.
+\item{varcov}{
+Variance covariance matrix of parameter estimates. If \code{robust=TRUE}, robust `sandwich' variance covariance matrix is returned.
 }
-\item{parms.se}{
-Standard errors of parameter estimates.
+\item{se}{
+Standard errors of parameter estimates. If \code{robust=TRUE}, robust 'sandwich' standard errors are returned.
 }
-\item{parms.rcov}{
-Robust (sandwich) covariance matrix of parameter estimates.
-}
-\item{parms.rse}{
-Robust standard errors of parameter estimates.
-}
-
 \item{pen70.est}{
  Penetrance estimates by age 70 specific to gender and mutation-status subgroups.
 }
@@ -66,16 +66,17 @@ Robust standard errors of parameter estimates.
  Standard errors of penetrance estimates by age 70  specific to gender and mutation-status subgroups. 
 }
 \item{pen70.ci}{
- 95\% confidence interval for penetrance estimates by age 70 specific to gender and mutation-status groups. 
+ 95\% confidence interval for penetrance estimates by age 70 specific to gender and mutation-status subgroups. 
 }
 
 \item{ageonset}{
-	Vector of ages of onset ranging from \code{agemin} to 80 years.
+	Vector of ages of onset ranging from \code{agemin} to 90 years.
 }
-\item{pen.maleCarr}{Vector of penetrance estimates for male carriers from \code{agemin} to 80 years.}
-\item{pen.femaleCarr}{Vector of penetrance estimates for female carriers from \code{agemin} to 80 years.}
-\item{pen.maleNonCarr}{Vector of penetrance estimates for male non-carriers from \code{agemin} to 80 years.}
-\item{pen.femaleNonCarr}{Vector of penetrance estimates for female non-carriers from \code{agemin} to 80 years.}
+\item{pen.maleCarr}{Vector of penetrance estimates for male carriers from \code{agemin} to 90 years.}
+\item{pen.femaleCarr}{Vector of penetrance estimates for female carriers from \code{agemin} to 90 years.}
+\item{pen.maleNonCarr}{Vector of penetrance estimates for male non-carriers from \code{agemin} to 90 years.}
+\item{pen.femaleNonCarr}{Vector of penetrance estimates for female non-carriers from \code{agemin} to 90 years.}
+\item{logLik}{Loglikelihood value for the fitted penetrance model.}
 }
 \references{
 Choi, Y.-H., Kopciuk, K. and Briollais, L. (2008) Estimating Disease Risk Associated Mutated Genes in Family-Based Designs, Human Heredity 66, 238-251
@@ -86,7 +87,9 @@ Choi, Y.-H. and Briollais (2011) An EM Composite Likelihood Approach for Multist
 Yun-Hee Choi
 }
 \seealso{
-\code{\link{simfam}, \link{penplot}, \link{summary.penmodel}, \link{plot.penmodel}} 
+\code{\link{penmodelEM}, \link{simfam}, \link{penplot}, \link{print.penmodel},\link{summary.penmodel},}
+
+\code{\link{print.summary.penmodel}, \link{plot.penmodel}, \link{penci}, \link{penf}} 
 }
 \examples{
 
@@ -110,4 +113,4 @@ summary(fit)
 plot(fit)
 
 }
-\keyword{Penetrance}
+\keyword{Penetrance model}

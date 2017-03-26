@@ -5,7 +5,7 @@ Compute mutation carrier probabilities for individuals with missing gentoypes
 %conditional on observed phenotypes and genotypes 
 }
 \description{
-This function computes model- or data-based carrier probabilities for individuals with missing genotypes based on the observed mutation status of family members and the individual's phenotype.
+Computes model- or data-based carrier probabilities for individuals with missing genotypes based on the observed mutation status of family members and the individual's phenotype.
 }
 \usage{
 carrierprob(condition="geno", method="data",fit=NULL, data, mode="dominant", q=0.02)
@@ -32,7 +32,7 @@ Choice of modes of inheritance when using \code{method="model"}. Possible choice
 }
 
  \item{q}{
-The frequency of the disease causing allele when using \code{method="model"}. The value should be between 0 and 1. If \code{NULL}, the estimated allele frequency from data will be used. Default value  is \code{0.02}.
+Frequency of the disease causing allele when using \code{method="model"}. The value should be between 0 and 1. If \code{NULL}, the estimated allele frequency from data will be used. Default value  is \code{0.02}.
 }
 }
 \details{
@@ -51,7 +51,7 @@ Returns a data frame with a vector of carrier probabilities called \code{carrp.g
 Yun-Hee Choi
 }
 \seealso{
-\code{\link{simfam}, \link{penmodelEM}, \link{plot.simfam}}
+\code{\link{simfam}, \link{penmodelEM}, \link{plot.simfam}, \link{summary.simfam}}
 }
 \examples{
 

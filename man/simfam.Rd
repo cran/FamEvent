@@ -4,11 +4,11 @@
 Generate familial time-to-event data
 }
 \description{
-This function generates familial time-to-event data for specified study design, genetic model and source of residual familial correlation; the generated data frame also contains family structure (individual's id, father id, mother id, relationship to proband, generation), gender, current age, genotypes of major or second genes.
+Generates familial time-to-event data for specified study design, genetic model and source of residual familial correlation; the generated data frame also contains family structure (individual's id, father id, mother id, relationship to proband, generation), gender, current age, genotypes of major or second genes.
 }
 \usage{
 simfam(N.fam, design="pop", variation="none", depend=1, 
-       base.dist="Weibull", frailty.dist="gamma", base.parms, vbeta, 
+       base.dist="Weibull", frailty.dist=NULL, base.parms, vbeta, 
        allelefreq=c(0.02, 0.2), dominant.m=TRUE, dominant.s=TRUE,
        mrate=0, hr=0, age1=c(65,2.5), age2=c(45,2.5), agemin=20)
 % \method{summary}{simulation}(object, \dots)
@@ -34,7 +34,7 @@ Choice of baseline hazard distribution.  Possible choices are: \code{"Weibull"},
 }
 
  \item{frailty.dist}{
-Choice of frailty distribution.  Possible choices are: \code{"gamma"} for gamma distribution or \code{"lognormal"} for log normal distribution. Default is \code{"gamma"}.
+Choice of frailty distribution.  Possible choices are: \code{"gamma"} for gamma distribution or \code{"lognormal"} for log normal distribution when \code{variation="frailty"}. Default is \code{NULL}.
 }
   \item{base.parms}{
 Vector of parameter values for baseline hazard function. 
@@ -42,20 +42,15 @@ Vector of parameter values for baseline hazard function.
 \code{base.parms=c(lambda, rho)}, where lambda and rho are the shape and scale parameters, respectively.
 }
   \item{vbeta}{
- Vector of parameter values for gender, majorgene, and secondgene. 
- }
+ Vector of parameter values for gender, majorgene, and secondgene. }
   \item{allelefreq}{
-Vector of population allele frequencies of major and second disease gene alleles. Frequencies must be between 0 and 1. Default frequencies are 0.02 for major gene allele and 0.2 for second gene allele, \code{allelefreq=c(0.02, 0.2)}
-}
-  \item{dominant.m}{logical; if TRUE, the genetic model of major gene is dominant, otherwise recessive.
-}
-  \item{dominant.s}{logical; if TRUE, the genetic model of second gene is dominant, otherwise recessive.
-}
+Vector of population allele frequencies of major and second disease gene alleles. Frequencies must be between 0 and 1. Default frequencies are 0.02 for major gene allele and 0.2 for second gene allele, \code{allelefreq=c(0.02, 0.2)}.}
+  \item{dominant.m}{Logical; if TRUE, the genetic model of major gene is dominant, otherwise recessive.}
+  \item{dominant.s}{Logical; if TRUE, the genetic model of second gene is dominant, otherwise recessive.}
   \item{mrate}{
-Proportion of missing genotypes, value between 0 and 1. Default value is 0.
-}
+Proportion of missing genotypes, value between 0 and 1. Default value is 0.}
   \item{hr}{
-Proportion of high risk families, which include at least two affected members, to be sampled from the two stage sampling. This value should be specified when \code{design="twostage"} is used. Default value is 0. Value should lie between 0 and 1.
+Proportion of high risk families, which include at least two affected members, to be sampled from the two stage sampling. This value should be specified when \code{design="twostage"}. Default value is 0. Value should lie between 0 and 1.
 }
   \item{age1}{
 Vector of mean and standard deviation for the current age of generation 1  or grandparents. Default values are mean of 65 years and standard deviation of 2.5 years, \code{age1=c(65,2.5)}.
@@ -85,7 +80,7 @@ The current ages for each generation are simulated assuming normal distributions
 
 }
 \value{
-The function returns a data frame which contains:
+Returns an object of class \code{'simfam'}, a data frame which contains:
 \item{famID}{Family identification number (id).}
 \item{indID}{Individual id.}
 \item{gender}{Gender indicator: 1 for males, 0 for females.}
@@ -99,8 +94,8 @@ The function returns a data frame which contains:
 \item{currentage}{Current age.}
 \item{time}{Minimum time between current age and age at onset. }
 \item{status}{Disease status: 1 for affected and 0 for unaffected (censored).}
-\item{mgene}{Carrier status of major gene which can possibly be missing: 1 for carrier, 2 for non-carrier, NA for missing carrier status}
-\item{relation}{Family members' relationship with the proband is as follows}
+\item{mgene}{Carrier status of major gene which can possibly be missing: 1 for carrier, 2 for non-carrier, NA for missing carrier status.}
+\item{relation}{Family members' relationship with the proband is as follows:}
   \tabular{ll}{
     1  \tab Proband (self) \cr
     2  \tab Brother or sister \cr
@@ -140,21 +135,22 @@ fam <- simfam(N.fam=100, design="pop+", variation="frailty",
 
 head(fam) 
 
-#   famID indID gender motherID fatherID proband generation majorgene secondgene
-# 1     1     1      1        0        0       0          1         2          0
-# 2     1     2      0        0        0       0          1         3          0
-# 3     1     3      0        2        1       1          2         2          0
-# 4     1     4      1        0        0       0          0         3          0
-# 5     1     7      0        3        4       0          3         2          0
-# 6     1     8      1        3        4       0          3         3          0
-#   ageonset currentage time status mgene relation fsize naff weight
-# 1       70         68   68      0     1        4    11    1      1
-# 2      110         68   68      0     0        4    11    1      1
-# 3       36         40   36      1     1        1    11    1      1
-# 4      212         50   50      0     0        6    11    1      1
-# 5       79         19   19      0     1        3    11    1      1
-# 6      169         16   16      0     0        3    11    1      1
-
+\dontrun{
+   famID indID gender motherID fatherID proband generation majorgene secondgene
+ 1     1     1      1        0        0       0          1         2          0
+ 2     1     2      0        0        0       0          1         3          0
+ 3     1     3      0        2        1       1          2         2          0
+ 4     1     4      1        0        0       0          0         3          0
+ 5     1     7      0        3        4       0          3         2          0
+ 6     1     8      1        3        4       0          3         3          0
+   ageonset currentage time status mgene relation fsize naff weight
+ 1       70         68   68      0     1        4    11    1      1
+ 2      110         68   68      0     0        4    11    1      1
+ 3       36         40   36      1     1        1    11    1      1
+ 4      212         50   50      0     0        6    11    1      1
+ 5       79         19   19      0     1        3    11    1      1
+ 6      169         16   16      0     0        3    11    1      1
+}
 summary(fam)
 
 plot(fam, famid=c(1:2)) # pedigree plots for families with IDs=1 and 2

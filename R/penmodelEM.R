@@ -1,10 +1,23 @@
-penmodelEM <- function(parms, vbeta, data, design="pop", base.dist="Weibull", method="data", mode="dominant", q=0.02){
+penmodelEM <- function(parms, vbeta, data, design="pop", base.dist="Weibull", robust=FALSE, method="data", mode="dominant", q=0.02){
 
   agemin <- attr(data, "agemin")
   if(is.null(agemin)) stop("agemin is not found. Specify agemin for data by attr(data,\"agemin\") ")
   
   newdata <- carrierprobgeno(data, method=method, mode=mode, q=q)
-  theta = theta0 = c(log(parms), vbeta)
+  
+    if(base.dist=="lognormal"){
+  		if(parms[2] <= 0) stop("parms[2] has to be > 0")
+		else
+  	  	est1 <- nlm(loglik, c(parms[1], log(parms[2]), vbeta), data=data, design=design, base.dist=base.dist, agemin=agemin, hessian=TRUE)
+  	} 
+  	else if(any(parms<0)) stop("both parms have to be > 0")
+
+  
+  
+  if(base.dist=="lognormal") theta = theta0 = c(parms[1],log(parms[2]), vbeta)
+  else theta = theta0 = c(log(parms), vbeta)
+  
+  
   est0 <- est <- theta
   dd <- lval0 <- lval <- 1
   i <- 0
@@ -23,34 +36,34 @@ penmodelEM <- function(parms, vbeta, data, design="pop", base.dist="Weibull", me
     #print(c(i, dd, lval, est))
   }
 cat("Iterations = ", i, "\n")
-  
-  EST <- c(exp(nlm.est$estimate[1:2]), nlm.est$estimate[3:4])
+
+  logLik <- -lval
+  EST <- nlm.est$estimate
   Var <- try(solve(nlm.est$hessian), TRUE)
+
   if(!is.null(attr(Var,"class"))) stop("Model didn't converge.\n  Try again with different initial values")
   else{  
-  se <- sqrt(diag(Var))
-  se.exp <-exp(nlm.est$estimate)*se
-  SE <- c(se.exp[1:2], se[3:4])
-    
-  grad <- numericGradient(loglikem, nlm.est$estimate, theta0=nlm.est$estimate, data=newdata, design=design, base.dist=base.dist, agemin=agemin, vec=TRUE)
-  Jscore <- t(grad)%*%grad
-  H <- nlm.est$hessian
-  #H <- numericNHessian(llik.retro.NF.noasc.vector, est, dat=cc.dat)
-  RobustVar <- Var%*%(Jscore)%*%Var
-  RobustSE <- sqrt(diag(RobustVar))
-  RobustSE[1:2] <- RobustSE[1:2]*exp(nlm.est$estimate[1:2]) 
+  	if(robust){
+  	grad <- numericGradient(loglikem, nlm.est$estimate, theta0=nlm.est$estimate, data=newdata, design=design, base.dist=base.dist, agemin=agemin, vec=TRUE)
+  	Jscore <- t(grad)%*%grad
+  	parms.cov <- Var%*%(Jscore)%*%Var
+  	parms.se <- sqrt(diag(parms.cov))
+  	}
+  	else{   	parms.cov <- Var
+  		  	parms.se <- sqrt(diag(parms.cov))
+  	}
   }
-    
   
-  parms.cov <- Var
-  parms.se <- SE
-  parms.rcov <- RobustVar
-  parms.rse <- RobustSE
-  
-  names(EST)<- names(parms.se)<-  names(parms.rse) <- c("lambda","rho" , "beta.sex","beta.gene")
-  rownames(parms.cov) <- colnames(parms.cov) <-c("lambda","rho" , "beta.sex","beta.gene")
-  rownames(parms.rcov) <- colnames(parms.rcov) <-c("lambda","rho" , "beta.sex","beta.gene")
-  
+
+  if(base.dist=="lognormal"){
+  names(EST)<- names(parms.se)  <- c("lambda","log(rho)" , "beta.sex","beta.gene")
+  rownames(parms.cov) <- colnames(parms.cov) <- c("lambda","log(rho)" , "beta.sex","beta.gene")
+  }
+  else{
+  names(EST)<- names(parms.se)  <- c("log(lambda)","log(rho)" , "beta.sex","beta.gene")
+  rownames(parms.cov) <- colnames(parms.cov) <- c("log(lambda)","log(rho)" , "beta.sex","beta.gene")
+  }
+
   ageonset <- agemin:90
   
   p1 <- penf(nlm.est$estimate, ageonset, sex=1, mut=1, base.dist=base.dist, agemin=agemin)  
@@ -58,17 +71,17 @@ cat("Iterations = ", i, "\n")
   p3 <- penf(nlm.est$estimate, ageonset, sex=1, mut=0, base.dist=base.dist, agemin=agemin)  
   p4 <- penf(nlm.est$estimate, ageonset, sex=0, mut=0, base.dist=base.dist, agemin=agemin)  
   
-  pen.est <- pen.ci(nlm.est$estimate, RobustVar, age=70, base.dist=base.dist, agemin=agemin)
+  pen.est <- pen.ci(nlm.est$estimate, parms.cov, age=70, base.dist=base.dist, agemin=agemin)
   pen70.est <- pen.est[1,]
   pen70.se <- pen.est[2,]
   pen70.ci <- pen.est[3:4,] 
   rownames(pen70.ci) <- c("lowerlimit", "upperlimit")
   
-  out <- list(  parms.est=EST, parms.cov=parms.cov, parms.se=parms.se, parms.rse=parms.rse,
-                pen70.est=pen70.est, pen70.se=pen70.se, pen70.ci=pen70.ci,
-                ageonset=ageonset,  
-                pen.maleCarr=p1, pen.femaleCarr=p2, 
-                pen.maleNoncarr=p3, pen.femaleNoncarr=p4)
+  
+  out <- list(  coefficients=EST, varcov=parms.cov, se=parms.se,
+ 		pen70.est=pen70.est, pen70.se=pen70.se, pen70.ci=pen70.ci,ageonset=ageonset,  
+        pen.maleCarr=p1, pen.femaleCarr=p2, pen.maleNoncarr=p3, pen.femaleNoncarr=p4,
+        logLik=logLik)
   
   class(out) <- "penmodel"
   attr(out, "design") <- design
@@ -76,7 +89,8 @@ cat("Iterations = ", i, "\n")
   attr(out, "agemin") <- agemin
   attr(out, "data") <- data
   attr(out, "iterations") <- i
+  attr(out, "robust") <- robust
   
-  
-return(out)
+invisible(out)
+
   }

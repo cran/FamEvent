@@ -8,9 +8,9 @@ aaq <- (1-qgene)^2
 
 tmp.g <- matrix(c(1,1, 1,2, 1,3, 2,1, 2,2, 2,3, 3,1, 3,2, 3,3), ncol=2, byrow=T)
  
-tmp.prob<-c(AAq[g]^2, 0.5*AAq[g]*Aaq[g], AAq[g]*aaq[g], 
-		      0.5*Aaq[g]*AAq[g], 0.25*Aaq[g]^2, 0.5*Aaq[g]*aaq[g], 
-		      aaq[g]*AAq[g], 0.5*aaq[g]*Aaq[g], aaq[g]^2)
+tmp.prob<-c(AAq[g]^2, AAq[g]*Aaq[g], AAq[g]*aaq[g], 
+		      Aaq[g]*AAq[g], Aaq[g]^2, Aaq[g]*aaq[g], 
+		      aaq[g]*AAq[g], aaq[g]*Aaq[g], aaq[g]^2)
 
 tmp <- sample(1:9, 1, prob=Pgene(gene, 1:9)*tmp.prob)
 

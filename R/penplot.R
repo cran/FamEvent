@@ -1,12 +1,23 @@
-penplot <- function(base.parms, vbeta, variation="none", base.dist="Weibull", frailty.dist="gamma", depend=1, agemin=20){
+penplot <- function(base.parms, vbeta, variation="none", base.dist="Weibull", frailty.dist=NULL, depend=1, agemin=20, print=TRUE, ...){
 
 x <- agemin:80
 t0 <- x-agemin
 
-if(variation=="secondgene") xbeta <- c( vbeta %*% t(expand.grid(c(0,1),c(0,1), c(0,1))) )
-else xbeta <- c( vbeta %*% t(expand.grid(c(0,1),c(0,1)) ) )
+if(variation=="frailty" & !any(frailty.dist==c("lognormal",  "gamma"))) 
+  stop("Unrecognized frailty distribution; frailty.dist should be either \"gamma\" or \"lognormal\" ")
+else if(variation!="frailty" & any(frailty.dist==c("lognormal",  "gamma")) ) stop("Variation should be specified as variation = \"frailty\".")
+else if(variation!="frailty" & !is.null(frailty.dist) ) stop("frailty.dist can be specified only with variation=\"frailty\" ")
 
 
+if(variation=="secondgene") {
+  if(length(vbeta)==3) xbeta <- c( vbeta %*% t(expand.grid(c(0,1),c(0,1), c(0,1))) )
+  else if(length(vbeta)<3) stop("vbeta should include a second gene effect.")
+  else stop("vbeta should be a vector of length 3.")
+} 
+else {
+  if(length(vbeta)==2) xbeta <- c( vbeta %*% t(expand.grid(c(0,1),c(0,1)) ) )
+  else stop("vbeta should be a vector of length 2.")
+}
 s1 <- cumhaz(base.dist, t0, base.parms)*exp(xbeta[1]) # female non-carr
 s2 <- cumhaz(base.dist, t0, base.parms)*exp(xbeta[2]) # male non-carr
 s3 <- cumhaz(base.dist, t0, base.parms)*exp(xbeta[3]) # female carr
@@ -26,31 +37,33 @@ else stop("Unrecognized variation")
  
 if(variation=="secondgene"){
 par(mfrow=c(1,2))
-	plot(x,pen[[5]], ylab="Penetrance", xlab="age at onset", ylim=c(0,1), type="l", lty=2, col="red", main=paste("Penetrances for second gene carriers \n", base.dist, "baseline"))
+	plot(x,pen[[5]], ylab="Penetrance", xlab="age at onset", ylim=c(0,1), type="l", lty=2, col="red", main=paste("Penetrances for second gene carriers \n", base.dist, "baseline"), ...)
   lines(x, pen[[6]], lty=2, col="blue")
   lines(x, pen[[7]], lty=1, col="red")
   lines(x, pen[[8]], lty=1, col="blue")
   legend("topleft", c("male carrier", "female carrier", "male noncarrier", "female noncarrier"), bty="n", lty=c(1,1,2,2), col=c("blue","red","blue","red"))
 
-	plot(x,pen[[1]], ylab="Penetrance", xlab="age at onset", ylim=c(0,1), type="l", lty=2, col="red", main=paste("Penetrances for second gene non-carriers \n", base.dist, "baseline"))
-  lines(x, pen[[2]], lty=2, col="blue")
-  lines(x, pen[[3]], lty=1, col="red")
-  lines(x, pen[[4]], lty=1, col="blue")
+	plot(x,pen[[1]], ylab="Penetrance", xlab="age at onset", ylim=c(0,1), type="l", lty=2, col="red", main=paste("Penetrances for second gene non-carriers \n", base.dist, "baseline"), ...)
+  lines(x, pen[[2]], lty=2, col="blue", ...)
+  lines(x, pen[[3]], lty=1, col="red", ...)
+  lines(x, pen[[4]], lty=1, col="blue", ...)
   legend("topleft", c("male carrier", "female carrier", "male noncarrier", "female noncarrier"), bty="n", lty=c(1,1,2,2), col=c("blue","red","blue","red"))
 
 }
 else if(variation=="frailty"){
-  plot(x,pen[[1]], ylab="Penetrance", xlab="age at onset", ylim=c(0,1), type="l", lty=2, col="red", main=paste("Penetrance curves \n", base.dist, "baseline and ", frailty.dist,"frailty"))
-  lines(x, pen[[2]], lty=2, col="blue")
-  lines(x, pen[[3]], lty=1, col="red")
-  lines(x, pen[[4]], lty=1, col="blue")
+  par(mfrow=c(1,1))
+  plot(x,pen[[1]], ylab="Penetrance", xlab="age at onset", ylim=c(0,1), type="l", lty=2, col="red", main=paste("Penetrance curves \n", base.dist, "baseline and ", frailty.dist,"frailty"), ...)
+  lines(x, pen[[2]], lty=2, col="blue", ...)
+  lines(x, pen[[3]], lty=1, col="red", ...)
+  lines(x, pen[[4]], lty=1, col="blue", ...)
   legend("topleft", c("male carrier", "female carrier", "male noncarrier", "female noncarrier"), bty="n", lty=c(1,1,2,2), col=c("blue","red","blue","red"))
 }
 else {
-  plot(x,pen[[1]], ylab="Penetrance", xlab="age at onset", ylim=c(0,1), type="l", lty=2, col="red", main=paste("Penetrance curves \n", base.dist, "baseline"))
-  lines(x, pen[[2]], lty=2, col="blue")
-  lines(x, pen[[3]], lty=1, col="red")
-  lines(x, pen[[4]], lty=1, col="blue")
+  par(mfrow=c(1,1))
+  plot(x,pen[[1]], ylab="Penetrance", xlab="age at onset", ylim=c(0,1), type="l", lty=2, col="red", main=paste("Penetrance curves \n", base.dist, "baseline"), ...)
+  lines(x, pen[[2]], lty=2, col="blue", ...)
+  lines(x, pen[[3]], lty=1, col="red", ...)
+  lines(x, pen[[4]], lty=1, col="blue", ...)
   legend("topleft", c("male carrier", "female carrier", "male noncarrier", "female noncarrier"), bty="n", lty=c(1,1,2,2), col=c("blue","red","blue","red"))
 }
 
@@ -59,9 +72,16 @@ names(pen70)<-c("male-carrier","famale-carrier","male-noncarr","female-noncarr")
 
 if(variation=="secondgene"){ 
   pen2=c((pen[[8]])[x==70], (pen[[7]])[x==70],(pen[[6]])[x==70],(pen[[5]])[x==70]) 
-  pen70 = rbind(pen70, pen2)
+  pen70 = rbind(pen2, pen70)
   row.names(pen70)<-c("secondgene=1","secondgene=0")
+  names(pen) <- c("secondgene=0: male-carrier","secondgene=0: famale-carrier","secondgene=0: male-noncarr","secondgene=0: female-noncarr",
+                  "secondgene=1: male-carrier","secondgene=1: famale-carrier","secondgene=1: male-noncarr","secondgene=1: female-noncarr")
   }
+else names(pen) <- c("male-carrier","famale-carrier","male-noncarr","female-noncarr")
 
-return(list(pen70=pen70))
+if(print){
+cat("Penetrance by age 70:\n")
+print(pen70)
+}
+invisible(list(pen70=pen70, pen=pen, x.age=x))
 }

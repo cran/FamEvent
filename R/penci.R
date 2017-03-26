@@ -1,4 +1,4 @@
-pen.ci <- function(est, cov, age=70, base.dist, frailty.dist=NULL,agemin, n=1000){
+penci <- function(est, cov, age=70, base.dist="Weibull", frailty.dist=NULL, agemin, n=1000){
    
   sest <- mvrnorm(n=n, est, cov) 
   
@@ -20,6 +20,7 @@ pen.ci <- function(est, cov, age=70, base.dist, frailty.dist=NULL,agemin, n=1000
   re <- round(rbind(
         Estimate=est.pen, SE=se.pen, apply(out*100, 2, quantile, prob=c(0.025, 0.975), na.rm=T)),2)
   colnames(re) <- c("Male Carrier", "Female Carrier", "Male Noncarrier", "Female Noncarrier")
-  
+  rownames(re) <- c("Estimate","SE", "lower", "upper")
+  #cat("Penetrance (%) by age", age, "\n")
   return(re)
 }

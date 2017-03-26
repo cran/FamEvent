@@ -2,32 +2,35 @@
 \alias{penmodelEM}
 \title{EM algorithm for estimating the penetrance model with missing genotypes}
 \description{
-This function fits family data with missing genotypes via the EM algorithm and provides model parameter estimates and corresponding gender- and genotype-specific penetrance estimates. 
+Fits a penetrance model for family data with missing genotypes via the EM algorithm and provides model parameter estimates and corresponding gender- and genotype-specific penetrance estimates. 
 }
 \usage{
 penmodelEM(parms, vbeta, data, design="pop", base.dist="Weibull", 
-           method="data", mode="dominant", q=0.02)
+           robust=FALSE, method="data", mode="dominant", q=0.02)
 
 }
 \arguments{
   \item{parms}{
 Vector of initial values for baseline parameters.
-\code{parms=c(lambda, rho)}, where lambda and rho are the initial values for the scale and shape parameters, respectively; lambda > 0, rho > 0.
+\code{parms=c(lambda, rho)}, where lambda and rho are the initial values for the scale and shape parameters, respectively. For the \code{"lognormal"} baseline distribution, rho > 0; for the other baselinse distributions, lambda > 0 and rho > 0.
 }
 \item{vbeta}{
  Vector of initial values for the regression coefficients for gender and majorgene,
  \code{vbeta=c(beta.s, beta.g)}.   
 }
 \item{data}{
-  Family data structure should follow the format of the data generated from \code{\link{simfam}}.
-  \code{data} should contain specific variables: \code{famID}, \code{indID}, \code{generation}, \code{gender}, \code{currentage}, \code{mgene}, \code{time}, \code{status} and \code{weight}; \code{attr(data,"agemin")} should be specified.
+  Data frame generated from \code{\link{simfam}} or data frame 
+  containing specific variables: \code{famID}, \code{indID}, \code{generation}, \code{gender}, \code{currentage}, \code{mgene}, \code{time}, \code{status} and \code{weight} with \code{attr(data,"agemin")} specified.
 }
 \item{design}{
-The study design of the family data. Possible choices are: \code{"pop"}, \code{"pop+"}, \code{"cli"}, \code{"cli+"} or \code{"twostage"}, where \code{"pop"} is for the population-based design with affected probands whose mutation status can be either carrier or non-carrier, \code{"pop+"} is similar to \code{"pop"} but with mutation carrier probands, \code{"cli"} is for the clinic-based design that includes affected probands with at least one parent and one sib affected, \code{"cli+"} is similar to \code{"cli"} but with mutation carrier probands, and \code{"twostage"} is for the two-stage design with oversampling of high risks families. Default is \code{"pop"}.
+Study design of the family data. Possible choices are: \code{"pop"}, \code{"pop+"}, \code{"cli"}, \code{"cli+"} or \code{"twostage"}, where \code{"pop"} is for the population-based design with affected probands whose mutation status can be either carrier or non-carrier, \code{"pop+"} is similar to \code{"pop"} but with mutation carrier probands, \code{"cli"} is for the clinic-based design that includes affected probands with at least one parent and one sib affected, \code{"cli+"} is similar to \code{"cli"} but with mutation carrier probands, and \code{"twostage"} is for the two-stage design with oversampling of high risks families. Default is \code{"pop"}.
 	}
  \item{base.dist}{
 Choice of baseline hazard distribution to fit. Possible choices are: \code{"Weibull"}, \code{"loglogistic", "Gompertz", "lognormal",} or \code{"gamma"}. Default is \code{"Weibull"}.
 }
+ \item{robust}{
+ 	Logical; if TRUE, use robust 'sandwich' standard errors and variance matrix, otherwise use conventional standard errors and variance matrix.
+ }
 
  \item{method}{
 Choice of methods for calculating the carrier probabilities for individuals with missing mutation status. Possible choices are \code{"data"} for empirical calculation of the carrier probabilities based on the observed carriers' statuses in the entire sample, specific to generation and proband's mutation status or \code{"mendelian"} for calculating carrier probabilities based on Mendelian transmission probabilies with the given allele frequency and mutation statuses observed in the family. Default is \code{"data"}.
@@ -62,27 +65,20 @@ These expectation and maximization steps iterate until convergence to obtain the
 
 See more details in Choi and Briollais (2011) or Choi et al. (2014).
 
+Transformed baseline parameters (\eqn{\lambda, \rho}) were used for estimation; see \code{\link{penmodel}} for details.
 }
 \value{
-An object of class \code{penmodel}, a list including elements
+Returns an object of class \code{'penmodel'}, including the following elements:
 
-\item{parms.est}{
-Parameter estimates of baseline parameters (\eqn{\lambda, \rho}) and regression coefficients for gender and mutation status (\eqn{\beta_s, \beta_g}) including their standard errors and also their robust standard errors.
+\item{coefficients}{
+Parameter estimates of transformed baseline parameters (\eqn{\lambda, \rho}) and regression coefficients for gender and mutation status (\eqn{\beta_s, \beta_g}) including their standard errors and also their robust standard errors.
 }
-
-\item{parms.cov}{
-Covariance matrix of parameter estimates.
+\item{varcov}{
+Variance covariance matrix of parameter estimates. If \code{robust=TRUE}, robust `sandwich' variance covariance matrix is returned.
 }
-\item{parms.se}{
-Standard errors of parameter estimates.
+\item{se}{
+Standard errors of parameter estimates. If \code{robust=TRUE}, robust `sandwich' standard errors are returned.
 }
-\item{parms.rcov}{
-Robust (sandwich) covariance matrix of parameter estimates.
-}
-\item{parms.rse}{
-Robust standard errors of parameter estimates.
-}
-
 \item{pen70.est}{
  Penetrance estimates by age 70 specific to gender and mutation-status subgroups.
 }
@@ -94,12 +90,13 @@ Robust standard errors of parameter estimates.
 }
 
 \item{ageonset}{
-	Vector of ages of onset ranging from \code{agemin} to 80 years.
+	Vector of ages of onset ranging from \code{agemin} to 90 years.
 }
-\item{pen.maleCarr}{Vector of penetrance estimates for male carriers from \code{agemin} to 80 years.}
-\item{pen.femaleCarr}{Vector of penetrance estimates for female carriers from \code{agemin} to 80 years.}
-\item{pen.maleNoncarr}{Vector of penetrance estimates for male non-carriers from \code{agemin} to 80 years.}
-\item{pen.femaleNoncarr}{Vector of penetrance estimates for female non-carriers from \code{agemin} to 80 years.}
+\item{pen.maleCarr}{Vector of penetrance estimates for male carriers from \code{agemin} to 90 years.}
+\item{pen.femaleCarr}{Vector of penetrance estimates for female carriers from \code{agemin} to 90 years.}
+\item{pen.maleNoncarr}{Vector of penetrance estimates for male non-carriers from \code{agemin} to 90 years.}
+\item{pen.femaleNoncarr}{Vector of penetrance estimates for female non-carriers from \code{agemin} to 90 years.}
+\item{logLik}{Loglikelihood value for the fitted penetrance model.}
 }
 \references{
 Choi, Y.-H. and Briollais, L. (2011) An EM composite likelihood approach for multistage sampling of family data with missing genetic covariates, Statistica Sinica 21, 231-253.
@@ -110,8 +107,9 @@ Choi, Y.-H., Briollais, L., Green, J., Parfrey, P., and Kopciuk, K. (2014) Estim
 Yun-Hee Choi
 }
 \seealso{
-\code{\link{simfam}}, \code{\link{penmodel}}, \code{link{summary.penmodel}}, 
-\code{\link{plot.penmodel}}, \code{\link{carrierprob}} 
+\code{\link{simfam}}, \code{\link{penmodel}},  \code{\link{print.penmodel}}, \code{\link{summary.penmodel}},  \code{\link{print.summary.penmodel}}, 
+
+\code{\link{plot.penmodel}},\code{\link{carrierprob}} 
 }
 
 \examples{
@@ -119,7 +117,7 @@ Yun-Hee Choi
 # Family data simulated with 30\% of members missing their genetic information.
 
 fam <- simfam(N.fam=100, design="pop+", base.dist="Weibull", base.parms=c(0.01,3),
-       vbeta=c(-1.13, 2.35, 0.5), agemin=20, allelefreq=0.02, mrate=0.3)
+       vbeta=c(-1.13, 2.35), agemin=20, allelefreq=0.02, mrate=0.3)
  
 # EM algorithm for fitting family data with missing genotypes
 
@@ -138,4 +136,4 @@ summary(fit)
 plot(fit)
 
 }
-\keyword{Penetrance}
+\keyword{Penetrance model}

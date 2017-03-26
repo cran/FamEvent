@@ -1,10 +1,15 @@
-import(MASS,truncnorm, survival, kinship2)
-export(simfam, summary.simfam, plot.simfam, penplot, penmodel, summary.penmodel, plot.penmodel, carrierprob, penmodelEM)
+import(MASS, truncnorm, survival, kinship2)
+export(simfam, summary.simfam, plot.simfam, penplot, penmodel, 
+print.penmodel, print.summary.penmodel, penci,penf,
+summary.penmodel,plot.penmodel, carrierprob, penmodelEM)
 S3method(summary, simfam)
 S3method(summary, penmodel)
 S3method(plot, simfam)
 S3method(plot, penmodel)
+S3method(print, penmodel)
+S3method(print, summary.penmodel)
 importFrom("grDevices", "dev.off")
 importFrom("graphics", "legend", "lines", "par", "plot", "title")
-importFrom("stats", "aggregate", "dgamma", "dnorm", "nlm", "pgamma",
-           "pnorm", "quantile", "rgamma", "rnorm", "runif", "uniroot", "var")
+importFrom("stats","symnum","coef","pt","aggregate", "dgamma", "dnorm", 
+	 "nlm", "pgamma",
+         "pnorm", "quantile", "rgamma", "rnorm", "runif", "uniroot", "var")
