@@ -13,9 +13,9 @@
 }
 \arguments{
   \item{x}{
-    An object class of 'summary.penmodel', a result of a call to \code{\link{summary.penmodel}}.}
+    An object class of \code{'summary.penmodel'}, a result of a call to \code{\link{summary.penmodel}}.}
   \item{digits}{Number of significant digits to use when printing.}
-  \item{signif.stars}{Logical; if TRUE, provides stars to hightlight significant p-values.}
+  \item{signif.stars}{Logical; if \code{TRUE}, provides stars to hightlight significant p-values. Default is \code{TRUE}.}
   \item{...}{Further arguments passed to or from other methods.}
 }
 
@@ -24,7 +24,7 @@ Prints a summary of parameter estimates, their standard errors, \eqn{t}-statisti
 
 Also prints penetrance estimates by age 70 specific to gender and mutation-status subgroups along with their standard errors and 95\% confidence intervals.
 
-Returns an object of class 'summary.penmodel'.
+Returns an object of class \code{'summary.penmodel'}.
 
 }
 \author{

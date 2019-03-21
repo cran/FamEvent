@@ -22,10 +22,8 @@ while (i <= n) {
 	   # At least one parent in first gen and two sibs in the second gen should be affected
      #[,7]=generation, [,6]=proband, [,13]=status
 	
-	if(affectnum==3) until <- ifelse(sum(dat[dat[,7]==1,13]) > 0 & sum(dat[dat[,7]==2,13]) > 1, TRUE, FALSE)
-	else if(affectnum==2) until <- ifelse(sum(dat[, 13]) >= affectnum, TRUE, FALSE)
-#	else if(affectnum==1) until <- ifelse(dat[dat[,6]==1,13] == 1, TRUE, FALSE)
-	else if(variation=="frailty") until <- ifelse( dat[dat[,6]==1,13] == 1, TRUE, FALSE) 
+	if(affectnum==3) until<- ifelse(sum(dat[dat[,7]==1,13]) >= 1 & sum(dat[dat[,7]==2,13]) > 1, TRUE, FALSE)
+	else if(variation=="frailty") until<- ifelse( dat[dat[,6]==1,13] > 0, TRUE, FALSE) 
 	else until <- TRUE
 	
 			if(!is.null(dim(dat))){

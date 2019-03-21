@@ -1,6 +1,6 @@
-import(MASS, truncnorm, survival, kinship2)
+import(survival)
 export(simfam, summary.simfam, plot.simfam, penplot, penmodel, 
-print.penmodel, print.summary.penmodel, penci,penf,
+print.penmodel, print.summary.penmodel, penetrance, fampower,
 summary.penmodel,plot.penmodel, carrierprob, penmodelEM)
 S3method(summary, simfam)
 S3method(summary, penmodel)
@@ -11,5 +11,15 @@ S3method(print, summary.penmodel)
 importFrom("grDevices", "dev.off")
 importFrom("graphics", "legend", "lines", "par", "plot", "title")
 importFrom("stats","symnum","coef","pt","aggregate", "dgamma", "dnorm", 
-	 "nlm", "pgamma",
-         "pnorm", "quantile", "rgamma", "rnorm", "runif", "uniroot", "var")
+	 "nlm", "pgamma", ".getXlevels", "model.extract", "model.matrix",
+   	 "optim", "qnorm", "sd", "terms", "pnorm", "quantile", "rgamma", 
+	 "rnorm", "runif", "uniroot", "var")
+importFrom(truncnorm, rtruncnorm)
+importFrom(eha, hpch)
+importFrom(eha, Hpch)
+importFrom(pracma,hessian)
+importFrom(pracma,jacobian)
+importFrom(kinship2, pedigree)
+importFrom(kinship2, pedigree.legend)
+importFrom(kinship2, plot.pedigree)
+importFrom(MASS, mvrnorm)

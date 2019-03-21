@@ -1,19 +1,15 @@
 # joint probability of genotype and phenotype
-cprob <- function(theta, data, mut, base.dist, agemin)
+cprob <- function(theta, X, y, delta, p, base.dist, cuts, nbase)
 {
 
-beta.sex <- theta[3]
-beta.gen <- theta[4]
+vbeta <- theta[-c(1:nbase)]  
+if(base.dist=="lognormal") etheta <-  c(theta[1], exp(theta[2]))
+else etheta <- exp(theta[1:nbase])
 
-xbeta <- beta.sex*data$gender+beta.gen*mut
+xbeta <- c(X%*%vbeta)
 
-y <- ifelse(data$time-agemin<0,0,data$time-agemin)
-delta <- data$status
-haz<-hazards(base.dist, y, theta)*exp(xbeta)
-Haz <-cumhaz(base.dist, y, theta)*exp(xbeta)
-
-if(mut==1) p <- data$carrp.geno
-else p <- 1-data$carrp.geno	
+haz <- hazards(base.dist, y, etheta, cuts)*exp(xbeta)
+Haz <- cumhaz(base.dist, y, etheta, cuts)*exp(xbeta)
 
 return((haz^delta)*exp(-Haz)*p)
 

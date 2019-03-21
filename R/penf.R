@@ -1,12 +1,19 @@
-penf <- function(est, age, sex, mut, base.dist="Weibull", frailty.dist=NULL, agemin){
-  if(base.dist=="lognormal") base.est <- c(est[1], exp(est[2]))
-  else base.est <- exp(est[1:2])
-  H <- cumhaz(base.dist, age-agemin, base.est)*exp(est[3]*sex+est[4]*mut) 
-  if(is.null(frailty.dist)) pen = 1-exp(-H)
-  else {
-    if(length(est)!=5) stop("length(est) should be 5.")
-    else pen = 1-laplace(dist=frailty.dist, g=H, k=est[5])
+penf <- function(est, x, age, base.dist="Weibull", frailty.dist=NULL, agemin=20, cuts=NULL){
+  nbase <- length(est)-length(x)
+  base.est <- exp(est[1:nbase])
+  if(base.dist=="lognormal") base.est[1] <- est[1] 
+  if(is.null(frailty.dist)){
+    xbeta <- sum(est[-c(1:nbase)]*x)
+    H <- cumhaz(base.dist, age-agemin, base.est, cuts=cuts)*exp(xbeta) 
+    pen <- 1-exp(-H)
   }
-  names(pen) <- NULL
+  else{    
+    k <- est[nbase+1]
+    xbeta <- sum(est[-c(1:(nbase+1))]*x)
+    H <- cumhaz(base.dist, age-agemin, base.est, cuts=cuts)*exp(xbeta) 
+    pen <- 1-laplace(dist=frailty.dist, g=H, k=k)
+  }
+#  names(pen) <- age
   return(pen)
 }
+

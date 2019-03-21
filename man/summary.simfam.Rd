@@ -39,20 +39,19 @@ Yun-Hee Choi
 \code{\link{simfam}}
 }
 \examples{
-fam <- simfam(N.fam=100, design="pop", variation="frailty", depend=1,
-       frailty.dist="gamma", base.dist="Weibull", base.parms=c(0.01, 3), 
-       vbeta=c(-1.13, 2.35))
+set.seed(4321)
+fam <- simfam(N.fam = 50, design = "pop", variation = "none", base.dist = "Weibull", 
+       base.parms = c(0.01, 3), vbeta = c(-1.13, 2.35))
        
 summary(fam)
 \dontrun{
 Study design:                           pop 
 Baseline distribution:                  Weibull 
-Frailty distribution:                   gamma 
-Number of families:                     100 
-Average number of affected per family:  1.28 
-Average number of carriers per family:  2.3 
-Average family size:                    16.02 
-Average age of onset for affected:      39.73 
+Number of families:                     50 
+Average number of affected per family:  1.24 
+Average number of carriers per family:  1.3 
+Average family size:                    17.02 
+Average age of onset for affected:      40.08 
 Sampling weights used:                  1
 }
 

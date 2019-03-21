@@ -5,17 +5,17 @@
 Print method for \code{penmodel}.
 }
 \description{
- Prints a summary of parameter and penetrance estimates of a fitted penetrance model.
+ Prints a summary of parameter estimates of a fitted penetrance model.
 }
 \usage{
 \method{print}{penmodel}(x, digits = max(3, getOption("digits") - 3), \ldots)
 }
 \arguments{
   \item{x}{
-An object class of \code{penmodel}, a fitted model by \code{\link{penmodel}} or \code{\link{penmodelEM}} functions.
+An object class of \code{'penmodel'}, a fitted model by \code{\link{penmodel}} or \code{\link{penmodelEM}} functions.
 }
- \item{digits}{the number of significant digits to use when printing.}
- \item{...}{further arguments passed to or from other methods.}
+ \item{digits}{Number of significant digits to use when printing.}
+ \item{...}{Further arguments passed to or from other methods.}
 }
 \value{
 Prints a short summary of the model and model fit.

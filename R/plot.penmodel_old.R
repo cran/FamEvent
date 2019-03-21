@@ -12,9 +12,6 @@ plot.penmodel <- function(x, agemax=80, print=TRUE, mark.time=FALSE, conf.int=FA
   nbase <- attr(x, "nbase")
   cuts <- attr(x, "cuts")
   formula <- attr(x, "formula")
-  Y <- attr(x, "Y")
-  X <- attr(x, "X")
-  
   parms <- exp(x$estimates[1:nbase])
   if(base.dist=="lognormal") parms[1] <- x$estimates[1]
   vbeta <- x$estimates[-c(1:nbase)]
@@ -25,16 +22,9 @@ plot.penmodel <- function(x, agemax=80, print=TRUE, mark.time=FALSE, conf.int=FA
 
  penest<-t(penout$pen)
 
-# if((length(vbeta) > 2) & add.KM) {
-#   warning("Interaction terms are not valid with KM curves.") 
-#   add.KM <- FALSE
-# }
-
-
-  if(add.KM){
+ if(add.KM){
    data <- attr(x, "data")
-   if(length(vbeta) > 2) sfit <- survfit(Y[data$proband==0,]~X[data$proband==0,1]+X[data$proband==0,2])
-   else sfit <- survfit(formula, data=data[data$proband==0,])
+   sfit <- survfit(formula, data=data[data$proband==0,])
    lines(sfit, fun="event", mark.time=TRUE, conf.int=FALSE, col=col[c(4,2,3,1)], lty=lty[c(4,2,3,1)], ...)
  }
  if(conf.int){

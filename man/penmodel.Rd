@@ -1,82 +1,78 @@
 \name{penmodel}
 \alias{penmodel}
-\title{Estimate the penetrance model and penetrance curves}
+\title{Fit a penetrance model}
 \description{
-Fits a penetrance model for family data based on a prospective likelihood with ascertainment correction and provides parameter estimates as well as the gender- and mutation-specific penetrance estimates. 
+Fits a penetrance model for family data based on a prospective likelihood with ascertainment correction and provides model parameter estimates. 
 }
 \usage{
-penmodel(parms, vbeta, data, design="pop", base.dist="Weibull", robust=FALSE)
-
+penmodel(formula, cluster = "famID", gvar = "mgene", parms, cuts = NULL, data, 
+design = "pop", base.dist = "Weibull", agemin = NULL, robust = FALSE)
 }
 \arguments{
-  \item{parms}{
-Vector of initial values for baseline parameters.
-\code{parms=c(lambda, rho)}, where lambda and rho are the initial values for the scale and shape parameters, respectively. For the \code{"lognormal"} baseline distribution, \code{rho} > 0; for the other baselinse distributions, \code{lambda} > 0 and \code{rho} > 0.
+\item{formula}{A formula expression as for other regression models. The response should be a survival object as returned by the \code{Surv} function. See the documentation for \code{Surv}, \code{lm} and \code{formula} for details.
 }
-\item{vbeta}{
- Vector of initial values for regression coefficients for gender and majorgene;
- \code{vbeta=c(beta.s, beta.g)}.   
+\item{cluster}{
+Name of cluster variable. Default is \code{"famID"}.
+}
+\item{gvar}{Name of genetic variable. Default is \code{"mgene"}.}
+\item{parms}{
+Vector of initial values for the parameters in the model including baseline parameters and regression coefficients. \code{parms = c(baseparm, coef)}, where \code{baseparm} includes the initial values for baseline parameters used for \code{base.dist}, and \code{coef} includes the initial values for regression coefficients for the variables specified in \code{formula}. See details for the baseline parameters.
+}
+\item{cuts}{ 
+Vector of cut points that define the intervals where the hazard function is constant. The \code{cuts} should be specified when \code{base.dist="piecewise"} and must be strictly positive and finite. Default is \code{NULL}.
 }
 \item{data}{
-  Data frame generated from \code{\link{simfam}} or data frame 
-  containing specific variables: \code{famID}, \code{indID}, \code{generation}, \code{gender}, \code{currentage}, \code{mgene}, \code{time}, \code{status} and \code{weight} with \code{attr(data,"agemin")} specified.
+ Data frame generated from \code{\link{simfam}} or data frame containing variables named in the \code{formula} and specific variables: \code{famID}, \code{indID}, \code{gender}, \code{currentage}, \code{mgene}, \code{time}, \code{status} and \code{weight} with \code{attr(data,"agemin")} specified.
 }
 \item{design}{
 Study design of the family data.  Possible choices are: \code{"pop", "pop+", "cli"}, \code{"cli+"} or \code{"twostage"}, where \code{"pop"} is for the population-based design with affected probands whose mutation status can be either carrier or non-carrier, \code{"pop+"} is similar to \code{"pop"} but with mutation carrier probands, \code{"cli"} is for the clinic-based design that includes affected probands with at least one parent and one sib affected, \code{"cli+"} is similar to \code{"cli"} but with mutation carrier probands, and \code{"twostage"} is for the two-stage design with oversampling of high risks families. Default is \code{"pop"}.
 	}
  \item{base.dist}{
-Choice of baseline hazard distribution to fit. Possible choices are: \code{"Weibull"}, \code{"loglogistic"}, \code{"Gompertz"}, \code{"lognormal",} or \code{"gamma"}. Default is \code{"Weibull"}.
+Choice of baseline hazard distributions to fit. Possible choices are: \code{"Weibull"}, \code{"loglogistic"}, \code{"Gompertz"}, \code{"lognormal"}, \code{"gamma"}, \code{"logBurr"}, or \code{"piecewise"}. Default is \code{"Weibull"}.
 }
- \item{robust}{
- 	Logical; if TRUE, use robust `sandwich' standard errors and variance covariance matrix, otherwise use conventional standard errors and variance covariance matrix.
- }
-
+\item{agemin}{
+Minimum age of disease onset or minimum age. Default is \code{NULL}.
+}
+\item{robust}{
+Logical; if \code{TRUE}, the robust `sandwich' standard errors and variance-covariance matrix are provided, otherwise the conventional standard errors and variance-covariance matrix are provided.
+}
 }
 \details{
+The penetrance model is fitted to family data with a specified baseline hazard distribution, 
+\ifelse{html}{ \out{<center> h(t|x<sub>s</sub>, x<sub>g</sub>) = h<sub>0</sub>(t - t<sub>0</sub>)  exp(&beta;<sub>s</sub> * x<sub>s</sub> + &beta;<sub>g</sub> * x<sub>g</sub>) , </center>}}{ \deqn{ h(t|x_s, x_g) = h_0(t - t_0) \exp(\beta_s x_s+\beta_g x_g) ,}{ h(g|xs, xg) = h0(t - t0) * Z * exp(beta.s * xs + beta.g * xg) ,}}
+where \ifelse{html}{\out{h<sub>0</sub>(t)}}{\eqn{h_0(t)}{h0(t)}} is the baseline hazards function specified by \code{base.dist}, which depends on the shape and scale parameters, \ifelse{html}{\out{&lambda;}}{\eqn{\lambda}{lambda}} and \ifelse{html}{\out{&rho;}}{\eqn{\rho}{rho}}; \ifelse{html}{\out{x<sub>s</sub>}}{\eqn{x_s}{xs}} indicates male (1) and female (0) and \ifelse{html}{\out{x<sub>g</sub>}}{\eqn{x_g}{xg}} indicates carrier (1) or non-carrier (0) of a gene of interest (major gene). Additional covariates can be added to \code{formula} in the model.
 
-The penetrance model is fitted to family data with a specified baseline hazard distribution,
-\deqn{ h(t|x_s, x_g) = h_0(t) \exp(\beta_s x_s+\beta_g x_g) }
-where \eqn{h_0(t)} is the baseline hazards function specified by \code{base.dist}, which depends on the shape and scale parameters, \eqn{\lambda} and \eqn{\rho}; \eqn{x_s} indicates male (1) and female (0) and \eqn{x_g} indicates carrier (1) or non-carrier (0) of a gene of interest (major gene).
+For family data arising from population- or clinic-based study designs (\code{design="pop", "pop+"}, \code{"cli"}, or \code{"cli+"}), the parameters of the penetrance model are estimated using the ascertainment-corrected prospective likelihood approach (Choi, Kopciuk and Briollais, 2008).
 
-For family data arising from population- or clinic-based study designs (\code{design="pop", "pop+"}, \code{"cli"}, or \code{"cli+"}), the parameters of the penetrance model are estimated from the ascertainment-corrected prospective likelihood approach (Choi, Kopciuk and Briollais, 2008).
+For family data arising from a two-stage study design (\code{design="twostage"}), model parameters are estimated  using the composite likelihood approach (Choi and Briollais, 2011)
 
-For family data arising from a two-stage study design (\code{design="twostage"}), model parameters are estimated based on the composite likelihood approach (Choi and Briollais, 2011)
+Note that the baseline parameters include \code{lambda} and \code{rho}, which represent the scale and shape parameters, respectively, and \code{eta}, additional parameter to specify for \code{"logBurr"} distribution. For the \code{"lognormal"} baseline distribution, \code{lambda} and \code{rho} represent the location and scale parameters for the normally distributed logarithm, where \code{lambda} can take any real values and \code{rho} > 0. For the other baselinse distributions, \code{lambda} > 0, \code{rho} > 0, and \code{eta} > 0. When a piecewise constant distribution is specified for the baseline hazards, \code{base.dist="piecewise"}, \code{baseparm} should specify the initial interval-constant values, one more than the cut points specified by\code{cuts}.
 
-Transformed baseline parameters (\eqn{\lambda, \rho}) were used for estimation; log tranformation was applied to both scale and shape parameters for \code{"Weibull"}, \code{"loglogistic"}, \code{"Gompertz"} and \code{"gamma"} baseline distributions. For \code{"lognormal"} baseline distribution, the log transformation was applied only to shape parameter \eqn{\rho}, not to \eqn{\lambda} which represents the location parameter in log-normal distribution.
+Transformed baseline parameters are used for estimation; log transformation is applied to both scale and shape parameters (\eqn{\lambda, \rho}) for \code{"Weibull"}, \code{"loglogistic"}, \code{"Gompertz"} and \code{"gamma"} baselines, to (\eqn{\lambda, \rho, \eta}) for \code{"logBurr"} and to the piecewise constant parameters for a \code{piecewise} baseline hazard. For \code{"lognormal"} baseline distribution, the log transformation is applied only to \eqn{\rho}, not to \eqn{\lambda}, which represents the location parameter for the normally distributed logarithm.
 
-Calculations of standard errors and 95\% confidence intervals for penetrance estimates by age 70 were based on the penetrances obtained from 1000 Monte-Carlo simulations of the estimated penetrance model; for more details, see \code{\link{penci}}.
+Calculations of penetrance estimates and their standard errors and 95\% confidence intervals at given ages can be obtained by \code{\link{penetrance}} function via Monte-Carlo simulations of the estimated penetrance model.
 
 }
 \value{
 Returns an object of class \code{'penmodel'}, including the following elements:
 
-\item{coefficients}{
-Parameter estimates of transformed baseline parameters (\eqn{\lambda, \rho}) and regression coefficients for gender and mutation status (\eqn{\beta_s, \beta_g}).
+\item{estimates}{
+Parameter estimates of transformed baseline parameters and regression coefficients.
 }
 \item{varcov}{
-Variance covariance matrix of parameter estimates. If \code{robust=TRUE}, robust `sandwich' variance covariance matrix is returned.
+Variance-covariance matrix of parameter estimates obtained from the inverse of Hessian matrix. 
+}
+\item{varcov.robust}{
+Robust `sandwich' variance-covariance matrix of parameter estimates when \code{robust=TRUE}. 
 }
 \item{se}{
-Standard errors of parameter estimates. If \code{robust=TRUE}, robust 'sandwich' standard errors are returned.
+Standard errors of parameter estimates obtained from the inverse of Hessian matrix.
 }
-\item{pen70.est}{
- Penetrance estimates by age 70 specific to gender and mutation-status subgroups.
+\item{se.robust}{
+Robust `sandwich' standard errors of parameter estimates when \code{robust=TRUE}.
 }
-\item{pen70.se}{
- Standard errors of penetrance estimates by age 70  specific to gender and mutation-status subgroups. 
-}
-\item{pen70.ci}{
- 95\% confidence interval for penetrance estimates by age 70 specific to gender and mutation-status subgroups. 
-}
-
-\item{ageonset}{
-	Vector of ages of onset ranging from \code{agemin} to 90 years.
-}
-\item{pen.maleCarr}{Vector of penetrance estimates for male carriers from \code{agemin} to 90 years.}
-\item{pen.femaleCarr}{Vector of penetrance estimates for female carriers from \code{agemin} to 90 years.}
-\item{pen.maleNonCarr}{Vector of penetrance estimates for male non-carriers from \code{agemin} to 90 years.}
-\item{pen.femaleNonCarr}{Vector of penetrance estimates for female non-carriers from \code{agemin} to 90 years.}
 \item{logLik}{Loglikelihood value for the fitted penetrance model.}
+\item{AIC}{Akaike information criterion (AIC) value of the model; AIC = 2*k - 2*logLik, where k is the number of parameters used in the model.}
 }
 \references{
 Choi, Y.-H., Kopciuk, K. and Briollais, L. (2008) Estimating Disease Risk Associated Mutated Genes in Family-Based Designs, Human Heredity 66, 238-251
@@ -87,30 +83,30 @@ Choi, Y.-H. and Briollais (2011) An EM Composite Likelihood Approach for Multist
 Yun-Hee Choi
 }
 \seealso{
-\code{\link{penmodelEM}, \link{simfam}, \link{penplot}, \link{print.penmodel},\link{summary.penmodel},}
-
-\code{\link{print.summary.penmodel}, \link{plot.penmodel}, \link{penci}, \link{penf}} 
+\code{\link{penmodelEM}}, \code{\link{simfam}}, \code{\link{penplot}}, \code{\link{print.penmodel}},
+\code{\link{summary.penmodel}}, \code{\link{print.summary.penmodel}}, \code{\link{plot.penmodel}}
 }
 \examples{
 
 # Family data simulated from population-based design using a Weibull baseline hazard 
 
-fam <- simfam(N.fam=300, design="pop+", variation="none", base.dist="Weibull", 
-       base.parms=c(0.01,3), vbeta=c(-1.13, 2.35), agemin=20, allelefreq=0.02)
+set.seed(4321)
+fam <- simfam(N.fam = 200, design = "pop+", variation = "none", base.dist = "Weibull", 
+       base.parms = c(0.01, 3), vbeta = c(-1.13, 2.35), agemin = 20, allelefreq = 0.02)
  
 # Penetrance model fit for simulated family data
 
-fit <- penmodel(parms=c(0.01, 3), vbeta=c(-1.13, 2.35), data=fam, 
-       design="pop+", base.dist="Weibull")
+fit <- penmodel(Surv(time, status) ~ gender + mgene, cluster = "famID", design = "pop+",
+       parms = c(0.01, 3, -1.13, 2.35), data = fam, base.dist = "Weibull")
 
-# Summary of the model parameter and penetrance estimates from model fit
+# Summary of the model parameter estimates from the model fit
 
 summary(fit)
 
-# Generate the lifetime penetrance curves from model fit for specific gender and 
-# mutation status groups along with their non-parametric penetrance curves 
-     
-plot(fit)
+# Plot the lifetime penetrance curves with 95% CIs from the model fit for specific  
+# gender and mutation status groups along with their nonparametric penetrance curves  
+# based on data excluding probands. 
 
+plot(fit, add.KM = TRUE, conf.int = TRUE, MC = 100)
 }
 \keyword{Penetrance model}

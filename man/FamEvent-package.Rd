@@ -52,20 +52,16 @@ Choi, Y.-H. and Briollais (2011) An EM Composite Likelihood Approach for Multist
 }
 \keyword{ package }
 \seealso{
-\code{\link{simfam}, \link{summary.simfam}, \link{plot.simfam}, \link{penplot},\link{carrierprob},}
-	
-\code{\link{penmodel},  \link{penmodelEM}, \link{print.penmodel}, \link{summary.penmodel},}
-
-\code{\link{print.summary.penmodel}, \link{plot.penmodel}} 
-
-
+\code{\link{simfam}}, \code{\link{summary.simfam}}, \code{\link{plot.simfam}}, \code{\link{penplot}}, \code{\link{carrierprob}}, \code{\link{penmodel}}, \code{\link{penmodelEM}}, 
+\code{\link{print.penmodel}}, \code{\link{summary.penmodel}},\code{\link{print.summary.penmodel}}, \code{\link{plot.penmodel}} 
 }
 \examples{
 
 #  Simulate family data 
 
-fam <- simfam(N.fam=100, design="pop+", variation="none", base.dist="Weibull", 
-       base.parms=c(0.01, 3), vbeta=c(-1.13, 2.35), allelefreq=0.02)
+set.seed(4321)
+fam <- simfam(N.fam = 100, design = "pop+", variation = "none", base.dist = "Weibull", 
+       base.parms = c(0.01, 3), vbeta = c(-1.13, 2.35), allelefreq = 0.02)
 
 # summary of simulated family data
 
@@ -73,17 +69,18 @@ summary(fam)
 
 # Pedigree plots for family 1 and 2
 
-plot(fam, famid=c(1,2))
+plot(fam, famid = c(1,2))
 
 # penetrance function plots given model parameter values for Weibull baseline 
 
-penplot(base.parms=c(0.01,3), vbeta=c(-1.3, 2.35), base.dist="Weibull", 
-        variation="none", agemin=20)
+penplot(base.parms = c(0.01, 3), vbeta = c(-1.3, 2.35), base.dist = "Weibull", 
+        variation = "none", agemin = 20)
 
 # model fit of family data 
 
-fit <- penmodel(parms=c(0.01, 3), vbeta=c(-1.13, 2.35), data=fam, 
-       design="pop+", base.dist="Weibull")
+fit <- penmodel(Surv(time, status) ~ gender + mgene, cluster = "famID", design = "pop+",
+       parms=c(0.01, 3, -1.13, 2.35), data = fam, base.dist = "Weibull", robust = TRUE)
+
 
 # summary of estimated model parameters and penetrance estimates 
 

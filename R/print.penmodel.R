@@ -8,11 +8,9 @@ print.penmodel <- function (x, digits = max(3, getOption("digits") - 3), ...)
       attr(x,"base.dist"), "baseline distribution \n")
   cat("Minimum age at onset used: ", attr(x, "agemin"))
   cat("\n")
-  cat("\nCoefficients: \n")
-  print(x$coefficients)
+  cat("\nEstimates: \n")
+  print(x$estimates)
   if(attr(x, "robust")) cat("Robust standard errors was obtained. \n")
-  cat("\nPenetrance (%) by age 70: \n")
-  print(x$pen70.est)
   invisible(x)
 
 }

@@ -25,32 +25,45 @@ carrierprobpheno <- function(method="data", fit=NULL, data, mode="dominant", q=0
     }
   }  # close for method=="data"
   else if(method=="model"){
-    if(is.null(fit)) stop("fit has to be specified.")
-    theta <- fit$parms.est 
+    if(is.null(fit)) stop("fit should be specified.")
+    theta <- fit$estimates 
     base.dist <- attr(fit, "base.dist")
     agemin <- attr(fit, "agemin")
+    nbase <- attr(fit, "nbase")
+    cuts <- attr(fit, "cuts")
+    formula <- attr(fit, "formula")
+    gvar <- attr(fit, "gvar")
+    
+    Y <- attr(fit, "Y")
+    X <- attr(fit, "X")
+    var.names <- colnames(X)
+    
+    X0 <- X1 <- X
+    X0[, gvar] <- 0
+    X1[, gvar] <- 1
+    xbeta <- c(X%*%theta[-c(1:nbase)])
+    xbeta0 <- c(X0%*%theta[-c(1:nbase)])
+    xbeta1 <- c(X1%*%theta[-c(1:nbase)])
+    
+    time0 <- Y[,1] - agemin
+    cuts0 <- cuts - agemin
+    status <- Y[,2]
+    
+    parms <- exp(theta[1:nbase])
+    if(base.dist=="lognormal") parms[1] <- theta[1]
 
-    beta.sex <- theta[3]
-    beta.gen <- theta[4]
-    xbeta1 <- beta.sex*data$gender+beta.gen*1
-    xbeta0 <- beta.sex*data$gender+beta.gen*0
-    y <- data$time-agemin
-    delta <- data$status
-    haz <-hazards(base.dist, y, theta)
-    Haz <-cumhaz(base.dist, y, theta)
-    haz1 <- haz*exp(xbeta1)
-    haz0 <- haz*exp(xbeta0)
-    Haz1 <- Haz*exp(xbeta1)
-    Haz0 <- Haz*exp(xbeta0)
-    p <- data$carrp.geno
-    if(is.null(p)) {
-      p <- carrierprobgeno(data=data, method="data", mode=mode, q=q)$carrp.geno
-      data$carrp.geno <- p
+    p.geno <- data$carrp.geno
+    if(is.null(p.geno)) {
+      p.geno <- carrierprobgeno(data=data, method="mendelian", mode=mode, q=q)$carrp.geno
+      data$carrp.geno <- p.geno
     }
-    p1 <- (haz1^delta)*exp(-Haz1)*p
-    p0 <- (haz0^delta)*exp(-Haz0)*(1-p)
-    carrp <- p1/(p1+p0)
+    
+    p1 <- cprob(theta, X1, time0, status, p=p.geno, base.dist=base.dist, cuts=cuts0, nbase=nbase)
+    p0 <- cprob(theta, X0, time0, status, p=1-p.geno, base.dist=base.dist, cuts=cuts0, nbase=nbase)
+    carrp <- p1/(p1+p0) #P(x=1|Xp, y)=P(y|x=1)*P(x=1|Xp)/(p1+p0) for EM
+    
     carrp[!is.na(data$mgene)] <- data$mgene[!is.na(data$mgene)]
+    
   } # close for method=="model
 
   carrp[is.na(carrp)] <- 0

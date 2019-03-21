@@ -1,10 +1,9 @@
 familyStructure <-
-function (i, cumind=cumind, m.carrier=1, depend=1, parms=c(0.016, 3), 
-			base.dist="Weibull", frailty.dist="gamma",
+function (i, cumind=cumind, m.carrier=1, interaction=TRUE, depend=1, parms=c(0.016, 3), base.dist="Weibull", frailty.dist="gamma",
             vbeta=c(-1.13, 2.35, 0.5), dominant.m=TRUE, dominant.s= TRUE, 
             variation="secondgene", allelefreq= c(0.02, 0.2), mrate=0, 
-            age1=c(65,2.5), age2=c(45,2.5), agemin=20)
-    {
+            probandage=c(45,1.5), agemin=20, agemax=100)
+{
     
 tmpdata<-numeric()
 indID<-c(cumind+1,cumind+2)
@@ -28,13 +27,13 @@ SecNum<-length(tmpgender)
     
 if (SecNum > 0) { ## at least one sample in second generation
       
-  tmpproband<-sample(SecNum,1,replace=TRUE)
+  #tmpproband <- 1 # sample(SecNum,1,replace=TRUE)
       
   NumMem<-2*SecNum+cumind+2
       
   for (j in 1:SecNum) {
         
-    if (j==tmpproband){ 
+    if (j==1){ # first one is assigned as the proband
       proband <- c(proband, c(1,0))
       relation <- c(relation, c(1,6))
     }
@@ -51,13 +50,13 @@ if (SecNum > 0) { ## at least one sample in second generation
      
     generation<-c(generation, c(2,0)) 
         
-    ThiNum<-sample(c(2,3,4,5), 1, replace=TRUE,prob=c(0.4991, 0.2720, 0.1482, 0.0807)) 
-        
+    ThiNum<-sample(c(2,3,4,5), 1, replace=TRUE, prob=c(0.4991, 0.2720, 0.1482, 0.0807)) 
+      
     for (k in 1:ThiNum) {
       proband<-c(proband,0)
       indID<- c(indID, NumMem+k)
       
-      if(j==tmpproband) relation <- c(relation, 3)
+      if(j==1) relation <- c(relation, 3)
       else relation <- c(relation, 5)
       
       if (gender[indID==(2*j+cumind+1)]==0) {
@@ -73,6 +72,7 @@ if (SecNum > 0) { ## at least one sample in second generation
       generation<-c(generation, 3)           
       }#Close for for(k in 1:ThiNum)
         NumMem<-NumMem+ThiNum  
+        
     } #Close for  for (j in 1:SecNum)
       
   nIndi <- length(indID)     
@@ -99,28 +99,28 @@ if (SecNum > 0) { ## at least one sample in second generation
   
 
   #------------------------------------------------------------------------------
-
   ###  Generating the current age
   # First generation with default mean 65 and sd=2.5; Second gen with default mean 45 and sd=2.5; third gene has mean age difference of 20 with their parents and sd=1
   #Probands age generated with truncated normal
-      
+  
+  prob.age <- rtruncnorm(1,a=agemin, b=agemax, mean=probandage[1], sd=probandage[2])    
+  
   genepos<-pos[generation==1]
-  censorage[genepos]<- rnorm(length(genepos), mean=age1[1], sd=age1[2])
+  censorage[genepos]<- rnorm(length(genepos), mean=prob.age+20, sd=1.5)
   min.page1<- min(censorage[genepos])
-  if(min.page1 < agemin) stop("agemin is too large.")
-  genepos<-pos[generation==0]
-  censorage[genepos]<- rnorm(length(genepos), mean=age2[1], sd=age2[2])
+#  if(min.page1 < agemin) stop("agemin is set too large.")
+  genepos<-pos[generation==0] #spouse 
+  censorage[genepos]<- rnorm(length(genepos), mean=probandage[1], sd=probandage[2])
   genepos<-pos[generation==2] 
+   
   for (j in 1:length(genepos)) {
-    tmp<-rtruncnorm(1,a=agemin,b=min.page1-14, mean=age2[1]-j, sd=age2[2])
-    censorage[genepos[j]]<- tmp
-    #min.page2 <- min( c(tmp, censorage[generation==0]) )
-    #if(min.page2 < agemin) stop("agemin is too large.")
+    if(j==1) censorage[genepos[1]] <- prob.age
+    else censorage[genepos[j]] <- rtruncnorm(1,a=agemin,b=min.page1-14, mean=prob.age[1]-j-1, sd=1.5)
     sonpos<-pos[fatherID==indID[genepos[j]] | motherID==indID[genepos[j]]]
     min.page2 <- min(censorage[indID==fatherID[sonpos[1]] | indID==motherID[sonpos[1]]])
     #if(min.page2 < agemin) stop("agemin is too large.")
     for (k in 1:length(sonpos)) {
-      #censorage[sonpos[k]]<- rtruncnorm(1,a=agemin, b=min.page2, mean=min.page2-20-k, sd=1)
+      #censorage[sonpos[k]]<- rtruncnorm(1,a=agemin, b=min.page2, mean=min.page2-20-k, sd=1.5)
       censorage[sonpos[k]]<- rnorm(1,mean=min.page2-20-k, sd=1.5)      
       }#Close for for(k in 1:length(sonpos))
     }#Close for for (j in 1:length(genepos))
@@ -134,22 +134,18 @@ if (SecNum > 0) { ## at least one sample in second generation
   G <- cbind(AAq, Aaq, aaq)
       
   #----------------------------------------------------------------------------
-      
   ## For generating genotypes, we first generate the proband's genotype and based on that, we generate other family members' genotypes
       
   # Generate proband's genotype given its age at onset and gender
   prob.age <- censorage[proband==1] # proband's current age
   prob.sex <- gender[proband==1]
-  # probID <- indID[proband==1] # proband's ID
-  
-  pGene <- fgene(base.dist, affage=prob.age-agemin, affsex=prob.sex, variation=variation, parms=parms, vbeta=vbeta, alpha=alpha, pg=0, m.carrier=m.carrier, dominant.m=dominant.m, aq = allelefreq)
-   #------------------------------------------------------------------------------ 
+  pGene <- fgene(base.dist, frailty.dist, depend=depend, affage=prob.age-agemin, affsex=prob.sex, interaction=interaction, variation=variation, parms=parms, vbeta=vbeta, alpha=alpha, pg=0, m.carrier=m.carrier, dominant.m=dominant.m, aq = allelefreq)
+  #------------------------------------------------------------------------------ 
      
   if(variation=="secondgene") ngene <- c(1,2)
   else  ngene <- 1
       
   for(g in ngene){
-    #disgene <- rep(0, nIndi)
       if( m.carrier==1 & g==1) {
         if(dominant.m) gg <- 1:2
         else gg <- 1
@@ -181,7 +177,6 @@ if (SecNum > 0) { ## at least one sample in second generation
     }#close for for(g in ngene)
       
   #------------------------------------------------------------------------------
-      
   # genotypes of first and second gene for generation=0 which is founder by random selection among AA, Aa, aa 
   disgene.m[generation==0] <- sample(c(1,2,3), sum(generation==0), replace=TRUE, prob=G[1,] )
   
@@ -195,11 +190,9 @@ if (SecNum > 0) { ## at least one sample in second generation
     f.g <- disgene.m[indID==fatherID[indID==i]]
         
     disgene.m[indID==i] <- kids.g(1, c(m.g, f.g) )
-#    ParentsG.m[indID==i] <- 3*(m.g-1)+f.g
-        
+
     if(variation=="secondgene"){
-      disgene.s[indID==i] <- kids.g(1, c(disgene.s[indID==motherID[indID==i]],
-                                    disgene.s[indID==fatherID[indID==i]]))
+      disgene.s[indID==i] <- kids.g(1, c(disgene.s[indID==motherID[indID==i]], disgene.s[indID==fatherID[indID==i]]))
       }
     }#Close for for(i in indID[generation==3])
       
@@ -217,56 +210,47 @@ if (SecNum > 0) { ## at least one sample in second generation
   else secondgene <- rep(0, nIndi)
       
   #------------------------------------------------------------------------------
-  ## simulate the age at on set for the family member: each generation may have different frailty, so simulated seperately.
+  ## simulate the age at onset for the family member: each generation may have different frailty, so simulated seperately.
       
-  vbeta1<-vbeta[1]   ## log relative risk of the gender effect
-  vbeta2<-vbeta[2]   ## log relative risk of the major gene
-      
+
+  if(variation=="secondgene"){
+    if(interaction) x <- cbind(gender, majorgene, gender*majorgene, secondgene)
+    else x <- cbind(gender, majorgene, secondgene)
+  }
+  else if(interaction) x <- cbind(gender, majorgene, gender*majorgene)
+  else   x <- cbind(gender, majorgene)
+  
+  xbeta <- c(x %*% vbeta)
+  
   # gen3 = generation 1,2,3   
   gen3 <- ifelse(generation==2 | generation==0, 2, ifelse(generation==1, 1,3))
   affected <- (proband==1)
 
-      if(variation=="secondgene"){
-        vbeta3<-vbeta[3]   ## log relative risk of the second gene
-        
-        ## generate ageonset for affected ones
-        genepos <- pos[proband==1]
-        xvbeta <- gender[genepos]*vbeta1 + majorgene[genepos]*vbeta2 + secondgene[genepos]*vbeta3
-        affage <- censorage[genepos]
-        affage.min <- ifelse(affage>agemin, affage-agemin, 0)
-#        S.p <- surv.dist(base.dist, affage.min, parms, xvbeta, alpha, res=0)
-        uni <- runif(length(genepos), 0,1)
- 		ageonset[genepos] <- apply(cbind(xvbeta,affage.min, uni), 1, inv.survp, base.dist=base.dist, parms=parms, alpha=alpha)
-            
-        ## generate ageonset for non-affected ones
-        genepos <- pos[proband==0]
-        xvbeta <- gender[genepos]*vbeta1 + majorgene[genepos]*vbeta2 + secondgene[genepos]*vbeta3
-        uni <- runif(length(genepos), 0, 1)
- 		ageonset[genepos] <- apply(cbind(xvbeta,uni), 1, inv.surv, base.dist=base.dist, parms=parms, alpha=alpha)
-      }  #close for if variation="secondgene"
-      else{ # without secondgene
-       
-        ## generate ageonset for probands
-        genepos <- pos[proband==1]
-        xvbeta <- gender[genepos]*vbeta1 + majorgene[genepos]*vbeta2  
-        affage <- censorage[genepos]
-        affage.min <- ifelse(affage > agemin, affage-agemin, 0)
-#        S.p <- surv.dist(base.dist, t=affage.min, parms, xvbeta, alpha, res=0)
-        uni <- runif(length(genepos), 0, 1)
-        ageonset[genepos] <- apply(cbind(xvbeta,affage.min, uni), 1, inv.survp, base.dist=base.dist, parms=parms, alpha=alpha)
-        
-# 		ageonset[genepos] <- apply(cbind(xvbeta,uni), 1, inv.surv, base.dist=base.dist, parms=parms, alpha=alpha)
-        ## generate ageonset for non-affected ones
-        genepos <- pos[proband==0]
-        xvbeta <- gender[genepos]*vbeta1 + majorgene[genepos]*vbeta2  
-        uni <- runif(length(genepos), 0,1)
- 		ageonset[genepos] <- apply(cbind(xvbeta,uni), 1, inv.surv, base.dist=base.dist, parms=parms, alpha=alpha)
-
- 		 }  
-     
+  #------------------------------------------------------------------------------
+  if(variation == "frailty"){
+#  if(TRUE){
+    uni <- runif(nIndi, 0, 1)
+    ageonset <- apply(cbind(xbeta,uni), 1, inv.surv, base.dist=base.dist, parms=parms, alpha=alpha)
+  }
+  else{
+  ## generating ageonsets for probands
+   genepos <- pos[proband==1]
+   xvbeta <- xbeta[genepos]
+   affage <- censorage[genepos]
+   affage.min <- ifelse(affage>agemin, affage-agemin, 0)
+   uni <- runif(length(genepos), 0,1)
+   ageonset[genepos] <- apply(cbind(xvbeta,affage.min, uni), 1, inv.survp, base.dist=base.dist, parms=parms, alpha=alpha)
+  
+  ## generate ageonset for non-affected ones
+   genepos <- pos[proband==0]
+   xvbeta <- xbeta[genepos]
+   uni <- runif(length(genepos), 0, 1)
+   ageonset[genepos] <- apply(cbind(xvbeta,uni), 1, inv.surv, base.dist=base.dist, parms=parms, alpha=alpha)
+  }
+  
   ageonset <- ageonset+agemin
-  currentage<- ifelse(censorage>100, 100, censorage)
-  time<-pmin(currentage, ageonset)   
+  currentage <- ifelse(censorage > agemax, agemax, censorage)
+  time <- pmin(currentage, ageonset)   
   status <- ifelse(currentage >= ageonset, 1, 0)
             
   # Generating missing genotypes 
@@ -279,7 +263,8 @@ if (SecNum > 0) { ## at least one sample in second generation
   naff <- sum(status) # number of affected in the family
   tmpdata<-cbind(
   famID, indID, gender, motherID, fatherID, proband, generation,
-  majorgene=disgene.m, secondgene=disgene.s, ageonset, currentage, time, status, mgene, relation, fsize, naff)
+  majorgene=disgene.m, secondgene=disgene.s, ageonset, currentage, 
+  time, status, mgene, relation, fsize, naff)
   }#Close for if (SecNum > 0)
     
 return(tmpdata)

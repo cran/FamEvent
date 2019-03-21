@@ -22,12 +22,12 @@ plot.simfam <- function(x, famid=NULL, pdf=FALSE, file=NULL, ...){
 
   for(i in famid){
   obj <- x[x$famID==i, ]
-  obj$gender[obj$gender==0] <- 2
+  obj$gender[obj$gender==0 & !is.na(obj$gender)] <- 2
   iprob <- rep("",length(obj$indID))
   iprob[obj$proband==1] <- "proband"
   if(!is.null(obj$carrp.pheno)) iprob[is.na(obj$mgene)] <- paste("p=",round(obj$carrp.pheno[is.na(obj$mgene)], 2),sep="")
   else if(!is.null(obj$carrp.geno)) iprob[is.na(obj$mgene)] <- paste("p=",round(obj$carrp.geno[is.na(obj$mgene)], 2),sep="")
-
+  
   ped <- pedigree(id=obj$indID, dadid=obj$fatherID, momid=obj$motherID, sex=obj$gender, affected=cbind(obj$status, obj$mgene))
 
  pedplot<- plot.pedigree(ped, id=paste(obj$indID, iprob, sep="\n"), col=ifelse(obj$proband==1,2,1), ...)
