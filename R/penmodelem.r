@@ -99,8 +99,7 @@ penmodelEM <- function(formula, cluster="famID", gvar="mgene", parms, cuts=NULL,
     i <- i+1
     est0 <- est
     lval0 <- lval
-    nlm.est <- optim(est0, loglikem, X=X, X0=X0, X1=X1, Y=Y, theta0=est0, cuts=cuts, nbase=nbase, data=newdata, design=design, base.dist=base.dist, agemin=agemin, 
-                   vec=FALSE)
+    nlm.est <- optim(est0, loglikem, X=X, X0=X0, X1=X1, Y=Y, theta0=est0, cuts=cuts, nbase=nbase, data=newdata, design=design, base.dist=base.dist, agemin=agemin, vec=FALSE)
     lval <- nlm.est$value
     est <- nlm.est$par
     dd <- abs(lval0-lval)
