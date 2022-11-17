@@ -10,7 +10,6 @@ xbeta <- c(X%*%vbeta)
 
 haz <- hazards(base.dist, y, etheta, cuts)*exp(xbeta)
 Haz <- cumhaz(base.dist, y, etheta, cuts)*exp(xbeta)
-
 return((haz^delta)*exp(-Haz)*p)
 
 }

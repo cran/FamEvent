@@ -6,7 +6,8 @@ Fits a penetrance model for family data based on a prospective likelihood with a
 }
 \usage{
 penmodel(formula, cluster = "famID", gvar = "mgene", parms, cuts = NULL, data, 
-design = "pop", base.dist = "Weibull", agemin = NULL, robust = FALSE)
+design = "pop", base.dist = "Weibull", frailty.dist = "none",
+agemin = NULL, robust = FALSE)
 }
 \arguments{
 \item{formula}{A formula expression as for other regression models. The response should be a survival object as returned by the \code{Surv} function. See the documentation for \code{Surv}, \code{lm} and \code{formula} for details.
@@ -30,6 +31,9 @@ Study design of the family data.  Possible choices are: \code{"pop", "pop+", "cl
  \item{base.dist}{
 Choice of baseline hazard distributions to fit. Possible choices are: \code{"Weibull"}, \code{"loglogistic"}, \code{"Gompertz"}, \code{"lognormal"}, \code{"gamma"}, \code{"logBurr"}, or \code{"piecewise"}. Default is \code{"Weibull"}.
 }
+ \item{frailty.dist}{
+Choice of frailty distribution. Possible choices are: \code{"gamma"}, \code{"lognormal"}, or \code{"none"}. Default is \code{"none"}.
+}
 \item{agemin}{
 Minimum age of disease onset or minimum age. Default is \code{NULL}.
 }
@@ -39,7 +43,7 @@ Logical; if \code{TRUE}, the robust `sandwich' standard errors and variance-cova
 }
 \details{
 The penetrance model is fitted to family data with a specified baseline hazard distribution, 
-\ifelse{html}{ \out{<center> h(t|x<sub>s</sub>, x<sub>g</sub>) = h<sub>0</sub>(t - t<sub>0</sub>)  exp(&beta;<sub>s</sub> * x<sub>s</sub> + &beta;<sub>g</sub> * x<sub>g</sub>) , </center>}}{ \deqn{ h(t|x_s, x_g) = h_0(t - t_0) \exp(\beta_s x_s+\beta_g x_g) ,}{ h(g|xs, xg) = h0(t - t0) * Z * exp(beta.s * xs + beta.g * xg) ,}}
+\ifelse{html}{ \out{ h(t|x<sub>s</sub>, x<sub>g</sub>) = h<sub>0</sub>(t - t<sub>0</sub>)  exp(&beta;<sub>s</sub> * x<sub>s</sub> + &beta;<sub>g</sub> * x<sub>g</sub>), }}{ \deqn{ h(t|x_s, x_g) = h_0(t - t_0) \exp(\beta_s x_s+\beta_g x_g),}{ h(g|xs, xg) = h0(t - t0) * Z * exp(beta.s * xs + beta.g * xg) ,}}
 where \ifelse{html}{\out{h<sub>0</sub>(t)}}{\eqn{h_0(t)}{h0(t)}} is the baseline hazards function specified by \code{base.dist}, which depends on the shape and scale parameters, \ifelse{html}{\out{&lambda;}}{\eqn{\lambda}{lambda}} and \ifelse{html}{\out{&rho;}}{\eqn{\rho}{rho}}; \ifelse{html}{\out{x<sub>s</sub>}}{\eqn{x_s}{xs}} indicates male (1) and female (0) and \ifelse{html}{\out{x<sub>g</sub>}}{\eqn{x_g}{xg}} indicates carrier (1) or non-carrier (0) of a gene of interest (major gene). Additional covariates can be added to \code{formula} in the model.
 
 For family data arising from population- or clinic-based study designs (\code{design="pop", "pop+"}, \code{"cli"}, or \code{"cli+"}), the parameters of the penetrance model are estimated using the ascertainment-corrected prospective likelihood approach (Choi, Kopciuk and Briollais, 2008).
@@ -51,7 +55,6 @@ Note that the baseline parameters include \code{lambda} and \code{rho}, which re
 Transformed baseline parameters are used for estimation; log transformation is applied to both scale and shape parameters (\eqn{\lambda, \rho}) for \code{"Weibull"}, \code{"loglogistic"}, \code{"Gompertz"} and \code{"gamma"} baselines, to (\eqn{\lambda, \rho, \eta}) for \code{"logBurr"} and to the piecewise constant parameters for a \code{piecewise} baseline hazard. For \code{"lognormal"} baseline distribution, the log transformation is applied only to \eqn{\rho}, not to \eqn{\lambda}, which represents the location parameter for the normally distributed logarithm.
 
 Calculations of penetrance estimates and their standard errors and 95\% confidence intervals at given ages can be obtained by \code{\link{penetrance}} function via Monte-Carlo simulations of the estimated penetrance model.
-
 }
 \value{
 Returns an object of class \code{'penmodel'}, including the following elements:

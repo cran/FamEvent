@@ -38,38 +38,14 @@ Frequency of the disease causing allele when using \code{method="model"}. The va
 }
 \encoding{UTF-8}
 \details{
-When \code{method="model"} along with the choice of \code{condition="geno+pheno"},
-the carrier probability for individual \eqn{i} is calculated by conditioning on her/his observed phenotype and carrier statuses of family members 
-\ifelse{html}{
-\out{ 
-	<style> 
-	td.upperline { border-top:solid 1px black } 
-    table.fraction { text-align: center; vertical-align: middle; margin-top: 0.5em; 
-    	             margin-bottom: 0.5em; line-height: 2em } 
-    </style>
-
-	<table class="fraction" align="center" cellpadding="0" cellspacing="0">
-    <tr>
-        <td rowspan="2" nowrap="nowrap">
-             P(X<sub>i</sub> = 1 | Y<sub>i</sub> , X<sup>o</sup> )  = 
-        </td>
-        <td nowrap="nowrap">
-            P(Y<sub>i</sub> | X<sub>i</sub> = 1) * P(X<sub>i</sub> = 1 | X<sup>o</sup>)
-        </td>
-    </tr>
-    <tr>
-        <td class="upperline">
-           P(Y<sub>i</sub> | X<sub>i</sub> = 1) * P(X<sub>i</sub> = 1 | X<sup>o</sup>) + P(Y<sub>i</sub> | X<sub>i</sub> = 0) * P(X<sub>i</sub> = 0 | X<sup>o</sup>)
-        </td>
-    </tr>
-</table> }}{
-\deqn{ P(X_i = 1 | Y_i, X^o ) = \frac{P(Y_i | X_i=1) P(X_i=1|X^o)}{P(Y_i | X_i=1) P(X_i=1|X^o) + P(Y_i| X_i=0) P(X_i=0|X^o)} , }{P(X(i) = 1 | Y(i), Xo ) = P(Y(i) | X(i) = 1)*P(X(i) = 1 | Xo) / (P(Y(i) | X(i) = 1)*P(X(i) = 1 | Xo) + P(Y(i) | X(i) = 0)*P(X(i) = 0 | Xo)) ,} }
-where \ifelse{html}{\out{X<sub>i</sub>}}{\eqn{X_i}{X(i)}} indicates the unknown carrier status of individual \eqn{i} and \ifelse{html}{\out{X<sup>o</sup>}}{\eqn{X^o}{Xo}} represents the observed carrier statuses in his or her family members; \ifelse{html}{\out{Y<sub>i</sub>}}{\eqn{Y_i}{Y(i)}} represents the observed phenotype \ifelse{html}{\out{t<sub>i</sub>, &delta;<sub>i</sub>}}{\eqn{(t_i, \delta_i)}{t(i), delta(i)}}  of individual \eqn{i} in terms of age at onset \ifelse{html}{\out{t<sub>i</sub>}}{\eqn{t_i}{t(i)}} and disease status indicator \ifelse{html}{\out{&delta;<sub>i</sub>}}{\eqn{\delta_i}{delta(i)}} with 1 used for affected individuals and 0 for unaffected individuals. 
-
-When \code{method="mendelian"} along with the choice of \code{condition="geno"}, the carrier probability is calculated based on Mendelian laws of genetic transmission with a fixed allele frequency.
-
-
-
+When \code{method="model"} along with the choice of \code{condition="geno+pheno"}, the carrier probability for individual \eqn{i} is calculated by conditioning on her/his observed phenotype and carrier statuses of family members 
+\ifelse{html}{\out{ 
+P(X<sub>i</sub> = 1 | Y<sub>i</sub> , X<sup>o</sup> )  =
+P(Y<sub>i</sub> | X<sub>i</sub> = 1) * P(X<sub>i</sub> = 1 | X<sup>o</sup>) /
+(P(Y<sub>i</sub> | X<sub>i</sub> = 1) * P(X<sub>i</sub> = 1 | X<sup>o</sup>) + P(Y<sub>i</sub> | X<sub>i</sub> = 0) * P(X<sub>i</sub> = 0 | X<sup>o</sup>)) }}{
+\deqn{ P(X_i = 1 | Y_i, X^o ) = \frac{P(Y_i | X_i=1) P(X_i=1|X^o)}{P(Y_i | X_i=1) P(X_i=1|X^o) + P(Y_i| X_i=0) P(X_i=0|X^o)} , }{P(X(i) = 1 | Y(i), Xo) = P(Y(i) | X(i) = 1)*P(X(i) = 1 | Xo) / (P(Y(i) | X(i) = 1)*P(X(i) = 1 | Xo) + P(Y(i) | X(i) = 0)*P(X(i) = 0 | Xo)) ,} }
+where \ifelse{html}{\out{X<sub>i</sub>}}{\eqn{X_i}{X(i)}} indicates the unknown carrier status of individual \eqn{i} and \ifelse{html}{\out{X<sup>o</sup>}}{\eqn{X^o}{Xo}} represents the observed carrier statuses in his or her family members; \ifelse{html}{\out{Y<sub>i</sub>}}{\eqn{Y_i}{Y(i)}} represents the observed phenotype \ifelse{html}{\out{t<sub>i</sub>, &delta;<sub>i</sub>}}{\eqn{(t_i, \delta_i)}{t(i), delta(i)}} of individual \eqn{i} in terms of age at onset \ifelse{html}{\out{t<sub>i</sub>}}{\eqn{t_i}{t(i)}} and disease status indicator \ifelse{html}{\out{&delta;<sub>i</sub>}}{\eqn{\delta_i}{delta(i)}} with 1 used for affected individuals and 0 for unaffected individuals.
+  When \code{method="mendelian"} along with the choice of \code{condition="geno"}, the carrier probability is calculated based on Mendelian laws of genetic transmission with a fixed allele frequency.
 }
 \value{
 Returns a data frame with a vector of carrier probabilities called \code{carrp.geno} when \code{condition="geno"} or \code{carrp.pheno} when \code{condtion="geno+pheno"} added after the last column of the family data.

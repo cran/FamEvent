@@ -14,8 +14,6 @@ bibentry(bibtype = "Article",
   volume       = "97",
   number       = "7",
   pages        = "1--30",
-  doi          = "10.18637/jss.v097.i07",
-
   header       = "To cite FamEvent in publications use:"
 )
 

@@ -33,6 +33,7 @@ carrierprobpheno <- function(method="data", fit=NULL, data, mode="dominant", q=0
     cuts <- attr(fit, "cuts")
     formula <- attr(fit, "formula")
     gvar <- attr(fit, "gvar")
+    data <- attr(fit, "data")
     
     Y <- attr(fit, "Y")
     X <- attr(fit, "X")

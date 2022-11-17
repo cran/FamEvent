@@ -8,10 +8,9 @@ penetrance <- function(fit, fixed, age, CI=TRUE, MC=100){
   nbase <- attr(fit, "nbase")
   cuts0 <- attr(fit, "cuts") - agemin
   
-  k <- ifelse(is.null(frailty.dist), 0, 1)
+  k <- ifelse(is.null(frailty.dist) || frailty.dist=="none", 0, 1)
   nvar <- length(fit$estimates)-nbase-k
-  
-  if(length(fixed)!= nvar) stop("the size of fixed is incorrect.")
+  if(length(fixed)!= nvar) stop("The size of fixed is incorrect.")
   if(min(age) < agemin) stop(paste("minimum age should be greater than", agemin))
   
   est <- penf(fit$estimates, x=fixed, age=age, base.dist=base.dist, frailty.dist=frailty.dist, agemin=agemin, cuts=cuts0)  

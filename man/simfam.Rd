@@ -71,20 +71,20 @@ The ages at onset correlated within families are generated from the shared frail
 
 \emph{The proportional hazard model}
 
-\ifelse{html}{ \out{<center> h(t|X) = h<sub>0</sub>(t - t<sub>0</sub>) exp(&beta;<sub>s</sub> * x<sub>s</sub> + &beta;<sub>g</sub> * x<sub>g</sub>) , </center>}}{	
+\ifelse{html}{ \out{<p style="text-align:center"> h(t|X) = h<sub>0</sub>(t - t<sub>0</sub>) exp(&beta;<sub>s</sub> * x<sub>s</sub> + &beta;<sub>g</sub> * x<sub>g</sub>), </p>}}{	
 		\deqn{ h(t|X) = h_0(t - t_0) \exp(\beta_s x_s+\beta_g x_g) ,}{ h(g|X) = h0(t - t0) * exp(beta.s * xs + beta.g * xg) ,}}
 where \ifelse{html}{\out{h<sub>0</sub>(t)}}{\eqn{h_0(t)}{h0(t)}} is the baseline hazard function, \ifelse{html}{\out{t<sub>0</sub>}}{\eqn{t_0}{t0}} is a minimum age of disease onset, \ifelse{html}{\out{x<sub>x</sub>}}{\eqn{x_s}{xs}} and \ifelse{html}{\out{x<sub>g</sub>}}{\eqn{x_g}{xg}} indicate male (1) or female (0) and carrier (1) or non-carrier (0) of a main gene of interest, respectively.
 
 
 \emph{The shared frailty model}
 
-\ifelse{html}{ \out{<center> h(t|X,Z) = h<sub>0</sub>(t - t<sub>0</sub>) Z exp(&beta;<sub>s</sub> * x<sub>s</sub> + &beta;<sub>g</sub> * x<sub>g</sub>) , </center>}}{	
+\ifelse{html}{ \out{<p style="text-align:center"> h(t|X,Z) = h<sub>0</sub>(t - t<sub>0</sub>) Z exp(&beta;<sub>s</sub> * x<sub>s</sub> + &beta;<sub>g</sub> * x<sub>g</sub>), </p>}}{	
 		\deqn{ h(t|X,Z) = h_0(t - t_0) Z \exp(\beta_s x_s+\beta_g x_g) ,}{ h(g|X,Z) = h0(t - t0) * Z * exp(\betas * xs + \betag * xg) ,}}
 where \ifelse{html}{\out{h<sub>0</sub>(t)}}{\eqn{h_0(t)}{h0(t)}} is the baseline hazard function, \ifelse{html}{\out{t<sub>0</sub>}}{\eqn{t_0}{t0}} is a minimum age of disease onset, \eqn{Z} represents a frailty shared within families and follows either a gamma or log-normal distribution, \ifelse{html}{\out{x<sub>x</sub>}}{\eqn{x_s}{xs}} and \ifelse{html}{\out{x<sub>g</sub>}}{\eqn{x_g}{xg}} indicate male (1) or female (0) and carrier (1) or non-carrier (0) of a main gene of interest, respectively.
 
 \emph{The two-gene model}
 
-\ifelse{html}{ \out{<center> h(t|X) = h<sub>0</sub>(t - t<sub>0</sub>) Z exp(&beta;<sub>s</sub> * x<sub>s</sub> + &beta;<sub>1</sub> * x<sub>2</sub> + &beta;<sub>2</sub> * x<sub>2</sub>) , </center>}}{
+\ifelse{html}{ \out{<p style="text-align:center"> h(t|X) = h<sub>0</sub>(t - t<sub>0</sub>) Z exp(&beta;<sub>s</sub> * x<sub>s</sub> + &beta;<sub>1</sub> * x<sub>2</sub> + &beta;<sub>2</sub> * x<sub>2</sub>), </p>}}{
 		\deqn{ h(t|X,Z) = h_0(t - t_0) Z \exp(\beta_s x_s+\beta_1 x_1 + \beta_2 x_2) ,}{ h(g|X,Z) = h0(t - t0) * Z * exp(betas * xs + beta1 * x1 + beta2 * x2) ,}}
 where \ifelse{html}{ \out{x<sub>1</sub>, x<sub>2</sub>}}{\eqn{x_1, x_2}{x1,x2}} indicate carriers (1) and non-carriers (0) of a major gene and of second gene mutation, respectively.
 
