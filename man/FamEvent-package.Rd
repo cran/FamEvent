@@ -59,11 +59,13 @@ Choi, Y.-H. and Briollais (2011) An EM Composite Likelihood Approach for Multist
 }
 \keyword{ package }
 \seealso{
-\code{\link{simfam}}, \code{\link{summary.simfam}}, \code{\link{plot.simfam}}, \code{\link{penplot}}, \code{\link{carrierprob}}, \code{\link{penmodel}}, \code{\link{penmodelEM}}, 
+\code{\link{simfam}}, \code{\link{summary.simfam}}, 
+\code{\link{simfam2}}, \code{\link{summary.simfam2}}, 
+\code{\link{plot.simfam}}, \code{\link{penplot}}, \code{\link{carrierprob}}, \code{\link{penmodel}}, \code{\link{penmodelEM}}, 
 \code{\link{print.penmodel}}, \code{\link{summary.penmodel}},\code{\link{print.summary.penmodel}}, \code{\link{plot.penmodel}},
-\code{\link{simfam_c}}, \code{\link{summary.simfam_c}}, \code{\link{plot.simfam_c}}, \code{\link{penplot_c}}, \code{\link{penmodel_c}},  
-\code{\link{print.penmodel_c}}, \code{\link{summary.penmodel_c}}, 
-\code{\link{print.summary.penmodel_c}}, \code{\link{plot.penmodel_c}}
+\code{\link{simfam_cmp}}, \code{\link{summary.simfam_cmp}}, \code{\link{plot.simfam_cmp}}, \code{\link{penplot_cmp}}, \code{\link{penmodel_cmp}},  
+\code{\link{print.penmodel_cmp}}, \code{\link{summary.penmodel_cmp}}, 
+\code{\link{print.summary.penmodel_cmp}}, \code{\link{plot.penmodel_cmp}}
 }
 \examples{
 \dontrun{
@@ -92,22 +94,41 @@ summary(fit)
 # penetrance curves useful for model checking 
 plot(fit) 
 
+## Example 2: Simulate family data from a correlated frailty model 
+#  with Kinship and IBD matrices given pedigree data.
 
-### Example 2: Simulate correlated competing risks family data 
+# Inputdata and IBD matrix should be provided; 
+# Inputdata was generated as an example using simfam.
+
+data <- simfam(N.fam = 10, design = "noasc", variation = "none",
+         base.dist = "Weibull", base.parms = c(0.016, 3), vbeta = c(1, 1))
+
+IBDmatrix <- diag(1, dim(data)[1])
+data <- data[ , c(1:7, 11, 14)]
+
+fam2 <- simfam2(inputdata = data, IBD = IBDmatrix, design = "pop", 
+        variation = c("kinship","IBD"), depend = c(1, 1), 
+        base.dist = "Weibull", base.parms = c(0.016, 3),
+        var_names = c("gender", "mgene"), vbeta = c(1,1),
+        agemin=20) 
+
+summary(fam2)
+
+### Example 3: Simulate correlated competing risks family data 
 set.seed(4321)
-fam2 <- simfam_c(N.fam = 200, design = "pop+", variation = "frailty", 
+fam3 <- simfam_cmp(N.fam = 200, design = "pop+", variation = "frailty", 
        base.dist = "Weibull", frailty.dist = "cgamma", depend=c(1, 2, 0.5), 
        allelefreq = 0.02, base.parms = list(c(0.01, 3), c(0.01, 3)), 
        vbeta = list(c(-1.13, 2.35), c(-1, 2)))
 
 # summary of simulated family data
-summary(fam2) 
+summary(fam3) 
 
 # Pedigree plots for family 1 
-plot(fam2, famid = 1)
+plot(fam3, famid = 1)
 
 # penetrance function plot for event 1 given model parameter values for Weibull baseline 
-penplot_c(event = 1, base.parms = list(c(0.01, 3), c(0.01, 3)), 
+penplot_cmp(event = 1, base.parms = list(c(0.01, 3), c(0.01, 3)), 
           vbeta = list(c(-1.3, 2.35), c(-1, 2)), base.dist = "Weibull", 
           variation = "frailty", frailty.dist = "cgamma", 
           depend=c(1,2,0.5), agemin = 20)
@@ -115,7 +136,7 @@ penplot_c(event = 1, base.parms = list(c(0.01, 3), c(0.01, 3)),
 
 # Fitting shared correlated gamma frailty Penetrance model for simulated competing risk data
 
-fit2 <- penmodel_c(
+fit3 <- penmodel_cmp(
         formula1 = Surv(time, status==1) ~ gender + mgene, 
         formula2 = Surv(time, status==2) ~ gender + mgene,
         cluster = "famID", gvar = "mgene", design = "pop+",  
@@ -123,13 +144,13 @@ fit2 <- penmodel_c(
         base.dist = "Weibull", frailty.dist = "cgamma", data = fam2, robust = TRUE)
 
 # Summary of the model parameter estimates from the model fit
-summary(fit2)
+summary(fit3)
 
 # Plot the lifetime penetrance curves with 95% CIs from the model fit for specific  
 # gender and mutation status groups along with their nonparametric penetrance curves  
 # based on data excluding probands. 
 
-plot(fit2, add.CIF = TRUE, conf.int = TRUE, MC = 100)
+plot(fit3, add.CIF = TRUE, conf.int = TRUE, MC = 100)
 }
 
 

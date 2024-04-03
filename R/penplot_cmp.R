@@ -1,4 +1,4 @@
-penplot_c <- function(event, base.parms, vbeta, cuts=NULL, variation="none", base.dist="Weibull", 
+penplot_cmp <- function(event, base.parms, vbeta, cuts=NULL, variation="none", base.dist="Weibull", 
                       frailty.dist=NULL, depend=c(1,1), agemin=20, agemax=80, print=TRUE, 
                       col=c("blue","red","blue","red"), lty=c(1,1,2,2), add.legend=TRUE, 
                       add.title=TRUE, x="topleft", y=NULL, xlab="Age at onset", ylab="Penetrance",

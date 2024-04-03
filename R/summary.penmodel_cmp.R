@@ -1,4 +1,4 @@
-summary.penmodel_c <- function(object, correlation=FALSE, ...){
+summary.penmodel_cmp <- function(object, correlation=FALSE, ...){
    
   ans <- object[c("estimates")]
   class(ans) <- "summary.penmodel"

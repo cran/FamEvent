@@ -1,4 +1,4 @@
-summary.simfam_c <- function(object, digits = max(3, getOption("digits") - 3), ...){
+summary.simfam_cmp <- function(object, digits = max(3, getOption("digits") - 3), ...){
 
   savedig <- options(digits = digits)
   on.exit(options(savedig))
@@ -143,7 +143,7 @@ if(is.null(variation)) attr(ans, "frailty.dist") <- NULL
 else if(variation=="frailty") attr(ans,"frailty.dist") <- frailty.dist
 else  attr(ans,"frailty.dist") <- NA
 attr(ans, "variation") <- variation
-class(ans) <- "summary.simfam_c"
+class(ans) <- "summary.simfam_cmp"
 invisible(ans)
 
 }

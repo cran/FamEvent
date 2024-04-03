@@ -17,7 +17,8 @@ Name of cluster variable. Default is \code{"famID"}.
 }
 \item{gvar}{Name of genetic variable. Default is \code{"mgene"}.}
 \item{parms}{
-Vector of initial values for the parameters in the model including baseline parameters and regression coefficients. \code{parms = c(baseparm, coef)}, where \code{baseparm} includes the initial values for baseline parameters used for \code{base.dist}, and \code{coef} includes the initial values for regression coefficients for the variables specified in \code{formula}. See details for the baseline parameters.
+Vector of initial values for the parameters in the model including baseline parameters and regression coefficients. \code{parms = c(baseparm, coef)}, where \code{baseparm} includes the initial values for baseline parameters used for \code{base.dist}, and \code{coef} includes the initial values for regression coefficients for the variables specified in \code{formula}. If frailty.dist is specified, the initial value of the frailty parameter should be specified \code{parms = c(baseparm, coef, k)}, where \code{k} the initial value for the frailty parameter. 
+See details for the baseline parameters.
 }
 \item{cuts}{ 
 Vector of cut points that define the intervals where the hazard function is constant. The \code{cuts} should be specified when \code{base.dist="piecewise"} and must be strictly positive and finite. Default is \code{NULL}.
@@ -42,9 +43,23 @@ Logical; if \code{TRUE}, the robust `sandwich' standard errors and variance-cova
 }
 }
 \details{
-The penetrance model is fitted to family data with a specified baseline hazard distribution, 
-\ifelse{html}{ \out{ h(t|x<sub>s</sub>, x<sub>g</sub>) = h<sub>0</sub>(t - t<sub>0</sub>)  exp(&beta;<sub>s</sub> * x<sub>s</sub> + &beta;<sub>g</sub> * x<sub>g</sub>), }}{ \deqn{ h(t|x_s, x_g) = h_0(t - t_0) \exp(\beta_s x_s+\beta_g x_g),}{ h(g|xs, xg) = h0(t - t0) * Z * exp(beta.s * xs + beta.g * xg) ,}}
+When \code{frailty.dist = "none"}, the following penetrance model is fitted to family data with a specified baseline hazard distribution 
+\ifelse{html}{ \out{ h(t|x<sub>s</sub>, x<sub>g</sub>) = h<sub>0</sub>(t - t<sub>0</sub>)  exp(&beta;<sub>s</sub> * x<sub>s</sub> + &beta;<sub>g</sub> * x<sub>g</sub>),  }}{ \deqn{ h(t|x_s, x_g) = h_0(t - t_0) \exp(\beta_s x_s+\beta_g x_g),}{ h(g|xs, xg) = h0(t - t0) * Z * exp(beta.s * xs + beta.g * xg) ,}}
 where \ifelse{html}{\out{h<sub>0</sub>(t)}}{\eqn{h_0(t)}{h0(t)}} is the baseline hazards function specified by \code{base.dist}, which depends on the shape and scale parameters, \ifelse{html}{\out{&lambda;}}{\eqn{\lambda}{lambda}} and \ifelse{html}{\out{&rho;}}{\eqn{\rho}{rho}}; \ifelse{html}{\out{x<sub>s</sub>}}{\eqn{x_s}{xs}} indicates male (1) and female (0) and \ifelse{html}{\out{x<sub>g</sub>}}{\eqn{x_g}{xg}} indicates carrier (1) or non-carrier (0) of a gene of interest (major gene). Additional covariates can be added to \code{formula} in the model.
+
+When \code{frailty.dist} is specified as either \code{"gamma"} or \code{"lognormal"}, the follwoing shared frailty model is fitted to family data 
+\ifelse{html}{
+\out{ h(t|X,Z) = h<sub>0</sub>(t - t<sub>0</sub>) Z exp(&beta;<sub>s</sub> * x<sub>s</sub> + &beta;<sub>g</sub> * x<sub>g</sub>), }}{	
+\deqn{ h(t|X, Z) = h_{0}(t - t_0) Z \exp(\beta_{s} x_s+\beta_{g} x_g) ,}{ h(g|X,Z) = h0(t - t0) * Z * exp(\beta s * xs + \beta g * xg) ,}}
+where \ifelse{html}{\out{h<sub>0</sub>(t)}}{\eqn{h_{0}(t)}{h0(t)}} is the baseline hazard function, \ifelse{html}{\out{t<sub>0</sub>}}{\eqn{t_0}{t0}} is a minimum age of disease onset, and \ifelse{html}{\out{Z}}{\eqn{Z}{Z}} represents a frailty shared within families whose distribution is specified by \code{frailty.dist}.
+
+\emph{Choice of frailty distributions}
+
+\code{frailty.dist = "gamma"} assumes \eqn{Z} follows Gamma(\eqn{k}, \eqn{1/k}). 
+
+\code{frailty.dist = "lognormal"} assumes \eqn{Z} follows log-normal distribution with mean 0 and variance \eqn{1/k}.
+
+\code{frailty.dist = "none"} shares no frailties within families and assumes independence among family members. 
 
 For family data arising from population- or clinic-based study designs (\code{design="pop", "pop+"}, \code{"cli"}, or \code{"cli+"}), the parameters of the penetrance model are estimated using the ascertainment-corrected prospective likelihood approach (Choi, Kopciuk and Briollais, 2008).
 
@@ -92,7 +107,6 @@ Yun-Hee Choi
 \code{\link{summary.penmodel}}, \code{\link{print.summary.penmodel}}, \code{\link{plot.penmodel}}
 }
 \examples{
-
 # Family data simulated from population-based design using a Weibull baseline hazard 
 
 set.seed(4321)

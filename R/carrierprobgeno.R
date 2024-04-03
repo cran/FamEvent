@@ -8,6 +8,10 @@ carrierprobgeno <-function(method="data", data, mode="dominant", q=0.02){
   id.na <- data$indID[is.na(data$mgene)]
   mut.ca <- data$relation[data$mgene==1 & !is.na(data$mgene)]
 
+  majorgene <- data$majorgene
+  pAA <- ifelse(is.na(carrp), NA, ifelse(majorgene==1, 1, 0)) # P(1=AA), A is disease gene
+  pAa <- ifelse(is.na(carrp), NA, ifelse(majorgene==2, 1, 0)) # P(2=Aa)
+  paa <- ifelse(is.na(carrp), NA, ifelse(majorgene==3, 1, 0)) # P(3=aa)
 #  cfam.id <- data$famID[data$proband==1 & data$mgene==1]
 #  nfam.id <- data$famID[data$proband==1 & data$mgene==0]
 #  i.cfam <- is.element(data$famID,cfam.id)
@@ -15,12 +19,21 @@ carrierprobgeno <-function(method="data", data, mode="dominant", q=0.02){
   
   if(method=="data"){
     for(g in unique(data$relation)){
-      for(s in c(0,1)){
-      	for(a in c(0,1)){
-        carrp[is.na(data$mgene) & data$relation == g & data$gender == s & data$status == a] <- mean(data$mgene[!is.na(data$mgene) & data$relation == g & data$gender == s & data$status == a])
-        }
+      for(s in c(0,1)){ #gender
+        pAA[is.na(data$mgene) & data$relation == g & data$gender == s] <- mean(data$majorgene[!is.na(data$mgene) & data$relation == g & data$gender == s]==1)
+        pAa[is.na(data$mgene) & data$relation == g & data$gender == s] <- mean(data$majorgene[!is.na(data$mgene) & data$relation == g & data$gender == s]==2)
+        paa[is.na(data$mgene) & data$relation == g & data$gender == s] <- mean(data$majorgene[!is.na(data$mgene) & data$relation == g & data$gender == s]==3)
       }
     }
+    
+    if(mode == "dominant") carrp <- pAA+pAa
+    else carrp <- pAA
+    carrp[is.na(carrp)] <- 0
+    data$carrp.geno <- carrp
+    data$pAA <- pAA
+    data$pAa <- pAa
+    data$paa <- paa
+    
   }
   else if (method=="mendelian"){
   	
@@ -131,10 +144,15 @@ p4.0 <- sum(P4.s0[1:n])
 		}
 
 	}#close for for(i in id.na)
-  }# close for else if(method=="mendelian")
+  
+	carrp[is.na(carrp)] <- 0
+	data$carrp.geno <- carrp
+#	data$pAA <- pAA
+#	data$pAa <- pAa
+#	data$paa <- paa
+	
+	}# close for else if(method=="mendelian")
   else stop("Unrecognized method")
 
-carrp[is.na(carrp)] <- 0
-data$carrp.geno <- carrp
 return(data)
 }

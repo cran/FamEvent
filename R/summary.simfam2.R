@@ -1,4 +1,4 @@
-summary.simfam <- function(object, digits = max(3, getOption("digits") - 3), ...){
+summary.simfam2 <- function(object, digits = max(3, getOption("digits") - 3), ...){
 
   savedig <- options(digits = digits)
   on.exit(options(savedig))
@@ -15,29 +15,24 @@ design.name <- c("pop: population-based study with affected probands",
 "twostage: two-stage design",
 "noasc: no ascertainment")[match(design, c("pop","pop+","cli","cli+","twostage", "noasc"))]
 
- cat("Study design:                          ", design.name,"\n")
+ cat("Study design:          ", design.name,"\n")
  }
-if(!is.null(base.dist)) cat("Baseline distribution:                 ", base.dist,"\n")
-
-  
+if(!is.null(base.dist)) cat("Baseline distribution: ", base.dist,"\n")
 if(!is.null(variation)) {
-  if(length(variation)==1){
-    if(variation == "frailty") 
-      cat("Frailty distribution:                  ", attr(object,"frailty.dist"),"\n")
-    else if(variation=="kinship")
-      cat("Frailty distribution:                   Lognormal with Kinship matrix \n")
-    else if(variation=="IBD")
-      cat("Frailty distribution:                   Lognormal with IBD matrix \n")
-    else if(variation=="secondgene") 
-      cat("Residucal familial correlation induced by a second gene variation \n")
-    else if(variation=="none")
-      cat("Frailty distribution:                   No frailties \n")
-  }
-  else if(length(variation)==2)
+    if(length(variation)==1){
+      if(variation == "frailty") 
+        cat("Frailty distribution:  ", attr(object,"frailty.dist"),"\n")
+      else if(variation=="kinship")
+        cat("Frailty distribution:                   Lognormal with Kinship matrix \n")
+      else if(variation=="IBD")
+        cat("Frailty distribution:                   Lognormal with IBD matrix \n")
+      else if(variation=="none")
+        cat("Frailty distribution:                   No frailties \n")
+    }
+    else if(length(variation)==2)
       cat("Frailty distribution:                   Lognormal with Kinship and IBD matrices \n")
 }
   
-
 if(is.null(object$weight)) object$weight <- 1
 
 	k <- ifelse(is.null(design), 1, ifelse(design=="twostage",2,1))
@@ -84,16 +79,9 @@ if(i==2) ans<-cbind(HighRisk=ans.high, LowRisk=ans)
 
 attr(ans,"design") <- design
 attr(ans,"base.dist") <- base.dist
-
 if(is.null(variation)) attr(ans, "frailty.dist") <- NULL
-else if(length(variation)==1){
-  if(variation=="frailty") attr(ans,"frailty.dist") <- frailty.dist
-  else if(variation=="kinship") attr(ans,"frailty.dist") <- "lognormal with Kinship matrix"
-  else if(variation=="IBD") attr(ans,"frailty.dist") <- "lognormal with IBD matrix"
-  else  attr(ans,"frailty.dist") <- NULL
-}
-else if(length(variation)==2) attr(ans,"frailty.dist") <- "lognormal with Kinship and IBD matrices"
-
+else if(length(variation)==1 & variation == "none") attr(ans,"frailty.dist") <- NULL
+else  attr(ans,"frailty.dist") <- frailty.dist
 attr(ans, "variation") <- variation
 class(ans) <- "summary.simfam"
 invisible(ans)

@@ -1,12 +1,9 @@
 \name{LSfam}
 \alias{LSfam}
 \docType{data}
-\title{ Ontario Lynch Syndrom families
-%%   ~~ data name/kind ... ~~
-}
+\title{Ontario Lynch Syndrom families}
 \description{
 Data from 32 Lynch Syndrome families segregating mismatch repair mutations selected from the Ontario Familial Colorectal Cancer Registry that includes 765 individuals, both probands and relatives. The families were ascertained throughout affected and mutation carrier probands.
-
 }
 \usage{data("LSfam")}
 \format{
@@ -23,6 +20,7 @@ Data from 32 Lynch Syndrome families segregating mismatch repair mutations selec
     \item{\code{mgene}}{MLH1 or MSH2 mutation indicators: 1 for mutated gene carriers, 0 for mutated gene noncarriers, or \code{NA} if missing.}
     \item{\code{proband}}{Proband indicators: 1 for proband, 0 for non-proband.}
     \item{\code{relation}}{Family members' relationship with the proband.
+  Relation codes:
   \tabular{ll}{
     1  \tab Proband (self) \cr
     2  \tab Brother or sister \cr
@@ -40,15 +38,11 @@ Data from 32 Lynch Syndrome families segregating mismatch repair mutations selec
     14  \tab Son or daughter in law \cr
     15  \tab Grandchild \cr
     16  \tab Uncle's or aunt's spouse. \cr
-  }
-
-    
     }
+   }
   }
 }
-
 \references{
-%%  ~~ possibly secondary sources and usages ~~
 Choi, Y.-H., Cotterchio, M., McKeown-Eyssen, G., Neerav, M., Bapat, B., Boyd, K., Gallinger, S.,  McLaughlin, J., Aronson, M., and Briollais, L. (2009). Penetrance of Colorectal Cancer among MLH1/ MSH2 Carriers Participating in the Colorectal Cancer Familial Registry in Ontario, Hereditary Cancer in Clinical Practice, 7:14.
 }
 \examples{

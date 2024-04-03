@@ -1,19 +1,19 @@
-\name{summary.simfam_c}
-\alias{summary.simfam_c}
+\name{summary.simfam_cmp}
+\alias{summary.simfam_cmp}
 
 \title{
-Summary method for \code{simfam_c}
+Summary method for \code{simfam_cmp}
 }
 \description{
-Provides a summary of simulated data from \code{simfam_c} function.
+Provides a summary of simulated data from \code{simfam_cmp} function.
 }
 \usage{
-\method{summary}{simfam_c}(object, digits = max(3, getOption("digits") - 3), \ldots)
+\method{summary}{simfam_cmp}(object, digits = max(3, getOption("digits") - 3), \ldots)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{object}{
-An object class of \code{'simfam'} generated from \code{simfam_c} function
+An object class of \code{'simfam'} generated from \code{simfam_cmp} function
 }
  \item{digits}{Number of significant digits to use when printing.}
  \item{...}{Further arguments passed to or from other methods.}
@@ -38,11 +38,11 @@ Yun-Hee Choi
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-\code{\link{simfam_c}}
+\code{\link{simfam_cmp}}
 }
 \examples{
 set.seed(4321)
-fam <- simfam_c(N.fam = 50, design = "pop+", variation = "none", 
+fam <- simfam_cmp(N.fam = 50, design = "pop+", variation = "none", 
         base.dist = "Weibull", 
         base.parms = list(c(0.01, 3), c(0.01, 3)), 
         vbeta = list(c(-1.13, 2.35), c(-1,2)))

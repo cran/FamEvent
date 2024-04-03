@@ -1,6 +1,6 @@
-fgene <-
-function(base.dist, frailty.dist, depend, affage, affsex, interaction, variation="secondgene", parms, vbeta, alpha,
-          pg=0, m.carrier=0, dominant.m=TRUE, aq){
+fgeneZ <-
+function(base.dist, frailty.dist, depend, affage, affsex, interaction, variation="secondgene", 
+         base.parms, vbeta, alpha, pg=0, m.carrier=0, dominant.m=TRUE, aq){
 # returns 2x3 matrix , first row for the major gene, 
 #	second row for the second gene
 
@@ -21,7 +21,7 @@ if(variation=="secondgene"){
     if(interaction) xbeta <- affsex*vbeta[1] + i*vbeta[2] + affsex*i*vbeta[3]+ j*vbeta[4]
     else xbeta <- affsex*vbeta[1] + i*vbeta[2] + j*vbeta[3]
     
-  	Ft[(i+1),(j+1)] <- 1- surv.dist(affage, base.dist, parms, xbeta, alpha, res=0)
+  	Ft[(i+1),(j+1)] <- 1- surv.dist(affage, base.dist, base.parms, xbeta, alpha, res=0)
   }
   if(!dominant.m){
     pAA[1] <- Ft[2,2]*AAq[1]*(AAq[2]+Aaq[2]) + Ft[2, 1]*AAq[1]*aaq[2]
@@ -41,29 +41,12 @@ if(variation=="secondgene"){
  }
   return( cbind(pAA, pAa, paa)/c(pAA+pAa+paa))
 }# close if variation=="secondgene"
-else if (variation == "frailty"){
-
-  Ft <- 0
-  for(i in c(0,1)){
-    if(interaction) xbeta <- affsex*vbeta[1] + i*vbeta[2] + affsex*i*vbeta[3]
-    else xbeta <- affsex*vbeta[1] + i*vbeta[2] 
-    H <- -log(surv.dist(affage, base.dist, parms, xbeta, alpha, res=0))
-    Ft[(i+1)] <- 1- laplace(frailty.dist, g=H, k=depend)
-  }
-  
-  pAA <- Ft[2]*AAq[1]
-  if(dominant.m) pAa <- Ft[2]*Aaq[1]
-  else pAa <- Ft[1]*Aaq[1]
-  paa <- Ft[1]*aaq[1]
-  return( cbind(pAA, pAa, paa)/c(pAA+pAa+paa))
-  
-}
 else{
   Ft <- 0
   for(i in c(0,1)){
     if(interaction) xbeta <- affsex*vbeta[1] + i*vbeta[2] + affsex*i*vbeta[3]
     else xbeta <- affsex*vbeta[1] + i*vbeta[2] 
-    Ft[i+1] <- 1 - surv.dist(affage, base.dist, parms, xbeta, alpha, res=0)
+    Ft[i+1] <- 1 - surv.dist(affage, base.dist, base.parms, xbeta, alpha, res=0)
   } 
 
   pAA <- Ft[2]*AAq[1]

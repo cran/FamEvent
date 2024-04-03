@@ -6,37 +6,22 @@ penmodel <- function(formula, cluster="famID", gvar="mgene", parms, cuts=NULL, d
   
   if(any(is.na(data[, gvar]))) stop("data include missing genetic information, use penmodelEM function.")
   options(na.action='na.omit')
-  agemin.data <- attr(data, "agemin")
-  if(!is.null(agemin.data)) agemin <- agemin.data
-  else if(is.null(agemin)) stop("agemin is not found. Please specify agemin.")
-    
-  if(agemin > 70) warning("agemin is set too high.")
   
-  # if(sum(data$time <=  agemin, na.rm = TRUE) > 0) cat("Individuals with time <= agemin were removed from the analysis.\n")
+  agemin <- attr(data, "agemin")
+  if(is.null(agemin)){
+    agemin <- 0
+    warning("agemin = 0 was used or assign agemin to attr(data, \"agemin\").")
+  }
   
-  data <- data[data$time >  agemin, ]
+  if(sum(data$time <=  agemin, na.rm = TRUE) > 0) cat("Individuals with time < agemin (", agemin,") were removed from the analysis.\n")
   
+  data <- data[data$time >=  agemin, ]
   data$famID.byuser <- data[, cluster]
-  
-  Call <- match.call()
-  indx <- match(c("formula", "data"), names(Call), nomatch = 0)
-  if (indx[1] == 0) stop("A formula argument is required")
-  temp <- Call[c(1, indx)]
-  temp[[1L]] <- quote(stats::model.frame)
-
-  temp$formula <- if (missing(data)) terms(formula)
-  else terms(formula, data = data)
-  
-  temp$data <- data
-
-  if (is.R()) m <- eval(temp, parent.frame())
-  else m <- eval(temp, sys.parent())
-  
+  m <- model.frame(formula, data)
   Terms <- attr(m, "terms")
   Y <- model.extract(m, "response")
   
   if (!inherits(Y, "Surv")) stop("Response must be a survival object.")
-  
   type <- attr(Y, "type")
   if (type == "counting") stop("start-stop type Surv objects are not supported.")
   if (type == "mright" || type == "mcounting") stop("multi-state survival is not supported.")
@@ -48,25 +33,6 @@ penmodel <- function(formula, cluster="famID", gvar="mgene", parms, cuts=NULL, d
 
 
   X <- model.matrix(Terms, m)
-
-  if (is.R()) {
-    assign <- lapply(attrassign(X, Terms)[-1], function(x) x - 1)
-    xlevels <- .getXlevels(Terms, m)
-    contr.save <- attr(X, "contrasts")
-  }
-  else {
-    assign <- lapply(attr(X, "assign")[-1], function(x) x - 1)
-    xvars <- as.character(attr(Terms, "variables"))
-    xvars <- xvars[-attr(Terms, "response")]
-    if (length(xvars) > 0) {
-      xlevels <- lapply(m[xvars], levels)
-      xlevels <- xlevels[!unlist(lapply(xlevels, is.null))]
-      if (length(xlevels) == 0) 
-        xlevels <- NULL
-    }
-    else xlevels <- NULL
-    contr.save <- attr(X, "contrasts")
-  }
 
   nvar <- ncol(X)-1
   var.names <- colnames(X)[-1]

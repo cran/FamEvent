@@ -1,58 +1,29 @@
-#penmodelEM(Surv(time, status)~gender+mgene+generation+gender*mgene, cluster="famID", gvar="mgene",parms=c(0.01,3,1,2,3,4),data=fam)
 penmodelEM <- function(formula, cluster="famID", gvar="mgene", parms, cuts=NULL, 
                        data, design="pop", base.dist="Weibull", agemin=NULL, robust=FALSE, method="data", 
                        mode="dominant", q=0.02){
   options(na.action='na.pass')
-  agemin.data <- attr(data, "agemin")
-  if(!is.null(agemin.data)) agemin <- agemin.data
-  else if(is.null(agemin)) stop("agemin is not found. Please specify agemin.")
   
-  if(agemin > 70) warning("agemin is set too high.")
+  agemin <- attr(data, "agemin")
+  if(is.null(agemin)){
+    agemin <- 0
+    warning("agemin = 0 was used or assign agemin to attr(data, \"agemin\").")
+  }
   
-  #if(sum(data$time <=  agemin, na.rm=TRUE) > 0) cat("Individuals with time <= agemin were removed from the analysis.\n")
+  if(sum(data$time <=  agemin, na.rm = TRUE) > 0) cat("Individuals with time < agemin (", agemin,") were removed from the analysis.\n")
+  data <- data[data$time >=  agemin, ]
   
   data <- data[data$time >  agemin, ]
-
-  Call <- match.call()
-  indx <- match(c("formula", "data"), names(Call), nomatch = 0)
-  if (indx[1] == 0) stop("A formula argument is required")
-  temp <- Call[c(1, indx)]
-  temp[[1L]] <- quote(stats::model.frame)
-  temp$formula <- if (missing(data)) terms(formula)
-  else terms(formula, data = data)
-  
-  temp$data <- data
-  
-  if (is.R()) m <- eval(temp, parent.frame())
-  else m <- eval(temp, sys.parent())
-  
+  data$famID.byuser <- data[, cluster]
+  m <- model.frame(formula, data)
   Terms <- attr(m, "terms")
   Y <- model.extract(m, "response")
+  
   if (!inherits(Y, "Surv")) stop("Response must be a survival object.")
   type <- attr(Y, "type")
   if (type == "counting") stop("start-stop type Surv objects are not supported.")
   if (type == "mright" || type == "mcounting") stop("multi-state survival is not supported.")
 
   X <- model.matrix(Terms, m)
-  
-  if (is.R()) {
-    assign <- lapply(attrassign(X, Terms)[-1], function(x) x - 1)
-    xlevels <- .getXlevels(Terms, m)
-    contr.save <- attr(X, "contrasts")
-  }
-  else {
-    assign <- lapply(attr(X, "assign")[-1], function(x) x - 1)
-    xvars <- as.character(attr(Terms, "variables"))
-    xvars <- xvars[-attr(Terms, "response")]
-    if (length(xvars) > 0) {
-      xlevels <- lapply(m[xvars], levels)
-      xlevels <- xlevels[!unlist(lapply(xlevels, is.null))]
-      if (length(xlevels) == 0) 
-        xlevels <- NULL
-    }
-    else xlevels <- NULL
-    contr.save <- attr(X, "contrasts")
-  }
   
   n <- nrow(X)
   nvar <- ncol(X)-1
@@ -66,13 +37,9 @@ penmodelEM <- function(formula, cluster="famID", gvar="mgene", parms, cuts=NULL,
   colnames(X) <- var.names
   vbeta <- parms[-c(1:nbase)]
 
-#  if(length(vbeta) != nvar) stop("The size of parms is incorrect.")
   if(length(parms) != (nvar+nbase) ) stop("The size of parms is incorrect.")
   if(is.null(data$weight)) data$weight <- 1
 
-  
-  ###
-  
   newdata <- carrierprobgeno(data, method=method, mode=mode, q=q)
  
   X0 <- X1 <- X
@@ -80,16 +47,6 @@ penmodelEM <- function(formula, cluster="famID", gvar="mgene", parms, cuts=NULL,
   X0[, gvar] <- 0
   X1[, gvar] <- 1
   
-  mfactor <- attr(temp$formula,"factors")
-  pos <- grep(gvar, colnames(mfactor))
-  if(length(pos)>1){
-    int.names <- names(mfactor[,pos[2]])[mfactor[,pos[2]]==1]
-    var2.name <- int.names[int.names != gvar]
-    var2 <- X[,var.names==var2.name]
-    X0[, pos[2]] <- 0
-    X1[, pos[2]] <- var2
-  }
-
   est0 <- est <- parms
   dd <- lval0 <- lval <- 1
   i <- 0
@@ -135,8 +92,6 @@ penmodelEM <- function(formula, cluster="famID", gvar="mgene", parms, cuts=NULL,
   	}
   }
   
-  
-
   aic = 2*length(EST) - 2*logLik
   
   out <- list(estimates = EST, varcov = parms.cov, varcov.robust = parms.cov.robust, se = parms.se, se.robust = parms.se.robust, logLik = logLik, AIC = aic)  

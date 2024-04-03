@@ -1,5 +1,5 @@
-\name{penplot_c}
-\alias{penplot_c}
+\name{penplot_cmp}
+\alias{penplot_cmp}
 \title{
 Plot penetrance functions from competing risk models
 }
@@ -7,7 +7,7 @@ Plot penetrance functions from competing risk models
 Plots the penetrance functions from competing risk models given the values of baseline parameters and regression coefficients and choices of baseline and frailty distributions.
 }
 \usage{
-penplot_c(event, base.parms, vbeta, cuts = NULL, variation = "none", 
+penplot_cmp(event, base.parms, vbeta, cuts = NULL, variation = "none", 
           base.dist = "Weibull", frailty.dist = NULL, depend = c(1, 1), 
           agemin = 20, agemax = 80, print = TRUE, 
           col = c("blue","red","blue","red"),  lty = c(1, 1, 2, 2), 
@@ -103,32 +103,32 @@ Displays plots of the penetrance functions and returns the following values:
 Yun-Hee Choi
 }
 \seealso{
-\code{\link{simfam_c}, \link{plot.penmodel_c}}
+\code{\link{simfam_cmp}, \link{plot.penmodel_cmp}}
 }
 \examples{
 # Penetrance function curves for event 1 
 # based on Weibull baselines (no frailty)
-penplot_c(event=1, base.parms = list(c(0.01,3), c(0.01, 3)), 
+penplot_cmp(event=1, base.parms = list(c(0.01,3), c(0.01, 3)), 
         vbeta = list(c(-1, 2), c(-1, 1)), variation = "none", 
         base.dist = "Weibull", agemin = 20, ylim = c(0,1))
 
 # Penetrance function curves for event 1 
 # based on gamma frailty and Weibull baselines
-penplot_c(event=1, base.parms = list(c(0.01,3), c(0.01, 3)), 
+penplot_cmp(event=1, base.parms = list(c(0.01,3), c(0.01, 3)), 
         vbeta = list(c(-1, 2), c(-1, 1)), depend=c(2, 2), 
         variation = "frailty", frailty.dist="gamma", base.dist = "Weibull", 
         agemin = 20, ylim = c(0,1))
 
 # Penetrance function curves for event 1 
 # based on correlated gamma frailty and Weibull baselines
-penplot_c(event=1, base.parms = list(c(0.01,3), c(0.01, 3)), 
+penplot_cmp(event=1, base.parms = list(c(0.01,3), c(0.01, 3)), 
         vbeta = list(c(-1, 2), c(-1, 1)), depend=c(2, 2, 0.2), 
         variation = "frailty", frailty.dist="cgamma", 
         base.dist = "Weibull", agemin = 20, ylim = c(0,1))
 
 # Penetrance function curves for event 1 
 # based on correlated lognormal frailty and Weibull baselines
-penplot_c(event=1, base.parms = list(c(0.01,3), c(0.01, 3)), 
+penplot_cmp(event=1, base.parms = list(c(0.01,3), c(0.01, 3)), 
         vbeta = list(c(-1, 2), c(-1, 1)), depend=c(2, 2, 0.2), 
         variation = "frailty", frailty.dist="clognormal", 
         base.dist = "Weibull", agemin = 20, ylim = c(0,1))

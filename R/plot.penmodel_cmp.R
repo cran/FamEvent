@@ -1,4 +1,4 @@
-plot.penmodel_c <- function(x, agemax=80, print=TRUE, conf.int=FALSE, add.CIF=TRUE, MC=100,
+plot.penmodel_cmp <- function(x, agemax=80, print=TRUE, conf.int=FALSE, add.CIF=TRUE, MC=100,
                           col=c("blue","red","blue","red"), lty=c(1,1,2,2), 
                           xlab="Age at onset", ylab="Penetrance", ylim=NULL, ...){
 
@@ -33,15 +33,15 @@ plot.penmodel_c <- function(x, agemax=80, print=TRUE, conf.int=FALSE, add.CIF=TR
   vbeta <- list(vbeta1, vbeta2)
   kappa <- exp(est[(nb+nvar1+nvar2+1):length(est)])
   age <- agemin:agemax
-  ci1.11 <- penetrance_c(x, event=1, fixed=list(c(1,1), c(1,1)), age=age, CI=conf.int, MC=MC) #male-carrier
-  ci1.01 <- penetrance_c(x, event=1, fixed=list(c(0,1), c(0,1)), age=age, CI=conf.int, MC=MC) #female-carrier
-  ci1.10 <- penetrance_c(x, event=1, fixed=list(c(1,0), c(1,0)), age=age, CI=conf.int, MC=MC) #male-noncarrier
-  ci1.00 <- penetrance_c(x, event=1, fixed=list(c(0,0), c(0,0)), age=age, CI=conf.int, MC=MC) #female-noncarrier
+  ci1.11 <- penetrance_cmp(x, event=1, fixed=list(c(1,1), c(1,1)), age=age, CI=conf.int, MC=MC) #male-carrier
+  ci1.01 <- penetrance_cmp(x, event=1, fixed=list(c(0,1), c(0,1)), age=age, CI=conf.int, MC=MC) #female-carrier
+  ci1.10 <- penetrance_cmp(x, event=1, fixed=list(c(1,0), c(1,0)), age=age, CI=conf.int, MC=MC) #male-noncarrier
+  ci1.00 <- penetrance_cmp(x, event=1, fixed=list(c(0,0), c(0,0)), age=age, CI=conf.int, MC=MC) #female-noncarrier
 
-  ci2.11 <- penetrance_c(x, event=2, fixed=list(c(1,1), c(1,1)), age=age, CI=conf.int, MC=MC) #male-carrier
-  ci2.01 <- penetrance_c(x, event=2, fixed=list(c(0,1), c(0,1)), age=age, CI=conf.int, MC=MC) #female-carrier
-  ci2.10 <- penetrance_c(x, event=2, fixed=list(c(1,0), c(1,0)), age=age, CI=conf.int, MC=MC) #male-noncarrier
-  ci2.00 <- penetrance_c(x, event=2, fixed=list(c(0,0), c(0,0)), age=age, CI=conf.int, MC=MC) #female-noncarrier
+  ci2.11 <- penetrance_cmp(x, event=2, fixed=list(c(1,1), c(1,1)), age=age, CI=conf.int, MC=MC) #male-carrier
+  ci2.01 <- penetrance_cmp(x, event=2, fixed=list(c(0,1), c(0,1)), age=age, CI=conf.int, MC=MC) #female-carrier
+  ci2.10 <- penetrance_cmp(x, event=2, fixed=list(c(1,0), c(1,0)), age=age, CI=conf.int, MC=MC) #male-noncarrier
+  ci2.00 <- penetrance_cmp(x, event=2, fixed=list(c(0,0), c(0,0)), age=age, CI=conf.int, MC=MC) #female-noncarrier
   
  variation <- ifelse(frailty.dist=="none" || is.null(frailty.dist), "none", "frailty")  
 

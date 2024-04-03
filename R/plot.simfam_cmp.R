@@ -1,4 +1,4 @@
-plot.simfam_c <- function(x, famid=NULL, pdf=FALSE, file=NULL, ...){
+plot.simfam_cmp <- function(x, famid=NULL, pdf=FALSE, file=NULL, ...){
   
   if(is.null(famid)) famid <- x$famID[1]
   if(length(famid)<5) {

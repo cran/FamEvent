@@ -7,9 +7,11 @@ Generate familial time-to-event data
 Generates familial time-to-event data for specified study design, genetic model and source of residual familial correlation; the generated data frame also contains family structure (individual's id, father id, mother id, relationship to proband, generation), gender, current age, genotypes of major or second genes.
 }
 \usage{
-simfam(N.fam, design = "pop", variation = "none", interaction = FALSE, depend = NULL, 
-       base.dist = "Weibull", frailty.dist = NULL, base.parms, vbeta, 
-       allelefreq = c(0.02, 0.2), dominant.m = TRUE, dominant.s = TRUE,
+simfam(N.fam, design = "pop", variation = "none", interaction = FALSE, 
+       add.x = FALSE, x.dist = NULL, x.parms = NULL, depend = NULL, 
+       base.dist = "Weibull", frailty.dist = NULL, base.parms = c(0.016, 3), 
+       vbeta = c(1, 1), 
+       allelefreq = 0.02, dominant.m = TRUE, dominant.s = TRUE,
        mrate = 0, hr = 0, probandage = c(45, 2), agemin = 20, agemax = 100)
 % \method{summary}{simulation}(object, \dots)
 }
@@ -19,16 +21,25 @@ simfam(N.fam, design = "pop", variation = "none", interaction = FALSE, depend = 
 Number of families to generate.
 }
   \item{design}{
-Family based study design used in the simulations. Possible choices are: \code{"pop"}, \code{"pop+"}, \code{"cli"}, \code{"cli+"} or \code{"twostage"}, where \code{"pop"} is for the population-based design that families are ascertained by affected probands, \code{"pop+"} is similar to \code{"pop"} but with mutation carrier probands, \code{"cli"} is for the clinic-based design that includes affected probands with at least one parent and one sib affected, \code{"cli+"} is similar to \code{"cli"} but with mutation carrier probands and \code{"twostage"} for two-stage design that randomly samples families from the population in the first stage and oversamples high risk families in the second stage that include at least two affected members in the family. Default is \code{"pop"}.
+Family based study design used in the simulations. Possible choices are: \code{"pop"}, \code{"pop+"}, \code{"cli"}, \code{"cli+"}, \code{"twostage"}, or \code{"noasc"}, where \code{"pop"} is for the population-based design that families are ascertained by affected probands, \code{"pop+"} is similar to \code{"pop"} but with mutation carrier probands, \code{"cli"} is for the clinic-based design that includes affected probands with at least one parent and one sib affected, \code{"cli+"} is similar to \code{"cli"} but with mutation carrier probands,  \code{"twostage"} for two-stage design that randomly samples families from the population in the first stage and oversamples high risk families in the second stage that include at least two affected members in the family, and \code{"noasc"} for no ascertainment correction that families are from simple random sampling. Default is \code{"pop"}.
 }
   \item{variation}{
-Source of residual familial correlation.  Possible choices are: \code{"frailty"} for frailty shared within families, \code{"secondgene"} for second gene variation, or \code{"none"} for no residual familial correlation. Default is \code{"none"}.
+Source of residual familial correlation.  Possible choices are: \code{"frailty"} for frailty shared within families, \code{"secondgene"} for second gene variation, \code{"kinship"} for correlated frailties within families with kinship matrix, or \code{"none"} for no residual familial correlation. Default is \code{"none"}.
 }
  \item{interaction}{
 Logical; if \code{TRUE}, allows the interaction between gender and mutation status. Default is \code{FALSE}.
 }
+ \item{add.x}{
+Logical; if \code{TRUE}, generates a covariate in addition to gender and majorgene. Default is \code{FALSE}. 
+ }
+\item{x.dist}{
+Distribution of the covairate. Possible choices to generate the covariate are: \code{"normal"} from normal distribution and \code{"binomial"} from binominal distribution. Default is \code{NULL}.
+ }
+\item{x.parms}{
+Parameter values for the specified distribution of the covariate. \code{x.parms = c(mean, sd)} should be specified for \code{x.dist = "normal"} and \code{x.parms = c(size, probs)} should be specified for \code{"binomial"}; when \code{size = 1}, it generates binary covariate. Default is \code{NULL}.
+}
  \item{depend}{
-Variance of the frailty distribution. Dependence within families increases with depend value.  Default is \code{NULL}. Value should be specified as a positive real number when \code{variation="frailty"}. 
+Inverse of variance of the frailty distribution. Dependence within families decreases with depend value.  Default is \code{NULL}. Value should be specified as a positive real number when \code{variation = "frailty"} or \code{variation = "kinship"}. 
 }
 
  \item{base.dist}{
@@ -39,11 +50,15 @@ Choice of baseline hazard distribution.  Possible choices are: \code{"Weibull"},
 Choice of frailty distribution.  Possible choices are: \code{"gamma"} or \code{"lognormal"} when \code{variation="frailty"}. Default is \code{NULL}.
 }
   \item{base.parms}{
-Vector of parameter values for the specified baseline hazard function. \code{base.parms=c(lambda, rho)} should be specified for \code{base.dist="Weibull"}, \code{"loglogistic"}, \code{"Gompertz"}, \code{"gamma"}, and \code{"lognormal"}. For \code{base.dist="logBurr"}, three parameters should be specified \code{base.parms = c(lambda, rho, eta)}. }  	
+Vector of parameter values for the specified baseline hazard function. \code{base.parms = c(lambda, rho)} should be specified for \code{base.dist = "Weibull"}, \code{"loglogistic"}, \code{"Gompertz"}, \code{"gamma"}, and \code{"lognormal"}. For \code{base.dist = "logBurr"}, three parameters should be specified \code{base.parms = c(lambda, rho, eta)}. 
+Default value is \code{base.parms = c(0.016, 3)} for \code{base.dist = "Weibull"}.
+}
   \item{vbeta}{
-Vector of regression coefficients for gender, majorgene, interaction between gender and majorgene (if \code{interaction = TRUE}), and secondgene (if \code{variation = "secondgene"}). }
-  \item{allelefreq}{
-Vector of population allele frequencies of major and second disease gene alleles. Frequencies must be between 0 and 1. Default frequencies are 0.02 for major gene allele and 0.2 for second gene allele, \code{allelefreq = c(0.02, 0.2)}.}
+Vector of regression coefficients for gender, majorgene, interaction between gender and majorgene (if \code{interaction = TRUE}), secondgene (if \code{variation = "secondgene"}), and additional covariate (if \code{add.x = TRUE}).}
+
+ \item{allelefreq}{
+Population allele frequencies of major disease gene. Value should be between 0 and 1. 
+Vector of population allele frequencies of major and second disease genes should be provided when \code{variation = "secondgene"}. Default value is \code{allelefreq = 0.02}.}
   \item{dominant.m}{Logical; if \code{TRUE}, the genetic model of major gene is dominant, otherwise recessive.}
   \item{dominant.s}{Logical; if \code{TRUE}, the genetic model of second gene is dominant, otherwise recessive.}
   \item{mrate}{
@@ -63,11 +78,11 @@ Maximum age of disease onset or maximum age. Default is 100 years of age.
 
 }
 \details{
-The \code{design} argument defines the type of family based design to be simulated. Two variants of the population-based and clinic-based design can be chosen: \code{"pop"} when proband is affected, \code{"pop+"} when proband is affected mutation carrier, \code{"cli"} when proband is affected and at least one parent and one sibling are affected, \code{"cli+"} when proband is affected mutation-carrier and at least one parent and one sibling are affected. The two-stage design, \code{"twostage"}, is used to oversample high risk families, where the proportion of high risks families to include in the sample is specified by \code{hr}. High risk families often include multiple (at least two) affected members in the family.
+The \code{design} argument defines the type of family based design to be simulated. Two variants of the population-based and clinic-based design can be chosen: \code{"pop"} when proband is affected, \code{"pop+"} when proband is affected mutation carrier, \code{"cli"} when proband is affected and at least one parent and one sibling are affected, \code{"cli+"} when proband is affected mutation-carrier and at least one parent and one sibling are affected. The two-stage design, \code{"twostage"}, is used to oversample high risk families, where the proportion of high risks families to include in the sample is specified by \code{hr}. High risk families often include multiple (at least two) affected members in the family. \code{design = "noasc"} is to be used for no ascertainment correction.
 
-The ages at onset are generated from the following penetrance models depending on the choice of \code{variation = "none", "frailty", "secondgene".}. When \code{variation = "none"}, the ages at onset are independently generated from the proportional hazard model conditional on the gender and carrier status of major gene mutation, \ifelse{html}{ \out{ X = c(x<sub>s</sub>, x<sub>g</sub>)}}{\eqn{X=(x_s, x_g)}{X=c(xs, xg)}}.  
+The ages at onset are generated from the following penetrance models depending on the choice of \code{variation = "none", "frailty", "secondgene", "kinship".}. When \code{variation = "none"}, the ages at onset are independently generated from the proportional hazard model conditional on the gender and carrier status of major gene mutation, \ifelse{html}{ \out{ X = c(x<sub>s</sub>, x<sub>g</sub>)}}{\eqn{X=(x_s, x_g)}{X=c(xs, xg)}}.  
 %When \code{variation = "frailty"}, the ages at onset are generated from the shared frailty model that induces the residual familial correlation by a frailty shared within the family. When \code{variation = "secondgene"}, the ages at onset are generated from the two-gene model that induces the residual familial correlation by a second gene shared within the family.
-The ages at onset correlated within families are generated from the shared frailty model (code{variation = "frailty"}) or the two-gene model (code{variation = "secondene"}), where the residual familial correlation is induced by a frailty or a second gene, respectively, shared within the family.
+The ages at onset correlated within families are generated from the shared frailty model (\code{variation = "frailty"}) , the correlated shared frailty model with kinship matrix (\code{variation = "kinship"}), or the two-gene model (\code{variation = "secondene"}), where the residual familial correlation is induced by a frailty or a second gene, respectively, shared within the family.
 
 \emph{The proportional hazard model}
 
@@ -82,6 +97,12 @@ where \ifelse{html}{\out{h<sub>0</sub>(t)}}{\eqn{h_0(t)}{h0(t)}} is the baseline
 		\deqn{ h(t|X,Z) = h_0(t - t_0) Z \exp(\beta_s x_s+\beta_g x_g) ,}{ h(g|X,Z) = h0(t - t0) * Z * exp(\betas * xs + \betag * xg) ,}}
 where \ifelse{html}{\out{h<sub>0</sub>(t)}}{\eqn{h_0(t)}{h0(t)}} is the baseline hazard function, \ifelse{html}{\out{t<sub>0</sub>}}{\eqn{t_0}{t0}} is a minimum age of disease onset, \eqn{Z} represents a frailty shared within families and follows either a gamma or log-normal distribution, \ifelse{html}{\out{x<sub>x</sub>}}{\eqn{x_s}{xs}} and \ifelse{html}{\out{x<sub>g</sub>}}{\eqn{x_g}{xg}} indicate male (1) or female (0) and carrier (1) or non-carrier (0) of a main gene of interest, respectively.
 
+\emph{The correlated shared frailty model with kinship matrix}
+
+\ifelse{html}{ \out{<p style="text-align:center"> h(t|X,Z) = h<sub>0</sub>(t - t<sub>0</sub>) Z exp(&beta;<sub>s</sub> * x<sub>s</sub> + &beta;<sub>g</sub> * x<sub>g</sub>), </p>}}{	
+		\deqn{ h(t|X,Z) = h_0(t - t_0) Z \exp(\beta_s x_s+\beta_g x_g) ,}{ h(g|X,Z) = h0(t - t0) * Z * exp(\betas * xs + \betag * xg) ,}}
+where \ifelse{html}{\out{h<sub>0</sub>(t)}}{\eqn{h_0(t)}{h0(t)}} is the baseline hazard function, \ifelse{html}{\out{t<sub>0</sub>}}{\eqn{t_0}{t0}} is a minimum age of disease onset, \eqn{Z} represents a vector of frailties following a multivariate log-normal distribution with mean \eqn{0} and variance \eqn{2*K*depend}, where \eqn{K} represents the kinship matrix, \ifelse{html}{\out{x<sub>x</sub>}}{\eqn{x_s}{xs}} and \ifelse{html}{\out{x<sub>g</sub>}}{\eqn{x_g}{xg}} indicate male (1) or female (0) and carrier (1) or non-carrier (0) of a main gene of interest, respectively.
+
 \emph{The two-gene model}
 
 \ifelse{html}{ \out{<p style="text-align:center"> h(t|X) = h<sub>0</sub>(t - t<sub>0</sub>) Z exp(&beta;<sub>s</sub> * x<sub>s</sub> + &beta;<sub>1</sub> * x<sub>2</sub> + &beta;<sub>2</sub> * x<sub>2</sub>), </p>}}{
@@ -90,7 +111,7 @@ where \ifelse{html}{ \out{x<sub>1</sub>, x<sub>2</sub>}}{\eqn{x_1, x_2}{x1,x2}} 
 
 The current ages for each generation are simulated assuming normal distributions. However, the probands' ages are generated using a left truncated normal distribution as their ages cannot be less than the minimum age of onset. The average age difference between each generation and their parents is specified as 20 years apart. 
 
-Note that simulating family data under the clinic-based designs (\code{"cli"} or \code{"cli+"}) or the two-stage design can be slower since the ascertainment criteria for the high risk families are difficult to meet in such settings. Especially, \code{"cli"} design could be slower than \code{"cli+"} design since the proband's mutation status is randomly selected from a disease population in \code{"cli"} design, so his/her family members are less likely to be mutation carriers and have less chance to be affected, whereas the probands are all mutation carriers, their family members have higher chance to be carriers and affected by disease. Therefore, \code{"cli"} design requires more iterations to sample high risk families than \code{"cli+"} design. All designs simulations that include \code{variation = "frailty"} could be also slower in order to generate families with specific familial correlations induced by the chosen frailty distribution.
+Note that simulating family data under the clinic-based designs (\code{"cli"} or \code{"cli+"}) or the two-stage design can be slower since the ascertainment criteria for the high risk families are difficult to meet in such settings. Especially, \code{"cli"} design could be slower than \code{"cli+"} design since the proband's mutation status is randomly selected from a disease population in \code{"cli"} design, so his/her family members are less likely to be mutation carriers and have less chance to be affected, whereas the probands are all mutation carriers, their family members have higher chance to be carriers and affected by disease. Therefore, \code{"cli"} design requires more iterations to sample high risk families than \code{"cli+"} design. 
 
 }
 \value{
@@ -141,13 +162,13 @@ Yun-Hee Choi, Wenqing He
 }
 \examples{
 
-## Example 1: simulate family data from population-based design using
+## Example 1: simulate family data from a population-based design using
 #  a Weibull distribution for the baseline hazard and inducing 
 #  residual familial correlation through a shared gamma frailty.
 
 set.seed(4321)
 fam <- simfam(N.fam = 10, design = "pop+", variation = "frailty", 
-       base.dist = "Weibull", frailty.dist = "gamma", depend=1, 
+       base.dist = "Weibull", frailty.dist = "gamma", depend = 1, 
        allelefreq = 0.02, base.parms = c(0.01, 3), vbeta = c(-1.13, 2.35))
 
 head(fam) 
@@ -173,12 +194,21 @@ summary(fam)
 
 plot(fam, famid = c(1:2)) # pedigree plots for families with IDs = 1 and 2
 
-## Example 2: simulate family data from two stage design to include 
+## Example 2: simulate family data from a two-stage design to include 
 #  30\% of high risk families in the sample. 
 
 set.seed(4321)
 fam <- simfam(N.fam = 50, design = "twostage", variation = "none", base.dist = "Weibull", 
        base.parms = c(0.01, 3), vbeta = c(-1.13, 2.35), hr = 0.3, allelefreq = 0.02)
+
+summary(fam)
+
+## Example 3: simulate family data from a correlated frailty model with kinship matrix 
+
+set.seed(4321)
+fam <- simfam(N.fam = 50, design = "pop", variation = "kinship", base.dist = "Weibull", 
+       frailty.dist = "lognormal", base.parms = c(0.01, 3), vbeta = c(-1.13, 2.35), 
+       depend = 1, allelefreq = 0.02)
 
 summary(fam)
 

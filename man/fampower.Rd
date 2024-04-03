@@ -60,7 +60,7 @@ Vector of parameter values for baseline hazard function.
 \code{base.parms = c(lambda, rho)}, where lambda and rho are the shape and scale parameters, respectively. If \code{base.dist = "logBurr"} is chosen, three parameters should be specified for \code{base.parms = c(lambda, rho, eta)}. 
 }
 \item{allelefreq}{
-Vector of population allele frequencies of major and second disease gene alleles. Frequencies must be between 0 and 1. Default frequencies are 0.02 for major gene allele and 0.2 for second gene allele, \code{allelefreq=c(0.02, 0.2)}.}
+Vector of population allele frequencies of major and second disease gene alleles. Frequencies must be between 0 and 1. Default frequencies are 0.02 for major gene allele and 0.2 for second gene allele, \code{allelefreq = c(0.02, 0.2)}.}
 \item{dominant.m}{Logical; if \code{TRUE}, the genetic model of the major gene is dominant, otherwise recessive.}
 \item{dominant.s}{Logical; if \code{TRUE}, the genetic model of the second gene is dominant, otherwise recessive.}
 \item{mrate}{

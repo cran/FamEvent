@@ -1,4 +1,4 @@
-print.penmodel_c <- function (x, digits = max(3, getOption("digits") - 3), ...) 
+print.penmodel_cmp <- function (x, digits = max(3, getOption("digits") - 3), ...) 
 {
   savedig <- options(digits = digits)
   on.exit(options(savedig))

@@ -1,11 +1,11 @@
-\name{penmodel_c}
-\alias{penmodel_c}
+\name{penmodel_cmp}
+\alias{penmodel_cmp}
 \title{Fit a penetrance model for competing risks data}
 \description{
 Fits a competing risks model for family data with ascertainment correction and provides model parameter estimates. 
 }
 \usage{
-penmodel_c(formula1, formula2, cluster = "famID", gvar = "mgene", 
+penmodel_cmp(formula1, formula2, cluster = "famID", gvar = "mgene", 
 parms, cuts = NULL, data,  design = "pop", base.dist = "Weibull", 
 frailty.dist = "none", agemin = NULL, robust = FALSE)
 }
@@ -19,7 +19,9 @@ Name of cluster variable. Default is \code{"famID"}.
 }
 \item{gvar}{Name of genetic variable. Default is \code{"mgene"}.}
 \item{parms}{
-list of Vectors of initial values for the parameters in each model including baseline parameters and regression coefficients and frailty parameters. \code{parms = list(c(baseparm1, coef1), c(baseparms2, coef2), c(k1, k2)}, where \code{baseparm1} and \code{baseparm2} include the initial values for baseline parameters used for each \code{base.dist}; \code{coef1} and \code{coef2} include the initial values for regression coefficients for the variables specified in \code{formula1} and \code{formula2}, respectively, and \code{c(k1, k2)} are the initial values for frailty parameters used for the specified frailty.distribution.
+list of Vectors of initial values for the parameters in each model including baseline parameters and regression coefficients and frailty parameters. 
+
+\code{parms = list(c(baseparm1, coef1), c(baseparms2, coef2), c(k1, k2)}, where \code{baseparm1} and \code{baseparm2} include the initial values for baseline parameters used for each \code{base.dist}; \code{coef1} and \code{coef2} include the initial values for regression coefficients for the variables specified in \code{formula1} and \code{formula2}, respectively, and \code{c(k1, k2)} are the initial values for frailty parameters used for the specified frailty.distribution.
 See Details for more details.
 }
 \item{cuts}{ 
@@ -71,18 +73,16 @@ where \ifelse{html}{\out{h<sub>01</sub>(t)}}{\eqn{h_{01}(t)}{h01(t)}} and \ifels
 \ifelse{html}{\out{Z<sub>j</sub>}}{\eqn{Z_j}{Zj}} follows Gamma(\ifelse{html}{\out{k<sub>j</sub>}}{\eqn{k_j}{kj}}, \ifelse{html}{\out{1/k<sub>j</sub>}}{\eqn{1/k_j}{1/kj}}). 
 
 \code{frailty.dist = "lognormal"} shares the frailties within families generated from a log-normal distribution independently for each competing event, where 
-\ifelse{html}{\out{Z<sub>j</sub>}}{\eqn{Z_j}{Zj}} follows log-normal distribution with mean 0 and variance (\ifelse{html}{\out{1/k<sub>j</sub>}}{\eqn{1/k_j}{1/kj}}.
+\ifelse{html}{\out{Z<sub>j</sub>}}{\eqn{Z_j}{Zj}} follows log-normal distribution with mean 0 and variance \ifelse{html}{\out{1/k<sub>j</sub>}}{\eqn{1/k_j}{1/kj}}.
 
 \code{frailty.dist = "cgamma"} shares the frailties within families generated from a correlated gamma distribution to allow the frailties between two events to be correlated, where the correlated gamma frailties (\ifelse{html}{\out{Z<sub>1</sub>, Z<sub>2</sub>}}{\eqn{Z_1, Z_2}{Z1, Z2}}) are generated with three independent gamma frailties (\ifelse{html}{\out{Y<sub>0</sub>, Y<sub>1</sub>, Y<sub>2</sub>}}{\eqn{Y_0, Y_1, Y_2}{Y0, Y1, Y2}}) as follows:
 
-\ifelse{html}{\out{Z<sub>1</sub> = k<sub>0</sub>/(k<sub>0</sub> + k<sub>1</sub>) Y<sub>0</sub> + Y<sub>1</sub>} }{\eqn{Z_1 = (k_0/(k_0 + k_1) Y_0 + Y_1}{Z1 = k0/(k0+k1)Y0 + Y1} }
+\ifelse{html}{\out{Z<sub>1</sub> = k<sub>0</sub>/(k<sub>0</sub> + k<sub>1</sub>) Y<sub>0</sub> + Y<sub>1</sub>} }{\eqn{Z_1 = (k_0/(k_0 + k_1) Y_0 + Y_1}{Z1 = k0/(k0+k1)Y0 + Y1} };
 
-\ifelse{html}{\out{Z<sub>2</sub> = k<sub>0</sub>/(k<sub>0</sub> + k<sub>2</sub>) Y<sub>0</sub> + Y<sub>2</sub>} }{\eqn{Z_2 = (k_0/(k_0 + k_2) Y_0 + Y_2}{Z2 = k0/(k0+k2)Y0 + Y2} }
+\ifelse{html}{\out{Z<sub>2</sub> = k<sub>0</sub>/(k<sub>0</sub> + k<sub>2</sub>) Y<sub>0</sub> + Y<sub>2</sub>} }{\eqn{Z_2 = (k_0/(k_0 + k_2) Y_0 + Y_2}{Z2 = k0/(k0+k2)Y0 + Y2} },
 
-where \ifelse{html}{\out{Y<sub>0</sub>}}{\eqn{Y_0}{Y0}} from Gamma(\ifelse{html}{\out{k<sub>0</sub>}}{\eqn{k_0}{k0}}, \ifelse{html}{\out{1/k<sub>0</sub>}}{\eqn{1/k_0}{1/k0}});
-
-\ifelse{html}{\out{Y<sub>1</sub>}}{\eqn{Y_1}{Y1}} from Gamma(\ifelse{html}{\out{k<sub>1</sub>}}{\eqn{k_1}{k1}}, \ifelse{html}{\out{1/(k<sub>0</sub> + k<sub>1</sub>)}}{\eqn{1/(k_0+k_1)}{1/(k0+k1)}});
-
+where \ifelse{html}{\out{Y<sub>0</sub>}}{\eqn{Y_0}{Y0}} from Gamma(\ifelse{html}{\out{k<sub>0</sub>}}{\eqn{k_0}{k0}}, \ifelse{html}{\out{1/k<sub>0</sub>}}{\eqn{1/k_0}{1/k0}}),
+\ifelse{html}{\out{Y<sub>1</sub>}}{\eqn{Y_1}{Y1}} from Gamma(\ifelse{html}{\out{k<sub>1</sub>}}{\eqn{k_1}{k1}}, \ifelse{html}{\out{1/(k<sub>0</sub> + k<sub>1</sub>)}}{\eqn{1/(k_0+k_1)}{1/(k0+k1)}}),
 \ifelse{html}{\out{Y<sub>2</sub>}}{\eqn{Y_2}{Y2}} from Gamma(\ifelse{html}{\out{k<sub>2</sub>}}{\eqn{k_2}{k2}}, \ifelse{html}{\out{1/(k<sub>0</sub> + k<sub>2</sub>)}}{\eqn{1/(k_0+k_2)}{1/(k0+k2)}}).
 
 \code{frailty.dist = "clognormal"} shares the frailties within families generated from a correlated log-normal distribution where 
@@ -102,7 +102,7 @@ Calculations of penetrance estimates and their standard errors and 95\% confiden
 
 }
 \value{
-Returns an object of class \code{'penmodel_c'}, including the following elements:
+Returns an object of class \code{'penmodel_cmp'}, including the following elements:
 
 \item{estimates}{
 Parameter estimates of transformed baseline parameters and regression coefficients.
@@ -131,8 +131,8 @@ Choi, Y.-H., Briollais, L., He, W. and Kopciuk, K. (2021) FamEvent: An R Package
 Yun-Hee Choi
 }
 \seealso{
-\code{\link{simfam_c}}, \code{\link{penplot_c}}, \code{\link{print.penmodel_c}},
-\code{\link{summary.penmodel_c}}, \code{\link{print.summary.penmodel_c}}, \code{\link{plot.penmodel_c}}
+\code{\link{simfam_cmp}}, \code{\link{penplot_cmp}}, \code{\link{print.penmodel_cmp}},
+\code{\link{summary.penmodel_cmp}}, \code{\link{print.summary.penmodel_cmp}}, \code{\link{plot.penmodel_cmp}}
 }
 \examples{
 
@@ -140,14 +140,14 @@ Yun-Hee Choi
 # using Weibull baseline hazards with gamma frailty distribution.
 \dontrun{
 set.seed(4321)
-fam1 <- simfam_c(N.fam = 200, design = "pop+", variation = "frailty", competing=TRUE,
+fam1 <- simfam_cmp(N.fam = 200, design = "pop+", variation = "frailty", 
               base.dist = "Weibull", frailty.dist = "cgamma", depend=c(0.5, 1, 0.5), 
               allelefreq = 0.02, base.parms = list(c(0.01, 3), c(0.01, 3)), 
               vbeta = list(c(-1.13, 2.35), c(-1, 2)))
 
 # Fitting shared gamma frailty Penetrance model for simulated competing risk data
 
-fit1 <- penmodel_c(
+fit1 <- penmodel_cmp(
         formula1 = Surv(time, status==1) ~ gender + mgene, 
         formula2 = Surv(time, status==2) ~ gender + mgene,
         cluster = "famID", gvar = "mgene", design = "pop+",  
@@ -156,7 +156,7 @@ fit1 <- penmodel_c(
 
 # Fitting shared correlated gamma frailty Penetrance model for simulated competing risk data
 
-fit2 <- penmodel_c(
+fit2 <- penmodel_cmp(
         formula1 = Surv(time, status==1) ~ gender + mgene, 
         formula2 = Surv(time, status==2) ~ gender + mgene,
         cluster = "famID", gvar = "mgene", design = "pop+",  

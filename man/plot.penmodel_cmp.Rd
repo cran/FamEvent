@@ -1,13 +1,13 @@
-\name{plot.penmodel_c}
-\alias{plot.penmodel_c}
+\name{plot.penmodel_cmp}
+\alias{plot.penmodel_cmp}
 \title{
-Plot method for \code{penmodel_c}
+Plot method for \code{penmodel_cmp}
 }
 \description{
 Plots penetrance curves for each event estimated from the fitted competing risks model and overlays non-parametric cumulative incidence curves estimated from the data without proabands.
 }
 \usage{
-\method{plot}{penmodel_c}(x, agemax = 80, print = TRUE, conf.int = FALSE, 
+\method{plot}{penmodel_cmp}(x, agemax = 80, print = TRUE, conf.int = FALSE, 
 add.CIF = TRUE, MC = 100, col = c("blue", "red", "blue", "red"), lty = c(1, 1, 2, 2), 
 xlab = "Age at onset", ylab = "Penetrance", ylim = NULL,  ...)
 }
@@ -40,7 +40,7 @@ Types of lines for male carriers, female carriers, male noncarriers, and female 
 \details{
 The 95\% confidence intervals for the parametric penetrance curves are
 obtained based on simulations of the parameters, assuming a multivariate normal distribution for the estimated
-parameters with their variance-covariance matrix. See \code{\link{penetrance_c}} for more details.
+parameters with their variance-covariance matrix. See \code{\link{penetrance_cmp}} for more details.
 }
 \value{
 Returns the following summary values:
@@ -62,21 +62,21 @@ Yun-Hee Choi
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-\code{\link{penmodel_c}, \link{print.penmodel_c}, \link{summary.penmodel_c},
-\link{print.summary.penmodel_c}, \link{simfam_c}	}
+\code{\link{penmodel_cmp}, \link{print.penmodel_cmp}, \link{summary.penmodel_cmp},
+\link{print.summary.penmodel_cmp}, \link{simfam_cmp}	}
 }
 \examples{
 
 \dontrun{
-# Simulated family data  
+# Simulate family data  
 set.seed(4321)
-fam2 <- simfam_c(N.fam = 500, design = "pop+", variation = "frailty", competing=TRUE,
+fam2 <- simfam_cmp(N.fam = 500, design = "pop+", variation = "frailty", 
                   base.dist = "Weibull", frailty.dist = "cgamma", depend=c(2, 2, 2), 
                   allelefreq = 0.02, base.parms = list(c(0.01, 3), c(0.01, 3)), 
                   vbeta = list(c(-1.13, 2.35),c(-1, 2)))
 
 # Fit family data
-fit2 <- penmodel_c(formula1 = Surv(time, status==1)~ gender + mgene, 
+fit2 <- penmodel_cmp(formula1 = Surv(time, status==1)~ gender + mgene, 
                    formula2 = Surv(time, status==2)~ gender + mgene, 
                    cluster = "famID", gvar = "mgene", frailty.dist = "cgamma",
                    parms=list(c(0.01, 3, -1, 2.3), c(0.01, 3, -1, 2), c(2, 2, 2)), 

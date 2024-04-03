@@ -1,4 +1,4 @@
-penetrance_c <- function(fit, event=1, fixed, age, CI=TRUE, MC=100){
+penetrance_cmp <- function(fit, event=1, fixed, age, CI=TRUE, MC=100){
  
   if(CI & MC==0) stop("The numbers of Monte-Carlo samples to use for constructing CIs should be specified.")
   if(!CI) MC <- 0

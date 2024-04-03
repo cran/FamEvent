@@ -1,5 +1,5 @@
-\name{penetrance_c}
-\alias{penetrance_c}
+\name{penetrance_cmp}
+\alias{penetrance_cmp}
 \title{
   Estimating Penetrances for competing risk models and confidence intervals
 }
@@ -7,12 +7,12 @@
   Estimates the cumulative disease risks (penetrances) and confidence intervals for the event of interest in the presence of competing event given fixed values of covariates based on the fitted competing risk model. 
 }
 \usage{
-  penetrance_c(fit, event = 1, fixed, age, CI = TRUE, MC = 100)
+  penetrance_cmp(fit, event = 1, fixed, age, CI = TRUE, MC = 100)
 }
 
 \arguments{
   \item{fit}{
-    An object class of \code{'penmodel_c'}, a fitted model by \code{\link{penmodel_c}} function.
+    An object class of \code{'penmodel_cmp'}, a fitted model by \code{\link{penmodel_cmp}} function.
   }
   \item{event}{
     Event of interest (either 1 or 2) for penetrance estimation. Default value is 1.
@@ -86,17 +86,17 @@ Choi, Y.-H., Briollais, L., He, W. and Kopciuk, K. (2021) FamEvent: An R Package
   Yun-Hee Choi
 }
 \seealso{
-  \code{\link{simfam_c}, \link{penmodel_c}}
+  \code{\link{simfam_cmp}, \link{penmodel_cmp}}
 }
 \examples{
 \dontrun{
 set.seed(4321)
-fam2 <- simfam_c(N.fam = 200, design = "pop+", variation = "frailty", competing = TRUE,
+fam2 <- simfam_cmp(N.fam = 200, design = "pop+", variation = "frailty", competing = TRUE,
                 base.dist = "Weibull", frailty.dist = "cgamma", depend=c(2, 2, 2), 
                 base.parms = list(c(0.01, 3), c(0.01, 3)), 
                 vbeta = list(c(-1.13, 2.35), c(-1, 2)), allelefreq = 0.02)
 
-fit2 <- penmodel_c(Surv(time, status==1) ~ gender + mgene, 
+fit2 <- penmodel_cmp(Surv(time, status==1) ~ gender + mgene, 
                    Surv(time, status==2) ~ gender + mgene, 
                    cluster = "famID", gvar = "mgene", frailty.dist = "cgamma",
                    parms = list(c(0.01, 3, -1, 2.3), c(0.01, 3, -1, 2), c(2, 2, 2)), 
@@ -106,7 +106,7 @@ fit2 <- penmodel_c(Surv(time, status==1) ~ gender + mgene,
 # Compute penetrance estimates for event 1 for male carriers at age 40, 50, 60, 70 and
 # their 95% CIs based on 100 Monte Carlo simulations.
  
-penetrance_c(fit2, event = 1, fixed = list(c(1,1), c(1,1)), 
+penetrance_cmp(fit2, event = 1, fixed = list(c(1,1), c(1,1)), 
              age = c(40, 50, 60, 70), CI = TRUE, MC = 200)
 }
 }
