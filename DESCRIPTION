@@ -1,8 +1,8 @@
 Package: FamEvent
 Type: Package
 Title: Family Age-at-Onset Data Simulation and Penetrance Estimation
-Version: 3.1
-Date: 2024-04-03
+Version: 3.2
+Date: 2024-07-02
 Author: Yun-Hee Choi, Karen Kopciuk, Wenqing He, Laurent Briollais
 Maintainer: Yun-Hee Choi <yun-hee.choi@schulich.uwo.ca>
 Description: Simulates age-at-onset traits associated with a segregating major gene in family data 
@@ -22,5 +22,5 @@ Depends: R (>= 3.3.0), survival
 Imports: MASS, stats, kinship2, truncnorm, eha, pracma, cmprsk,
         matrixcalc
 Repository: CRAN
-Packaged: 2024-04-03 17:58:44 UTC; yun-heechoi
-Date/Publication: 2024-04-03 23:33:10 UTC
+Packaged: 2024-07-02 18:49:20 UTC; yun-heechoi
+Date/Publication: 2024-07-02 19:30:06 UTC

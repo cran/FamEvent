@@ -1,4 +1,4 @@
-summary.simfam2 <- function(object, digits = max(3, getOption("digits") - 3), ...){
+summary.simfam_tvc <- function(object, digits = max(3, getOption("digits") - 3), ...){
 
   savedig <- options(digits = digits)
   on.exit(options(savedig))
@@ -37,38 +37,60 @@ if(is.null(object$weight)) object$weight <- 1
 
 	k <- ifelse(is.null(design), 1, ifelse(design=="twostage",2,1))
 	for(i in 1:k){
-		if(is.null(design)) data <- object
+		  if(is.null(design)) data <- object
   		else if(design=="twostage"){
-	 		if(i==1){ 
+	 		  if(i==1){ 
 	 			data <- object[object$weight==1,]
 				cat("\n ## High risk families", "\n")
-	 		}
-	 		else{
+	 		  }
+	 		  else{
 	 			data <- object[object$weight!=1,]
 				cat("\n ## Low risk families", "\n")
-	 		}
+	 		  }
   		}
-		else data <- object	 
+		  else data <- object	 
 
 numfam <- length(data$famID[data$proband==1])
 avgnumaffec <- sum(data$status, na.rm=TRUE)/numfam
 avgnumcarr <- sum(data$mgene,na.rm=TRUE)/numfam
 if(!is.null(data$fsize)) avgfamsize <- mean(data$fsize[data$proband==1])
 else avgfamsize <- mean(aggregate(data$indID, by=list(data$famID), length)[,2])
+
 avgageonset <- mean(data$time[data$status==1], na.rm=TRUE)
 wt <- unique(data$weight)
 
-ans <- list(num.fam=numfam, avg.num.affected=avgnumaffec, avg.num.carriers=avgnumcarr, avg.family.size=avgfamsize,avgageonset=avgageonset)
+if(!is.null(data$tvc.status)) {
+  avgnumtvc <- sum(data$tvc.status, na.rm=TRUE)/numfam
+  ans <- list(num.fam=numfam, avg.num.affected=avgnumaffec, avg.num.carriers=avgnumcarr, 
+              avg.family.size=avgfamsize, avgageonset=avgageonset,
+              avg.num.tvc = avgnumtvc)
+}
+else{
+ans <- list(num.fam=numfam, avg.num.affected=avgnumaffec, avg.num.carriers=avgnumcarr, 
+            avg.family.size=avgfamsize, avgageonset=avgageonset)
+}
 
 if(i==1) ans.high <- ans
-nn<-c(
-"Number of families:                    ", 
-"Average number of affected per family: ", 
-"Average number of carriers per family: ", 
-"Average family size:                   ",
-"Average age of onset for affected:     ")
 
-for(j in 1:5)  cat(nn[j], ans[[j]], "\n")
+if(is.null(data$tvc.status)){
+  nn<-c(
+    "Number of families:                    ", 
+    "Average number of affected per family: ", 
+    "Average number of carriers per family: ", 
+    "Average family size:                   ",
+    "Average age of onset for affected:     ")
+  for(j in 1:5)  cat(nn[j], ans[[j]], "\n")
+}
+else{
+  nn<-c(
+    "Number of families:                     ", 
+    "Average number of affected per family:  ", 
+    "Average number of carriers per family:  ", 
+    "Average family size:                    ",
+    "Average age of onset for affected:      ",
+    "Average number of TVC events per family:")
+  for(j in 1:6)  cat(nn[j], ans[[j]], "\n")
+}
 
 #cat("Sampling weights used:                 ", unique(data$weight))
 #cat("\n")
@@ -83,7 +105,7 @@ if(is.null(variation)) attr(ans, "frailty.dist") <- NULL
 else if(length(variation)==1 & variation == "none") attr(ans,"frailty.dist") <- NULL
 else  attr(ans,"frailty.dist") <- frailty.dist
 attr(ans, "variation") <- variation
-class(ans) <- "summary.simfam"
+class(ans) <- "summary.simfam_tvc"
 invisible(ans)
 
 }

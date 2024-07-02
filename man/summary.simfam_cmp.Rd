@@ -59,7 +59,6 @@ Average number of carriers per family:  5.54
 Average family size:                    15.58 
 Average age of onset for event 1:       42.59 
 Average age of onset for event 2:       43.72 
-Sampling weights used:                  1
 }
 
 }

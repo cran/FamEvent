@@ -8,5 +8,5 @@ else if(dist=="gamma") chaz <- -log(1-pgamma(t,shape=parms[2], scale=1/parms[1] 
 else if(dist=="logBurr") chaz <- parms[3]*log(1+(parms[1]*t)^parms[2]/parms[3])
 else if(dist=="piecewise") chaz <- Hpch(t, cuts=cuts, levels=parms)
 else stop("Unrecognized baseline distribution")
- chaz
- }
+return(chaz)
+}

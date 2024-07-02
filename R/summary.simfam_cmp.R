@@ -70,8 +70,8 @@ nn<-c(
 
 for(j in 1:7)  cat(nn[j], ans[[j]], "\n")
 
-cat("Sampling weights used:                 ", unique(data$weight))
-cat("\n")
+#cat("Sampling weights used:                 ", unique(data$weight))
+#cat("\n")
 
 if(i==2) ans<-cbind(HighRisk=ans.high, LowRisk=ans)
 

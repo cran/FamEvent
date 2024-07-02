@@ -4,20 +4,30 @@ penmodel <- function(formula, cluster="famID", gvar="mgene", parms, cuts=NULL, d
   if(!frailty.dist%in%c("none", "gamma", "lognormal")) stop("frailty.dist should be one of \"none\", \"gamma\", or \"lognormal\".")
   nfp <- ifelse(frailty.dist=="none", 0, 1)
   
-  if(any(is.na(data[, gvar]))) stop("data include missing genetic information, use penmodelEM function.")
+#  if(any(is.na(data[, gvar]))) cat("Individuals with missing genetic information were removed.") #stop("data include missing genetic information, use penmodelEM function.")
   options(na.action='na.omit')
   
-  agemin <- attr(data, "agemin")
   if(is.null(agemin)){
-    agemin <- 0
-    warning("agemin = 0 was used or assign agemin to attr(data, \"agemin\").")
+    agemin <- attr(data, "agemin")
+    if(is.null(agemin)) {
+          agemin <- 0
+          warning("agemin = 0 was used or assign agemin to attr(data, \"agemin\").")
+    }
   }
   
-  if(sum(data$time <=  agemin, na.rm = TRUE) > 0) cat("Individuals with time < agemin (", agemin,") were removed from the analysis.\n")
+  
+  if(sum(data$time <=  agemin, na.rm = TRUE) > 0) cat("Individuals with time < agemin (", agemin,") were removed.\n")
   
   data <- data[data$time >=  agemin, ]
   data$famID.byuser <- data[, cluster]
-  m <- model.frame(formula, data)
+  
+  x.names <- attr(terms(formula), "term.labels")
+  i.missing <- apply(data[, x.names], 1, anyNA) # indicates if any x variable is missing
+  newdata <- data[!i.missing,]
+
+  if( sum(i.missing) >0 ) cat("Individuals with missing covariates were removed.\n")
+  m <- model.frame(formula, data) # missing data were removed
+  
   Terms <- attr(m, "terms")
   Y <- model.extract(m, "response")
   
@@ -49,7 +59,7 @@ penmodel <- function(formula, cluster="famID", gvar="mgene", parms, cuts=NULL, d
 #  if(length(vbeta) != nvar) stop("The size of parms is incorrect.")
   if(length(parms) != (nvar+nbase+nfp) ) stop("The size of parms is incorrect.")
   
-  if(is.null(data$weight)) data$weight <- 1
+  if(is.null(newdata$weight)) newdata$weight <- 1
  
   if(base.dist=="lognormal"){
   	if(parms[2] <= 0) stop("parms[2] has to be > 0")
@@ -59,17 +69,18 @@ penmodel <- function(formula, cluster="famID", gvar="mgene", parms, cuts=NULL, d
   
   if(frailty.dist=="none"){
     est1 <- optim(c(log(parms[1:nbase]), vbeta), loglik_ind, X=X, Y=Y, cuts=cuts, 
-                  nbase=nbase, data=data, design=design, base.dist=base.dist, 
+                  nbase=nbase, data=newdata, design=design, base.dist=base.dist, 
                   agemin=agemin, control = list(maxit = 50000), hessian=TRUE)
   }
   else{ # frailty model
-    if(is.null(data$df)){
-      df <- aggregate(Y[,2], list(data$famID), sum)[,2]
-      fsize <- aggregate(Y[,2], list(data$famID), length)[,2]
-      data$df <- rep(df, fsize)
+    if(is.null(newdata$df)){
+      df <- aggregate(Y[,2], list(newdata$famID), sum)[,2]
+      fsize <- aggregate(Y[,2], list(newdata$famID), length)[,2]
+      newdata$df <- rep(df, fsize)
     }
+    
     est1 <- optim(c(log(parms[1:nbase]), vbeta, log(kappa)), loglik_frailty, X=X, Y=Y, 
-                  cuts=cuts, nbase=nbase, data=data, design=design, base.dist=base.dist, 
+                  cuts=cuts, nbase=nbase, data=newdata, design=design, base.dist=base.dist, 
                   frailty.dist=frailty.dist, agemin=agemin, vec=FALSE,
                   control = list(maxit = 50000), hessian=TRUE)
   }
@@ -95,8 +106,8 @@ penmodel <- function(formula, cluster="famID", gvar="mgene", parms, cuts=NULL, d
     names(EST) <- names(parms.se)  <- rownames(parms.cov) <- colnames(parms.cov) <- parms.name
     
     if(robust){
-      if(frailty.dist=="none")  grad <- jacobian(loglik_ind, est1$par, X=X, Y=Y, cuts=cuts, nbase=nbase, data=data, design=design, base.dist=base.dist, agemin=agemin, vec=TRUE)
-      else grad <- jacobian(loglik_frailty, est1$par, X=X, Y=Y, cuts=cuts, nbase=nbase, data=data, design=design, base.dist=base.dist, frailty.dist=frailty.dist, agemin=agemin, vec=TRUE)
+      if(frailty.dist=="none")  grad <- jacobian(loglik_ind, est1$par, X=X, Y=Y, cuts=cuts, nbase=nbase, data=newdata, design=design, base.dist=base.dist, agemin=agemin, vec=TRUE)
+      else grad <- jacobian(loglik_frailty, est1$par, X=X, Y=Y, cuts=cuts, nbase=nbase, data=newdata, design=design, base.dist=base.dist, frailty.dist=frailty.dist, agemin=agemin, vec=TRUE)
       Jscore <- t(grad)%*%grad
  		 parms.cov.robust <- Var%*%(Jscore)%*%Var
  		 parms.se.robust <- sqrt(diag(parms.cov.robust))
@@ -114,7 +125,7 @@ penmodel <- function(formula, cluster="famID", gvar="mgene", parms, cuts=NULL, d
     attr(out, "agemin") <- agemin
     attr(out, "cuts") <- cuts
     attr(out, "nbase") <- nbase
-    attr(out, "data") <- data
+    attr(out, "data") <- newdata
     attr(out, "robust") <- robust
     attr(out, "formula") <- formula
     attr(out, "X") <- X

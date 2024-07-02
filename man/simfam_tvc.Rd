@@ -1,14 +1,15 @@
-\name{simfam}
-\alias{simfam}
+\name{simfam_tvc}
+\alias{simfam_tvc}
 \title{
-Generate familial time-to-event data
+Generate familial time-to-event data with a time-varying covariate
 }
 \description{
-Generates familial time-to-event data for specified study design, genetic model and source of residual familial correlation; the generated data frame also contains family structure (individual's id, father id, mother id, relationship to proband, generation), gender, current age, genotypes of major or second genes.
+Generates familial time-to-event data with a time-varying covariate for specified study design, genetic model and source of residual familial correlation; the generated data frame also contains family structure (individual's id, father id, mother id, relationship to proband, generation), gender, current age, genotypes of major or second genes.
 }
 \usage{
-simfam(N.fam, design = "pop", variation = "none", interaction = FALSE, 
+simfam_tvc(N.fam, design = "pop", variation = "none", interaction = FALSE, 
        add.x = FALSE, x.dist = NULL, x.parms = NULL, depend = NULL, 
+       add.tvc = FALSE, tvc.type = "PE", tvc.range = NULL, tvc.parms = 1,
        base.dist = "Weibull", frailty.dist = NULL, base.parms = c(0.016, 3), 
        vbeta = c(1, 1), 
        allelefreq = 0.02, dominant.m = TRUE, dominant.s = TRUE,
@@ -41,8 +42,22 @@ Parameter values for the specified distribution of the covariate. \code{x.parms 
  \item{depend}{
 Inverse of variance of the frailty distribution. Dependence within families decreases with depend value.  Default is \code{NULL}. Value should be specified as a positive real number when \code{variation = "frailty"} or \code{variation = "kinship"}. 
 }
-
- \item{base.dist}{
+\item{add.tvc}{
+Logical; if \code{TRUE}, generates a time varying covariate. Default is \code{FALSE}. 
+}
+\item{tvc.type}{
+Choice of time-varying covariate model. Possible choices are: \code{"PE"} and \code{"CO"}.
+Default is \code{"PE"}.
+}
+\item{tvc.range}{
+Range of ages at which the time-varying covariate occurs. 
+Default is \code{NULL}.
+}
+\item{tvc.parms}{
+Vector of parameter values used for the time-varying covariate model. 
+Default value is 1.
+}
+\item{base.dist}{
 Choice of baseline hazard distribution.  Possible choices are: \code{"Weibull"}, \code{"loglogistic"}, \code{"Gompertz"}, \code{"lognormal"} \code{"gamma"}, \code{"logBurr"}. Default is \code{"Weibull"}.
 }
 
@@ -78,10 +93,26 @@ Maximum age of disease onset or maximum age. Default is 100 years of age.
 
 }
 \details{
+
+\bold{Time-varying covariate}
+
+When \code{add.tvc = TRUE}, the time at which the time-varying covariate (TVC) occurs, \code{tvc.age}, is generated from a uniform distribution with the range specified by \code{tvc.range}. A vector of minimum and maximum ages for the TVC should be specified in \code{tve.range}. When \code{tvc.range = NULL}, \code{agemin} and \code{agemax} are used as the range. In addition, \code{tvc.type} should be either \code{"PE"} or \code{"CO"} and the parameter values for the specified TVC type should be provided in \code{tvc.parms}.
+
+\code{tvc.type = "PE"} represents a permanent exposure model for TVC which assumes that the effect of the TVC stays constant after \code{tvc.age}. The \code{tvc.parms} for the PE model should be specified as a single value, which represents log hazard ratio.
+
+\code{tvc.type = "CO"} represents the Cox and Oaks model for TVC which assumes that the effect of the TVC decays exponentially over time in the form
+\ifelse{html}{\out{ &beta; exp(-(t - t*) &eta;) + &eta;<sub>0</sub>,}}{\eqn{\beta \exp(-(t - t^\ast)\eta ) + \eta_0,}{beta*exp( -(t - t*)*eta ) + eta0,}}
+where \ifelse{html}{\out{t*}}{\eqn{t^\ast}{t*}} is the time at which the TVC occurs.
+The \code{tvc.parms} for the CO model should be specified by a vector of three parameters consisting of \code{c(beta, eta, eta0)}.
+
+\bold{Family-based study design}
+
 The \code{design} argument defines the type of family based design to be simulated. Two variants of the population-based and clinic-based design can be chosen: \code{"pop"} when proband is affected, \code{"pop+"} when proband is affected mutation carrier, \code{"cli"} when proband is affected and at least one parent and one sibling are affected, \code{"cli+"} when proband is affected mutation-carrier and at least one parent and one sibling are affected. The two-stage design, \code{"twostage"}, is used to oversample high risk families, where the proportion of high risks families to include in the sample is specified by \code{hr}. High risk families often include multiple (at least two) affected members in the family. \code{design = "noasc"} is to be used for no ascertainment correction.
 
+\bold{Penetrance model}
+
 The ages at onset are generated from the following penetrance models depending on the choice of \code{variation = "none", "frailty", "secondgene", "kinship".}. When \code{variation = "none"}, the ages at onset are independently generated from the proportional hazard model conditional on the gender and carrier status of major gene mutation, \ifelse{html}{ \out{ X = c(x<sub>s</sub>, x<sub>g</sub>)}}{\eqn{X=(x_s, x_g)}{X=c(xs, xg)}}.  
-%When \code{variation = "frailty"}, the ages at onset are generated from the shared frailty model that induces the residual familial correlation by a frailty shared within the family. When \code{variation = "secondgene"}, the ages at onset are generated from the two-gene model that induces the residual familial correlation by a second gene shared within the family.
+
 The ages at onset correlated within families are generated from the shared frailty model (\code{variation = "frailty"}) , the correlated shared frailty model with kinship matrix (\code{variation = "kinship"}), or the two-gene model (\code{variation = "secondene"}), where the residual familial correlation is induced by a frailty or a second gene, respectively, shared within the family.
 
 \emph{The proportional hazard model}
@@ -101,7 +132,7 @@ where \ifelse{html}{\out{h<sub>0</sub>(t)}}{\eqn{h_0(t)}{h0(t)}} is the baseline
 
 \ifelse{html}{ \out{<p style="text-align:center"> h(t|X,Z) = h<sub>0</sub>(t - t<sub>0</sub>) Z exp(&beta;<sub>s</sub> * x<sub>s</sub> + &beta;<sub>g</sub> * x<sub>g</sub>), </p>}}{	
 		\deqn{ h(t|X,Z) = h_0(t - t_0) Z \exp(\beta_s x_s+\beta_g x_g) ,}{ h(g|X,Z) = h0(t - t0) * Z * exp(\betas * xs + \betag * xg) ,}}
-where \ifelse{html}{\out{h<sub>0</sub>(t)}}{\eqn{h_0(t)}{h0(t)}} is the baseline hazard function, \ifelse{html}{\out{t<sub>0</sub>}}{\eqn{t_0}{t0}} is a minimum age of disease onset, \eqn{Z} represents a vector of frailties following a multivariate log-normal distribution with mean \eqn{0} and variance \eqn{2*K/depend}, where \eqn{K} represents the kinship matrix, \ifelse{html}{\out{x<sub>x</sub>}}{\eqn{x_s}{xs}} and \ifelse{html}{\out{x<sub>g</sub>}}{\eqn{x_g}{xg}} indicate male (1) or female (0) and carrier (1) or non-carrier (0) of a main gene of interest, respectively.
+where \ifelse{html}{\out{h<sub>0</sub>(t)}}{\eqn{h_0(t)}{h0(t)}} is the baseline hazard function, \ifelse{html}{\out{t<sub>0</sub>}}{\eqn{t_0}{t0}} is a minimum age of disease onset, \eqn{Z} represents a vector of frailties following a multivariate log-normal distribution with mean \eqn{0} and variance \eqn{2*K*depend}, where \eqn{K} represents the kinship matrix, \ifelse{html}{\out{x<sub>x</sub>}}{\eqn{x_s}{xs}} and \ifelse{html}{\out{x<sub>g</sub>}}{\eqn{x_g}{xg}} indicate male (1) or female (0) and carrier (1) or non-carrier (0) of a main gene of interest, respectively.
 
 \emph{The two-gene model}
 
@@ -110,8 +141,6 @@ where \ifelse{html}{\out{h<sub>0</sub>(t)}}{\eqn{h_0(t)}{h0(t)}} is the baseline
 where \ifelse{html}{ \out{x<sub>1</sub>, x<sub>2</sub>}}{\eqn{x_1, x_2}{x1,x2}} indicate carriers (1) and non-carriers (0) of a major gene and of second gene mutation, respectively.
 
 The current ages for each generation are simulated assuming normal distributions. However, the probands' ages are generated using a left truncated normal distribution as their ages cannot be less than the minimum age of onset. The average age difference between each generation and their parents is specified as 20 years apart. 
-
-Note that simulating family data under the clinic-based designs (\code{"cli"} or \code{"cli+"}) or the two-stage design can be slower since the ascertainment criteria for the high risk families are difficult to meet in such settings. Especially, \code{"cli"} design could be slower than \code{"cli+"} design since the proband's mutation status is randomly selected from a disease population in \code{"cli"} design, so his/her family members are less likely to be mutation carriers and have less chance to be affected, whereas the probands are all mutation carriers, their family members have higher chance to be carriers and affected by disease. Therefore, \code{"cli"} design requires more iterations to sample high risk families than \code{"cli+"} design. 
 
 }
 \value{
@@ -130,6 +159,9 @@ Returns an object of class \code{'simfam'}, a data frame which contains:
 \item{time}{Ages at disease onset for the affected or ages of last follow-up for the unaffected. }
 \item{status}{Disease statuses: 1 for affected, 0 for unaffected (censored).}
 \item{mgene}{Major gene mutation indicators: 1 for mutated gene carriers, 0 for mutated gene noncarriers, or \code{NA} if missing.}
+\item{newx}{Additional covariate when \code{add.x = TRUE}.}
+\item{tvc.age}{Age at which the time-varying covariate occurs when \code{add.tvc = TRUE}.}
+\item{tvc.status}{TVC status: 1 if \code{tvc.age < time}, 0 otherwise.}
 \item{relation}{Family members' relationship with the proband:
   \tabular{ll}{
     1  \tab Proband (self) \cr
@@ -155,62 +187,52 @@ Choi, Y.-H., Kopciuk, K. and Briollais, L. (2008) Estimating Disease Risk Associ
 Choi, Y.-H. and Briollais (2011) An EM Composite Likelihood Approach for Multistage Sampling of Family Data with Missing Genetic Covariates, Statistica Sinica 21, 231-253.
 }
 \author{
-Yun-Hee Choi, Wenqing He
+Yun-Hee Choi
 }
 \seealso{
-\code{\link{summary.simfam}, \link{plot.simfam}, \link{penplot}}
+\code{\link{summary.simfam_tvc}, \link{plot.simfam_tvc}}
 }
 \examples{
 
-## Example 1: simulate family data from a population-based design using
-#  a Weibull distribution for the baseline hazard and inducing 
-#  residual familial correlation through a shared gamma frailty.
+## Example: simulate family data with TVC based on CO model.
 
 set.seed(4321)
-fam <- simfam(N.fam = 10, design = "pop+", variation = "frailty", 
+fam <- simfam_tvc(N.fam = 10, design = "pop", variation = "frailty", 
        base.dist = "Weibull", frailty.dist = "gamma", depend = 1, 
-       allelefreq = 0.02, base.parms = c(0.01, 3), vbeta = c(-1.13, 2.35))
-
-head(fam) 
+       add.tvc = TRUE, tvc.type = "CO", tvc.range = c(30,60), 
+       tvc.parms = c(1, 0.1, 0), allelefreq = 0.02, 
+       base.parms = c(0.01, 3), vbeta = c(-1.13, 2.35))
 
 \dontrun{
-  famID indID gender motherID fatherID proband generation majorgene secondgene
-1     1     1      1        0        0       0          1         2          0
-2     1     2      0        0        0       0          1         2          0
-3     1     3      0        2        1       1          2         2          0
-4     1     4      1        0        0       0          0         3          0
-5     1     9      0        3        4       0          3         2          0
-6     1    10      1        3        4       0          3         3          0
-   ageonset currentage     time status mgene relation fsize naff weight
-1 103.76925   69.19250 69.19250      0     1        4    18    2      1
-2  64.88982   67.31119 64.88982      1     1        4    18    2      1
-3  45.84891   47.57119 45.84891      1     1        1    18    2      1
-4 269.71990   47.37403 47.37403      0     0        6    18    2      1
-5  69.78355   27.80081 27.80081      0     1        3    18    2      1
-6 192.09392   25.34148 25.34148      0     0        3    18    2      1
+> head(fam) 
+  famID indID gender motherID fatherID proband generation majorgene secondgene ageonset
+1     1     1      1        0        0       0          1         2          0 61.80566
+2     1     2      0        0        0       0          1         3          0 61.56996
+3     1     3      0        2        1       1          2         2          0 39.42050
+4     1     4      1        0        0       0          0         3          0 90.17320
+5     1    13      0        3        4       0          3         3          0 51.49538
+6     1    14      0        3        4       0          3         3          0 75.97238
+  currentage     time status mgene  tvc.age tvc.status relation fsize naff weight
+1   68.26812 61.80566      1     1 59.16387          1        4    29    3      1
+2   68.60174 61.56996      1     0 39.45786          1        4    29    3      1
+3   47.05410 39.42050      1     1 35.01941          1        1    29    3      1
+4   44.86501 44.86501      0     0 58.67013          0        6    29    3      1
+5   22.73075 22.73075      0     0 30.19254          0        3    29    3      1
+6   22.71399 22.71399      0     0 40.66258          0        3    29    3      1
+
+> summary(fam) 
+Study design:           pop: population-based study with affected probands 
+Baseline distribution:  Weibull 
+Frailty distribution:   gamma 
+Number of families:                     10 
+Average number of affected per family:  3.1 
+Average number of carriers per family:  3.4 
+Average family size:                    16.3 
+Average age of onset for affected:      48.19 
+Average number of TVC event per family: 4 
+Sampling weights used:                  1
 }
 
-summary(fam)
-
-plot(fam, famid = c(1:2)) # pedigree plots for families with IDs = 1 and 2
-
-## Example 2: simulate family data from a two-stage design to include 
-#  30\% of high risk families in the sample. 
-
-set.seed(4321)
-fam <- simfam(N.fam = 50, design = "twostage", variation = "none", base.dist = "Weibull", 
-       base.parms = c(0.01, 3), vbeta = c(-1.13, 2.35), hr = 0.3, allelefreq = 0.02)
-
-summary(fam)
-
-## Example 3: simulate family data from a correlated frailty model with kinship matrix 
-
-set.seed(4321)
-fam <- simfam(N.fam = 50, design = "pop", variation = "kinship", base.dist = "Weibull", 
-       frailty.dist = "lognormal", base.parms = c(0.01, 3), vbeta = c(-1.13, 2.35), 
-       depend = 1, allelefreq = 0.02)
-
-summary(fam)
 
 }
 \keyword{Simulation}

@@ -1,6 +1,7 @@
-familyStructure <-
+familyStructure_tvc <-
 function (i, cumind = cumind, m.carrier = 1, variation = "none", interaction = FALSE, 
           add.x = FALSE, x.dist = NULL, x.parms = NULL, depend = NULL, 
+          add.tvc = FALSE, tvc.type = "PE", tvc.range= NULL, tvc.parms = 1,
           base.dist = "Weibull", frailty.dist = NULL, base.parms = c(0.016, 3), 
           vbeta = c(1, 1), allelefreq = 0.02, dominant.m = TRUE, dominant.s = TRUE, 
           mrate = 0, probandage = c(45, 2), agemin = 20, agemax = 100)
@@ -103,7 +104,7 @@ if (SecNum > 0) { ## at least one sample in second generation
     sex <- ifelse(gender == 1, 'male', 'female')
     mped <- pedigree(indID, fatherID, motherID, sex = sex, famid = famID)
     kmat <- as.matrix(kinship(mped))
-    alpha <- mvrnorm(1, mu = rep(0,nrow(kmat)), Sigma = 2*kmat/depend) # covariance matrix variance = 1/depend
+    alpha <- mvrnorm(1, mu = rep(0,nrow(kmat)), Sigma = 2*kmat/depend)
   }
   
   #------------------------------------------------------------------------------
@@ -135,12 +136,13 @@ if (SecNum > 0) { ## at least one sample in second generation
       
   
   #------------------------------------------------------------------------------
-  # generate additional covariate
+  # generate additional covariates
   if(add.x){
     if(x.dist =="normal") newx <- rnorm(nIndi, mean=x.parms[1], sd=x.parms[2])
     else if(x.dist =="binomial") newx <- rbinom(nIndi, size = x.parms[1], prob = x.parms[2])
   }
-  
+  # generate TVC 
+  if(add.tvc) tvc.age <- runif(nIndi, min=tvc.range[1]-agemin, max=tvc.range[2]-agemin)
   
   #------------------------------------------------------------------------------
             
@@ -157,19 +159,22 @@ if (SecNum > 0) { ## at least one sample in second generation
   prob.age <- censorage[proband==1] # proband's current age
   prob.sex <- gender[proband==1]
   if(add.x) prob.x <- newx[proband==1]
+  if(add.tvc) prob.tvc <- tvc.age[proband==1]
   
-  if(variation == "kinship"){
-    prob.alpha <- alpha[proband == 1]
-  } else prob.alpha = alpha
+  if(variation == "kinship") prob.alpha <- alpha[proband == 1]
+  else prob.alpha <- alpha
   
-  if(add.x) pGene <- fgeneZX(base.dist, frailty.dist, depend=depend, affage=prob.age-agemin, 
-                           affsex=prob.sex, affx = prob.x, interaction=interaction, variation=variation, 
-                           base.parms=base.parms, vbeta=vbeta, alpha=prob.alpha, pg=c(0,0), m.carrier=m.carrier, 
-                           dominant.m=dominant.m, aq = allelefreq)
-  else   pGene <- fgeneZ(base.dist, frailty.dist, depend=depend, affage=prob.age-agemin, 
-                            affsex=prob.sex, interaction=interaction, variation=variation, 
-                            base.parms=base.parms, vbeta=vbeta, alpha=prob.alpha, pg=c(0,0), m.carrier=m.carrier, 
-                            dominant.m=dominant.m, aq = allelefreq)
+  if(add.x) pGene <- fgeneZXC(base.dist, frailty.dist, depend=depend, affage=prob.age-agemin, 
+                      affsex=prob.sex, affx = prob.x, 
+                      add.tvc = add.tvc, tvc.age=prob.tvc, tvc.type=tvc.type, tvc.parms=tvc.parms,
+                      interaction=interaction, variation=variation, 
+                      base.parms=base.parms, vbeta=vbeta, alpha=prob.alpha, pg=c(0,0), m.carrier=m.carrier, 
+                      dominant.m=dominant.m, aq = allelefreq)
+  else   pGene <- fgeneZC(base.dist, frailty.dist, depend=depend, affage=prob.age-agemin, affsex=prob.sex, 
+                          add.tvc = add.tvc, tvc.age=prob.tvc, tvc.type=tvc.type, tvc.parms=tvc.parms,
+                          interaction=interaction, variation=variation, 
+                          base.parms=base.parms, vbeta=vbeta, alpha=prob.alpha, pg=c(0,0), m.carrier=m.carrier, 
+                          dominant.m=dominant.m, aq = allelefreq)
 
   #------------------------------------------------------------------------------ 
      
@@ -259,7 +264,11 @@ if (SecNum > 0) { ## at least one sample in second generation
   #------------------------------------------------------------------------------
   if(variation == "frailty" | variation == "kinship"){
     uni <- runif(nIndi, 0, 1)
-    ageonset <- apply(cbind(xbeta,alpha, uni), 1, inv2.surv, base.dist=base.dist, parms=base.parms)
+    if(add.tvc) ageonset <- apply(cbind(xbeta, tvc.age, alpha, uni), 1, inv2.surv_tvc, 
+                      base.dist=base.dist, parms=base.parms, 
+                      tvc.type=tvc.type, tvc.parms=tvc.parms)
+    else ageonset <- apply(cbind(xbeta, alpha, uni), 1, inv2.surv, base.dist=base.dist, parms=base.parms)
+    
   } else{
   ## generating ageonsets for probands
    genepos <- pos[proband==1]
@@ -267,20 +276,29 @@ if (SecNum > 0) { ## at least one sample in second generation
    affage <- censorage[genepos]
    affage.min <- ifelse(affage>agemin, affage-agemin, 0)
    uni <- runif(length(genepos), 0,1)
-   ageonset[genepos] <- apply(cbind(xvbeta,affage.min, uni), 1, inv.survp, base.dist=base.dist, parms=base.parms, alpha=alpha)
-  
+   if(add.tvc) ageonset[genepos] <- apply(cbind(xvbeta, prob.tvc, affage.min, uni), 1, inv.survp_tvc, 
+                                          base.dist=base.dist, parms=base.parms, 
+                                          tvc.type=tvc.type, tvc.parms=tvc.parms, alpha=alpha)
+   else ageonset[genepos] <- apply(cbind(xvbeta,affage.min, uni), 1, inv.survp, base.dist=base.dist, parms=base.parms, alpha=alpha)
+   
   ## generate ageonset for non-affected ones
    genepos <- pos[proband==0]
    xvbeta <- xbeta[genepos]
+   tvcage <- tvc.age[genepos]
    uni <- runif(length(genepos), 0, 1)
-   ageonset[genepos] <- apply(cbind(xvbeta,uni), 1, inv.surv, base.dist=base.dist, parms=base.parms, alpha=alpha)
+   if(add.tvc) ageonset[genepos] <- apply(cbind(xvbeta, tvcage, uni), 1, inv.surv_tvc, base.dist=base.dist, 
+               parms=base.parms, tvc.type=tvc.type, tvc.parms=tvc.parms, alpha=alpha)
+   else ageonset[genepos] <- apply(cbind(xvbeta,uni), 1, inv.surv, base.dist=base.dist, parms=base.parms, alpha=alpha)
   }
   
-  ageonset <- ageonset+agemin
+  ageonset <- ageonset + agemin
+  tvc.age <- tvc.age + agemin
   currentage <- ifelse(censorage > agemax, agemax, censorage)
   time <- pmin(currentage, ageonset)   
   status <- ifelse(currentage >= ageonset, 1, 0)
-            
+  tvc.status <- ifelse(tvc.age < time, 1, 0)
+  #  tvc.age[tvc.status==0] <- NA
+  
   # Generating missing genotypes 
   # mgene is genotype with missing genotype NA
   mgene <-  majorgene 
@@ -290,17 +308,26 @@ if (SecNum > 0) { ## at least one sample in second generation
   fsize <- length(famID) # family size
   naff <- sum(status) # number of affected in the family
   if(add.x){
-    tmpdata<-cbind(
-    famID, indID, gender, motherID, fatherID, proband, generation,
-    majorgene=disgene.m, secondgene=disgene.s, ageonset, currentage, 
-    time, status, mgene, newx, relation, fsize, naff)
+    if(add.tvc)
+      tmpdata<-cbind(
+          famID, indID, gender, motherID, fatherID, proband, generation,
+          majorgene=disgene.m, secondgene=disgene.s, ageonset, currentage, 
+          time, status, mgene, newx, tvc.age, tvc.status, relation, fsize, naff)
+    else tmpdata<-cbind(
+          famID, indID, gender, motherID, fatherID, proband, generation,
+          majorgene=disgene.m, secondgene=disgene.s, ageonset, currentage, 
+          time, status, mgene, newx, relation, fsize, naff)
   }
-  else 
-    tmpdata <- cbind(
-    famID, indID, gender, motherID, fatherID, proband, generation,
-    majorgene=disgene.m, secondgene=disgene.s, ageonset, currentage, 
-    time, status, mgene, relation, fsize, naff)
-
+  else{
+    if(add.tvc)  tmpdata <- cbind(
+                  famID, indID, gender, motherID, fatherID, proband, generation,
+                  majorgene=disgene.m, secondgene=disgene.s, ageonset, currentage, 
+                  time, status, mgene, tvc.age, tvc.status, relation, fsize, naff)
+    else tmpdata <- cbind(
+            famID, indID, gender, motherID, fatherID, proband, generation,
+            majorgene=disgene.m, secondgene=disgene.s, ageonset, currentage, 
+            time, status, mgene, relation, fsize, naff)
+  }
   }#Close for if (SecNum > 0)
     
 return(tmpdata)

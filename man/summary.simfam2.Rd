@@ -63,7 +63,6 @@ Average number of affected per family:  1.24
 Average number of carriers per family:  1.3 
 Average family size:                    17.02 
 Average age of onset for affected:      40.08 
-Sampling weights used:                  1
 }
 
 }

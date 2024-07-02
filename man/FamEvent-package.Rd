@@ -24,23 +24,36 @@ affected members in the family at the second stage.
 
 Ages at disease onset are generated specific to family members' gender and
 mutation status according to the specified study design with residual
-familial correlations induced by either a shared frailty or a second gene.
+familial correlations induced by a shared frailty, correlated frailties with Kinship matrix, or a second gene.
+
 For estimating age at onset risks with family data, an ascertainment
 corrected prospective likelihood approach is used to account for the
 population or clinic-based study designs while a composite likelihood
 approach is used for the two-stage sampling design. The Expectation and
 Maximization (EM) algorithm has been implemented for inferring missing
 genotypes conditional on observed genotypes and phenotypes in the families. 
-For family members who have missing
-genotypes, their carrier probabilities are obtained either from the fitted
-model or from Mendelian transmission probabilities. This package also
+For family members who have missing genotypes, their carrier 
+probabilities are obtained either from the fitted model or from Mendelian 
+transmission probabilities. 
+
+This package also
 provides functions to plot the age-dependent penetrance curves estimated
 parametrically from the fitted model or non-parametrically from the data,
 pedigree plots of simulated families and penetrance function curves for
 carriers and non-carriers of a major and second gene based on specified
 parameter values.
 
-Generation and model fit of competing risks data are also available based on frailty models.
+\bold{In summary, this package facilitates the following:}
+
+1. Family data generations from 1) a shared frailty model or 2) a correlated frailty model with Kinship and/or IBD matrix; 3) a competing risk model.
+
+2. Covariates considered: sex, gene, options for additional covariates.
+
+3. Time-varying covariate generation based on permanent exposure (PE) or the Cox-Oaks model (CO).
+
+3. Model estimation for shared frailty models and competing risk models. 
+
+
 %\packageDescription{FamilyData}
 }
 \author{
@@ -59,9 +72,11 @@ Choi, Y.-H. and Briollais (2011) An EM Composite Likelihood Approach for Multist
 }
 \keyword{ package }
 \seealso{
-\code{\link{simfam}}, \code{\link{summary.simfam}}, 
-\code{\link{simfam2}}, \code{\link{summary.simfam2}}, 
-\code{\link{plot.simfam}}, \code{\link{penplot}}, \code{\link{carrierprob}}, \code{\link{penmodel}}, \code{\link{penmodelEM}}, 
+\code{\link{simfam}}, \code{\link{summary.simfam}}, \code{\link{plot.simfam}}, 
+\code{\link{simfam2}}, \code{\link{summary.simfam2}}, \code{\link{plot.simfam2}},
+\code{\link{simfam_tvc}}, \code{\link{summary.simfam_tvc}}, 
+\code{\link{plot.simfam_tvc}}, 
+\code{\link{penplot}}, \code{\link{carrierprob}}, \code{\link{penmodel}}, \code{\link{penmodelEM}}, 
 \code{\link{print.penmodel}}, \code{\link{summary.penmodel}},\code{\link{print.summary.penmodel}}, \code{\link{plot.penmodel}},
 \code{\link{simfam_cmp}}, \code{\link{summary.simfam_cmp}}, \code{\link{plot.simfam_cmp}}, \code{\link{penplot_cmp}}, \code{\link{penmodel_cmp}},  
 \code{\link{print.penmodel_cmp}}, \code{\link{summary.penmodel_cmp}}, 
@@ -151,6 +166,18 @@ summary(fit3)
 # based on data excluding probands. 
 
 plot(fit3, add.CIF = TRUE, conf.int = TRUE, MC = 100)
+
+### Example 4: Simulate family data with a time-varying covariate 
+set.seed(4321)
+
+fam4 <- simfam_tvc(N.fam = 10, design = "pop", variation = "frailty", 
+       base.dist = "Weibull", frailty.dist = "gamma", depend = 1, 
+       add.tvc = TRUE, tvc.type = "CO", tvc.range = c(30,60), 
+       tvc.parms = c(1, 0.1, 0), allelefreq = 0.02, 
+       base.parms = c(0.01, 3), vbeta = c(-1.13, 2.35))
+
+summary(fam4)
+
 }
 
 
