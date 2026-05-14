@@ -6,8 +6,7 @@ plot.penmodel <- function(x, agemax=80, print=TRUE, mark.time=FALSE, conf.int=FA
 
   
   base.dist <- attr(x,"base.dist")
-#  frailty.dist <- attr(x, "frailty.dist")
-#  depend <- attr(x, "depend")
+  frailty.dist <- attr(x, "frailty.dist")
   agemin <- attr(x, "agemin")
   nbase <- attr(x, "nbase")
   cuts <- attr(x, "cuts")
@@ -17,10 +16,16 @@ plot.penmodel <- function(x, agemax=80, print=TRUE, mark.time=FALSE, conf.int=FA
   
   parms <- exp(x$estimates[1:nbase])
   if(base.dist=="lognormal") parms[1] <- x$estimates[1]
+
   vbeta <- x$estimates[-c(1:nbase)]
+  
+  if(is.null(frailty.dist)) variation <- "none"
+  else if(frailty.dist == "none") variation <- "none"
+  else variation <- "frailty"
+  
   #names(vbeta)
- penout <- penplot(base.parms=parms, vbeta=vbeta, cuts=cuts, base.dist=base.dist, variation="none", 
-                   frailty.dist=NULL, depend=1, agemin=agemin, agemax=agemax, print=FALSE, col=col,lty=lty, 
+ penout <- penplot(base.parms=parms, vbeta=vbeta, cuts=cuts, base.dist=base.dist, variation=variation, 
+                   frailty.dist=frailty.dist, depend=1, agemin=agemin, agemax=agemax, print=FALSE, col=col,lty=lty, 
                    add.legend=FALSE, add.title=add.title, x=xpos,y=ypos, xlab=xlab,ylab=ylab, ylim=ylim, main=main, ...)
 
  penest<-t(penout$pen)
@@ -35,8 +40,9 @@ plot.penmodel <- function(x, agemax=80, print=TRUE, mark.time=FALSE, conf.int=FA
    data <- attr(x, "data")
    if(length(vbeta) > 2) sfit <- survfit(Y[data$proband==0,]~X[data$proband==0,1]+X[data$proband==0,2])
    else sfit <- survfit(formula, data=data[data$proband==0,])
-   lines(sfit, fun="event", mark.time=TRUE, conf.int=FALSE, col=col[c(4,2,3,1)], lty=lty[c(4,2,3,1)], ...)
- }
+   if(dim(X)[2] == 2) lines(sfit, fun="event", mark.time=TRUE, conf.int=FALSE, col=col[c(4,2,3,1)], lty=lty[c(4,2,3,1)], ...)
+   if(dim(X)[2] == 1) lines(sfit, fun="event", mark.time=TRUE, conf.int=FALSE, col=col[c(2, 1)], lty = lty, ...)
+  }
  if(conf.int){
    if(add.KM) lines(sfit, fun="event", conf.int="only", col=col[c(4,2,3,1)], lty=3, ...)
    cat("Calculating ... \n")
@@ -64,7 +70,11 @@ plot.penmodel <- function(x, agemax=80, print=TRUE, mark.time=FALSE, conf.int=FA
      out <- list(coefficients=x$estimates, pen70=penout$pen70, x.age=xx, pen=t(penest), lower=lower, upper=upper)
  }
  else {
-   if(add.legend) legend(xpos, ypos, c("male carrier", "female carrier", "male noncarrier", "female noncarrier"), bty="n", lty=lty, col=col)
+   if(add.legend) {
+     if(dim(X)[2] == 2) legend(xpos, ypos, c("male carrier", "female carrier", "male noncarrier", "female noncarrier"), bty="n", lty=lty, col=col)
+     if(dim(X)[2] == 1) legend(xpos, ypos, c("x = 1", "x = 0"), bty="n", lty=lty, col=col)
+   }
+  
    out <- list(coefficients=x$estimates, pen70=penout$pen70, x.age=penout$x.age, pen=t(penest))
  }
  if(print){

@@ -1,7 +1,7 @@
 \name{penetrance_cmp}
 \alias{penetrance_cmp}
 \title{
-  Estimating Penetrances for competing risk models and confidence intervals
+  Penetrance function for competing risk models and confidence intervals
 }
 \description{
   Estimates the cumulative disease risks (penetrances) and confidence intervals for the event of interest in the presence of competing event given fixed values of covariates based on the fitted competing risk model. 
@@ -33,40 +33,40 @@
 
 }
 \details{
-The cause-specific hazard for event \eqn{j} is specified as:
-\ifelse{html}{\out{h<sub>j</sub>(t|x) = h<sub>0j</sub>(t) exp(&beta;<sub>j</sub> *x<sub>j</sub>),}}{
-\deqn{ h_j(t|x) = h_{0j}(t) \exp(\beta_j x_j) ,}{hj(t|x) = h0j(t) exp(bj*xj) ,}}
-where \ifelse{html}{\out{h<sub>0j</sub>(t)}}{\eqn{h_{0j}(t)}{h0j(t)}} is the baseline hazards function for event \eqn{j}, \ifelse{html}{\out{x<sub>j</sub>}}{\eqn{x_j}{xj}} is the vector of covariates associated with event \eqn{j} and \ifelse{html}{\out{&beta;<sub>j</sub>}}{\eqn{\beta_j}{bj}} is the vector of corresponding regression coefficients, \eqn{j = 1, 2}. 
+The cause-specific hazard for event \eqn{j}{j} is specified as
 
-The penetrance function for event \eqn{j} in the presence of competing risks based on cause-specific hazards (with no frailties assumed) model is defined as the probability of developing an event of interest by age \eqn{t} given fixed values of covariates \eqn{x} in the following form: 
-\ifelse{html}{\out{ P(T < t, d = j |x) = &int;<sub>t0</sub><sup>t</sup> h<sub>j</sub>(u|x<sub>j</sub>)exp(-H<sub>1</sub>(u|x<sub>1</sub>)-H<sub>2</sub>(u|x<sub>2</sub>))du,}}{
-\deqn{ P(T < t, d = j | x) = \int_{t_0}^t h_j(u|x_j) \exp(-H_1(u|x_1)-H_2(u|x_2))du }{
-P(T < t, d = j | x) = \int_{t0}^t hj(u|xj)exp(-H1(u|x1)-H2(u|x2))du 
-}}
-where \ifelse{html}{\out{t<sub>0</sub>}}{\eqn{t_0}{t0}} is the minimum age of onset, \eqn{d} is the type of event which takes \eqn{(j = 1, 2)}.
+\deqn{ h_j(t | x) = h_{0j}(t) \exp(\beta_j x_j) ,}{hj(t | x) = h0j(t) exp(bj*xj) ,}
+
+where \eqn{h_{0j}(t)}{h0j(t)} is the baseline hazards function for event \eqn{j}{j}, \eqn{x_j}{xj} is the vector of covariates associated with event \eqn{j}{j} and \eqn{\beta_j}{bj} is the vector of corresponding regression coefficients, \eqn{j = 1, 2.}{j = 1, 2.} 
+
+The penetrance function for event \eqn{j}{j} in the presence of competing risks based on cause-specific hazards (with no frailties assumed) model is defined as the probability of developing an event of interest by age \eqn{t}{t} given fixed values of covariates \eqn{x}{x} in the following form: 
+
+\deqn{ P(T<t, d = j \mid x) = \int_{t_0}^t h_j(u|x_j) \exp(-H_1(u \mid x_1)-H_2(u \mid x_2))du, }{
+P(T < t, d = j | x) = \int_{t0}^t hj(u|xj)exp(-H1(u|x1)-H2(u|x2))du, }
+
+where \eqn{t_0}{t0} is the minimum age of onset, \eqn{d}{d} is the type of event which takes \eqn{j = 1, 2.}{j = 1, 2.}
 
 The shared frailty competing risks model is:
-\ifelse{html}{\out{
-h<sub>j</sub>(t|z<sub>j</sub>, x) = z<sub>j</sub>*h<sub>0j</sub>(t) exp(&beta;<sub>j</sub> *x<sub>j</sub>),}}{		
-\deqn{ h_j(t|z_j, x_j) = z_j h_{0j}(t) \exp(\beta_j x_j) ,}{ hj(t|zj, xj) = zj h0j(t) exp(bj*xj), }}
-where \ifelse{html}{\out{z<sub>j</sub>}}{\eqn{z_j}{zj}} is the shared frailty for event \eqn{j} within families whose distribution is specified by \code{frailty.dist}.
 
-  The penetrance function for event \eqn{j} from the shared frailty competing risks model is obtained by integrating over the frailty distribution of \ifelse{html}{\out{G(z1, z2)}}{\eqn{G(z_1, z_2)}{G(z1, z2)}},
-\ifelse{html}{\out{
-P(T < t, d = j | x) = &int;<sub>t0</sub><sup>t</sup>
-&int; &int; h<sub>j</sub>(u|x<sub>j</sub>, z<sub>j</sub>) exp(-H<sub>1</sub>(u|x<sub>1</sub> z<sub>j</sub>)-H<sub>2</sub>(u|x<sub>2</sub>, z<sub>j</sub>)) dG(z<sub>1</sub> dz<sub>2</sub>)du, }}{
-\deqn{ P(T < t, d = j | x) = \int_{t_0}^t \int \int h_j(u|x_j, z_j) \exp(-H_1(u|x_1, z_1)-H_2(u|x_2, z_2))dG(z_1, z_2) du,}{
-P(T < t, d = j | x) = \int_{t0}^t \int \int hj(u|xj, zj)exp(-H1(u|x1, z1)-H2(u|x2, z2)) dG(z1, z2) du,}}
-where \ifelse{html}{\out{t<sub>0</sub>}}{\eqn{t_0}{t0}} is the minimum age of onset, \eqn{d} is the type of event which takes \eqn{(j = 1, 2)}. 
+\deqn{ h_j(t|z_j, x_j) = z_j h_{0j}(t) \exp(\beta_j x_j) ,}{ hj(t|zj, xj) = zj h0j(t) exp(bj*xj), }
+
+where \eqn{z_j}{zj} is the shared frailty for event \eqn{j}{j} within families whose distribution is specified by \code{frailty.dist}.
+
+The penetrance function for event \eqn{j}{j} from the shared frailty competing risks model is obtained by integrating over the frailty distribution of \eqn{G(z_1, z_2)}{G(z1, z2)},
+
+\deqn{ P(T<t, d = j \mid x) = \int_{t_0}^t \int \int h_j(u \mid x_j, z_j) \exp(-H_1(u \mid x_1, z_1)-H_2(u \mid x_2, z_2))dG(z_1, z_2) du,}{
+P(T < t, d = j | x) = \int_{t0}^t \int \int hj(u|xj, zj)exp(-H1(u|x1, z1)-H2(u|x2, z2)) dG(z1, z2) du,}
+
+where \eqn{t_0}{t0} is the minimum age of onset, \eqn{d}{d} is the type of event which takes \eqn{j = 1, 2.}{j = 1, 2.}  
 
 See Choi et al. (2021) for more details about the penetrance functions.
   
   Calculations of standard errors of the penetrance estimates and 95\% confidence intervals (CIs) for the penetrance at a given age are based on Monte-Carlo simulations of the estimated penetrance model. A multivariate normal distribution is assumed for the parameter estimates, and \code{MC = n} sets of the parameters are generated from the multivariate normal distribution with the parameter estimates and their variance-covariance matrix.
   For each simulated set, a penetrance estimate is calculated at a given age by substituting the simulated parameters into the penetrance function.
   
-  The standard error of the penetrance estimate at a given age is calculated by the standard deviation of penetrance estimates obtained from \eqn{n} simulations.
+  The standard error of the penetrance estimate at a given age is calculated by the standard deviation of penetrance estimates obtained from \eqn{n}{n} simulations.
   
-  The 95\% CI for the penetrance at a given age is calculated using the 2.5th and 97.5th percentiles of the penetrance estimates obtained from \eqn{n} simulations.
+  The 95\% CI for the penetrance at a given age is calculated using the 2.5th and 97.5th percentiles of the penetrance estimates obtained from \eqn{n}{n} simulations.
 }
 \value{
   Returns the following values:

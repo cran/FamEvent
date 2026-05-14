@@ -21,7 +21,7 @@ An object class of \code{'penmodel'}, a fitted model by \code{\link{penmodel}} o
 
 \value{
 Returns the object of class \code{'summary.penmodel'}, including the following summary values:
-\item{estimates}{List of parameter estimates of transformed baseline parameters and regression coefficients, their standard errors, their robust standard errors if \code{robust=TRUE} was selected when fitting the penetrance model, \eqn{t}-statistics and corresponding two-sided \eqn{p}-values.}
+\item{estimates}{List of parameter estimates of transformed baseline parameters and regression coefficients, their standard errors, their robust standard errors if \code{robust = TRUE} was selected when fitting the penetrance model, \eqn{t}{t}-statistics and corresponding two-sided \eqn{p}{p}-values.}
 \item{varcov}{Variance-covariance matrix of the parameter estimates.}
 \item{varcov.robust}{Robust variance-covariance matrix of the parameter estimates if \code{robust = TRUE} was selected when fitting the penetrance model.}
 \item{correlation}{Correlation matrix obtained from the variance-covariance matrix.}
@@ -32,13 +32,15 @@ Returns the object of class \code{'summary.penmodel'}, including the following s
 # Simulated family data 
 
 set.seed(4321)
-fam <- simfam(N.fam = 200, design = "pop+", variation = "none", base.dist = "Weibull", 
-       base.parms = c(0.01, 3), vbeta = c(-1.13, 2.35), agemin = 20, allelefreq = 0.02)
+fam <- simfam(N.fam = 200, design = "pop+", variation = "none", 
+       base.dist = "Weibull", base.parms = c(0.01, 3), vbeta = c(-1.13, 2.35), 
+       agemin = 20, allelefreq = 0.02)
  
 # Penetrance model fit for the simulated family data
 
 fit <- penmodel(Surv(time, status) ~ gender + mgene, cluster = "famID", 
-       parms=c(0.01, 3, -1.13, 2.35), data = fam, design = "pop+", base.dist = "Weibull")
+       parms=c(0.01, 3, -1.13, 2.35), data = fam, design = "pop+", 
+       base.dist = "Weibull")
 
 # Summary of the model parameter and penetrance estimates from model fit
 

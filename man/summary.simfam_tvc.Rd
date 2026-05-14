@@ -44,7 +44,7 @@ Yun-Hee Choi
 set.seed(4321)
 fam <- simfam_tvc(N.fam = 10, design = "pop", variation = "frailty", 
        base.dist = "Weibull", frailty.dist = "gamma", depend = 1, 
-       add.tvc = TRUE, tvc.type = "CO", tvc.range = c(30,60), 
+       add.tvc = TRUE, tvc.type = "CO", tvc.range = c(30, 60), 
        tvc.parms = c(1, 0.1, 0), allelefreq = 0.02, 
        base.parms = c(0.01, 3), vbeta = c(-1.13, 2.35))
 

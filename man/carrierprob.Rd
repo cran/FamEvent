@@ -17,7 +17,7 @@ q = 0.02)
  }
  \item{method}{
 Choice of methods to calculate the carrier probability. Possible choices are \code{"data"} for empirical calculation of the carrier probabilities based on data, 
-\code{"mendelian"} using Mendelian transmission probabilities based on observed carriers within families, or \code{"model"} using the parametric model fit; see details below. Default is \code{"data"}.
+\code{"mendelian"} using Mendelian transmission probabilities based on observed carriers within families, and \code{"model"} using the parametric model fit; see details below. Default is \code{"data"}.
  If \code{method = "data"}, only \code{data} is required to be specified.  
 }
 
@@ -29,26 +29,24 @@ Family data that includes missing genotypes using the same data format generated
 }
 
 \item{mode}{
-Choice of modes of inheritance when using \code{method="model"}. Possible choices are \code{"dominant"} for dominant model or \code{"recessive"} for recessive model. Default is \code{"dominant"}.
+Choice of modes of inheritance when using \code{method = "model"}. Possible choices are \code{"dominant"} for dominant model and \code{"recessive"} for recessive model. Default is \code{"dominant"}.
 }
 
  \item{q}{
-Frequency of the disease causing allele when using \code{method="model"}. The value should be between 0 and 1. If \code{NULL}, the estimated allele frequency from data will be used. Default value  is \code{0.02}.
+Frequency of the disease causing allele when using \code{method = "model"}. The value should be between 0 and 1. If \code{NULL}, the estimated allele frequency from data will be used. Default value  is \code{0.02}.
 }
 }
 \encoding{UTF-8}
 \details{
-When \code{method="model"} along with the choice of \code{condition="geno+pheno"}, the carrier probability for individual \eqn{i} is calculated by conditioning on her/his observed phenotype and carrier statuses of family members 
-\ifelse{html}{\out{ 
-P(X<sub>i</sub> = 1 | Y<sub>i</sub> , X<sup>o</sup> )  =
-P(Y<sub>i</sub> | X<sub>i</sub> = 1) * P(X<sub>i</sub> = 1 | X<sup>o</sup>) /
-(P(Y<sub>i</sub> | X<sub>i</sub> = 1) * P(X<sub>i</sub> = 1 | X<sup>o</sup>) + P(Y<sub>i</sub> | X<sub>i</sub> = 0) * P(X<sub>i</sub> = 0 | X<sup>o</sup>)) }}{
-\deqn{ P(X_i = 1 | Y_i, X^o ) = \frac{P(Y_i | X_i=1) P(X_i=1|X^o)}{P(Y_i | X_i=1) P(X_i=1|X^o) + P(Y_i| X_i=0) P(X_i=0|X^o)} , }{P(X(i) = 1 | Y(i), Xo) = P(Y(i) | X(i) = 1)*P(X(i) = 1 | Xo) / (P(Y(i) | X(i) = 1)*P(X(i) = 1 | Xo) + P(Y(i) | X(i) = 0)*P(X(i) = 0 | Xo)) ,} }
-where \ifelse{html}{\out{X<sub>i</sub>}}{\eqn{X_i}{X(i)}} indicates the unknown carrier status of individual \eqn{i} and \ifelse{html}{\out{X<sup>o</sup>}}{\eqn{X^o}{Xo}} represents the observed carrier statuses in his or her family members; \ifelse{html}{\out{Y<sub>i</sub>}}{\eqn{Y_i}{Y(i)}} represents the observed phenotype \ifelse{html}{\out{t<sub>i</sub>, &delta;<sub>i</sub>}}{\eqn{(t_i, \delta_i)}{t(i), delta(i)}} of individual \eqn{i} in terms of age at onset \ifelse{html}{\out{t<sub>i</sub>}}{\eqn{t_i}{t(i)}} and disease status indicator \ifelse{html}{\out{&delta;<sub>i</sub>}}{\eqn{\delta_i}{delta(i)}} with 1 used for affected individuals and 0 for unaffected individuals.
+When \code{method = "model"} along with the choice of \code{condition = "geno+pheno"}, the carrier probability for individual \eqn{i} is calculated by conditioning on her/his observed phenotype and carrier statuses of family members 
+
+\deqn{ P(X_i = 1 | Y_i, X^o ) = \frac{P(Y_i | X_i=1) P(X_i=1|X^o)}{P(Y_i | X_i=1) P(X_i=1|X^o) + P(Y_i| X_i=0) P(X_i=0|X^o)},}{P(X(i) = 1 | Y(i), Xo) = P(Y(i) | X(i) = 1)*P(X(i) = 1 | Xo) / (P(Y(i) | X(i) = 1)*P(X(i) = 1 | Xo) + P(Y(i) | X(i) = 0)*P(X(i) = 0 | Xo)),} 
+
+where \eqn{X_i}{X(i)} indicates the unknown carrier status of individual \eqn{i}{i} and \eqn{X^o}{Xo} represents the observed carrier statuses in his or her family members; \eqn{Y_i}{Y(i)} represents the observed phenotype \eqn{(t_i, \delta_i)}{t(i), delta(i)} of individual \eqn{i}{i} in terms of age at onset \eqn{t_i}{t(i)} and disease status indicator \eqn{\delta_i}{delta(i)} with 1 used for affected individuals and 0 for unaffected individuals.
   When \code{method="mendelian"} along with the choice of \code{condition="geno"}, the carrier probability is calculated based on Mendelian laws of genetic transmission with a fixed allele frequency.
 }
 \value{
-Returns a data frame with a vector of carrier probabilities called \code{carrp.geno} when \code{condition="geno"} or \code{carrp.pheno} when \code{condtion="geno+pheno"} added after the last column of the family data.
+Returns a data frame with a vector of carrier probabilities called \code{carrp.geno} when \code{condition = "geno"} or \code{carrp.pheno} when \code{condtion = "geno+pheno"} added after the last column of the family data.
 }
 \author{
 Yun-Hee Choi

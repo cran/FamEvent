@@ -24,16 +24,20 @@ See details for the baseline parameters.
 Vector of cut points that define the intervals where the hazard function is constant. The \code{cuts} should be specified when \code{base.dist="piecewise"} and must be strictly positive and finite. Default is \code{NULL}.
 }
 \item{data}{
- Data frame generated from \code{\link{simfam}} or data frame containing variables named in the \code{formula} and specific variables: \code{famID}, \code{indID}, \code{gender}, \code{currentage}, \code{mgene}, \code{time}, \code{status} and \code{weight} with \code{attr(data,"agemin")} specified.
+ Data frame generated from \code{\link{simfam}} or data frame containing variables named in the \code{formula} and specific variables: \code{famID}, \code{indID}, \code{gender}, \code{currentage}, \code{mgene}, \code{time}, \code{status} and \code{weight} with \code{attr(data, "agemin")} specified.
 }
 \item{design}{
-Study design of the family data.  Possible choices are: \code{"pop", "pop+", "cli"}, \code{"cli+"} or \code{"twostage"}, where \code{"pop"} is for the population-based design with affected probands whose mutation status can be either carrier or non-carrier, \code{"pop+"} is similar to \code{"pop"} but with mutation carrier probands, \code{"cli"} is for the clinic-based design that includes affected probands with at least one parent and one sib affected, \code{"cli+"} is similar to \code{"cli"} but with mutation carrier probands, and \code{"twostage"} is for the two-stage design with oversampling of high risks families. Default is \code{"pop"}.
-	}
+Family-based study design used in the simulations. Possible choices are \code{"pop"}, \code{"pop+"}, \code{"cli"}, \code{"cli+"}, \code{"twostage"}, and \code{"noasc"}.  
+
+\code{"pop"} is a population-based design with affected probands; \code{"pop+"} is similar to \code{"pop"} but with mutation-carrying probands; \code{"cli"} is a clinic-based design with affected probands and at least one affected parent and one affected sibling; \code{"cli+"} is similar to \code{"cli"} but with mutation-carrying probands; \code{"twostage"} is a two-stage design that oversamples high-risk families (with at least two affected members); and \code{"noasc"} corresponds to simple random sampling without ascertainment correction.
+Default is \code{"pop"}.
+}
+
  \item{base.dist}{
-Choice of baseline hazard distributions to fit. Possible choices are: \code{"Weibull"}, \code{"loglogistic"}, \code{"Gompertz"}, \code{"lognormal"}, \code{"gamma"}, \code{"logBurr"}, or \code{"piecewise"}. Default is \code{"Weibull"}.
+Choice of baseline hazard distributions to fit. Possible choices are \code{"Weibull"}, \code{"loglogistic"}, \code{"Gompertz"}, \code{"lognormal"}, \code{"gamma"}, \code{"logBurr"}, and \code{"piecewise"}. Default is \code{"Weibull"}.
 }
  \item{frailty.dist}{
-Choice of frailty distribution. Possible choices are: \code{"gamma"}, \code{"lognormal"}, or \code{"none"}. Default is \code{"none"}.
+Choice of frailty distribution. Possible choices are \code{"gamma"}, \code{"lognormal"}, and \code{"none"}. Default is \code{"none"}.
 }
 \item{agemin}{
 Minimum age of disease onset or minimum age. Default is \code{NULL}.
@@ -44,20 +48,22 @@ Logical; if \code{TRUE}, the robust `sandwich' standard errors and variance-cova
 }
 \details{
 When \code{frailty.dist = "none"}, the following penetrance model is fitted to family data with a specified baseline hazard distribution 
-\ifelse{html}{ \out{ h(t|x<sub>s</sub>, x<sub>g</sub>) = h<sub>0</sub>(t - t<sub>0</sub>)  exp(&beta;<sub>s</sub> * x<sub>s</sub> + &beta;<sub>g</sub> * x<sub>g</sub>),  }}{ \deqn{ h(t|x_s, x_g) = h_0(t - t_0) \exp(\beta_s x_s+\beta_g x_g),}{ h(g|xs, xg) = h0(t - t0) * Z * exp(beta.s * xs + beta.g * xg) ,}}
-where \ifelse{html}{\out{h<sub>0</sub>(t)}}{\eqn{h_0(t)}{h0(t)}} is the baseline hazards function specified by \code{base.dist}, which depends on the shape and scale parameters, \ifelse{html}{\out{&lambda;}}{\eqn{\lambda}{lambda}} and \ifelse{html}{\out{&rho;}}{\eqn{\rho}{rho}}; \ifelse{html}{\out{x<sub>s</sub>}}{\eqn{x_s}{xs}} indicates male (1) and female (0) and \ifelse{html}{\out{x<sub>g</sub>}}{\eqn{x_g}{xg}} indicates carrier (1) or non-carrier (0) of a gene of interest (major gene). Additional covariates can be added to \code{formula} in the model.
+
+\deqn{ h(t|x_s, x_g) = h_0(t - t_0) \exp(\beta_s x_s+\beta_g x_g),}{ h(g|xs, xg) = h0(t - t0) * Z * exp(beta.s * xs + beta.g * xg),}
+
+where \eqn{h_0(t)}{h0(t)} is the baseline hazards function specified by \code{base.dist}, which depends on the shape and scale parameters, \eqn{\lambda}{lambda} and \eqn{\rho}{rho}; \eqn{x_s}{xs} indicates male (1) and female (0) and \eqn{x_g}{xg} indicates carrier (1) or non-carrier (0) of a gene of interest (major gene). Additional covariates can be added to \code{formula} in the model.
 
 When \code{frailty.dist} is specified as either \code{"gamma"} or \code{"lognormal"}, the follwoing shared frailty model is fitted to family data 
-\ifelse{html}{
-\out{ h(t|X,Z) = h<sub>0</sub>(t - t<sub>0</sub>) Z exp(&beta;<sub>s</sub> * x<sub>s</sub> + &beta;<sub>g</sub> * x<sub>g</sub>), }}{	
-\deqn{ h(t|X, Z) = h_{0}(t - t_0) Z \exp(\beta_{s} x_s+\beta_{g} x_g) ,}{ h(g|X,Z) = h0(t - t0) * Z * exp(\beta s * xs + \beta g * xg) ,}}
-where \ifelse{html}{\out{h<sub>0</sub>(t)}}{\eqn{h_{0}(t)}{h0(t)}} is the baseline hazard function, \ifelse{html}{\out{t<sub>0</sub>}}{\eqn{t_0}{t0}} is a minimum age of disease onset, and \ifelse{html}{\out{Z}}{\eqn{Z}{Z}} represents a frailty shared within families whose distribution is specified by \code{frailty.dist}.
+
+\deqn{ h(t|X, Z) = h_{0}(t - t_0) Z \exp(\beta_{s} x_s+\beta_{g} x_g),}{ h(g|X,Z) = h0(t - t0) * Z * exp(\beta s * xs + \beta g * xg),}
+
+where \eqn{h_{0}(t)}{h0(t)} is the baseline hazard function, \eqn{t_0}{t0} is a minimum age of disease onset, and \eqn{Z}{Z} represents a frailty shared within families whose distribution is specified by \code{frailty.dist}.
 
 \emph{Choice of frailty distributions}
 
-\code{frailty.dist = "gamma"} assumes \eqn{Z} follows Gamma(\eqn{k}, \eqn{1/k}). 
+\code{frailty.dist = "gamma"} assumes \eqn{Z}{Z} follows Gamma(\eqn{k}{k}, \eqn{1/k}{1/k}). 
 
-\code{frailty.dist = "lognormal"} assumes \eqn{Z} follows log-normal distribution with mean 0 and variance \eqn{1/k}.
+\code{frailty.dist = "lognormal"} assumes \eqn{Z}{Z} follows log-normal distribution with mean 0 and variance \eqn{1/k}{1/k}). 
 
 \code{frailty.dist = "none"} shares no frailties within families and assumes independence among family members. 
 
@@ -65,9 +71,9 @@ For family data arising from population- or clinic-based study designs (\code{de
 
 For family data arising from a two-stage study design (\code{design="twostage"}), model parameters are estimated  using the composite likelihood approach (Choi and Briollais, 2011)
 
-Note that the baseline parameters include \code{lambda} and \code{rho}, which represent the scale and shape parameters, respectively, and \code{eta}, additional parameter to specify for \code{"logBurr"} distribution. For the \code{"lognormal"} baseline distribution, \code{lambda} and \code{rho} represent the location and scale parameters for the normally distributed logarithm, where \code{lambda} can take any real values and \code{rho} > 0. For the other baselinse distributions, \code{lambda} > 0, \code{rho} > 0, and \code{eta} > 0. When a piecewise constant distribution is specified for the baseline hazards, \code{base.dist="piecewise"}, \code{baseparm} should specify the initial interval-constant values, one more than the cut points specified by\code{cuts}.
+Note that the baseline parameters include \code{lambda} and \code{rho}, which represent the scale and shape parameters, respectively, and \code{eta}, additional parameter to specify for \code{"logBurr"} distribution. For the \code{"lognormal"} baseline distribution, \code{lambda} and \code{rho} represent the location and scale parameters for the normally distributed logarithm, where \code{lambda} can take any real values and \code{rho} > 0. For the other baselinse distributions, \code{lambda} > 0, \code{rho} > 0, and \code{eta} > 0. When a piecewise constant distribution is specified for the baseline hazards, \code{base.dist = "piecewise"}, \code{baseparm} should specify the initial interval-constant values, one more than the cut points specified by\code{cuts}.
 
-Transformed baseline parameters are used for estimation; log transformation is applied to both scale and shape parameters (\eqn{\lambda, \rho}) for \code{"Weibull"}, \code{"loglogistic"}, \code{"Gompertz"} and \code{"gamma"} baselines, to (\eqn{\lambda, \rho, \eta}) for \code{"logBurr"} and to the piecewise constant parameters for a \code{piecewise} baseline hazard. For \code{"lognormal"} baseline distribution, the log transformation is applied only to \eqn{\rho}, not to \eqn{\lambda}, which represents the location parameter for the normally distributed logarithm.
+Transformed baseline parameters are used for estimation; log transformation is applied to both scale and shape parameters (\eqn{\lambda, \rho}{lambda, rho}) for \code{"Weibull"}, \code{"loglogistic"}, \code{"Gompertz"} and \code{"gamma"} baselines, to (\eqn{\lambda, \rho, \eta}{lambda, rho, eta}) for \code{"logBurr"} and to the piecewise constant parameters for a \code{piecewise} baseline hazard. For \code{"lognormal"} baseline distribution, the log transformation is applied only to \eqn{\rho}{rho}, not to \eqn{\lambda}{lambda}, which represents the location parameter for the normally distributed logarithm.
 
 Calculations of penetrance estimates and their standard errors and 95\% confidence intervals at given ages can be obtained by \code{\link{penetrance}} function via Monte-Carlo simulations of the estimated penetrance model.
 }
@@ -81,13 +87,13 @@ Parameter estimates of transformed baseline parameters and regression coefficien
 Variance-covariance matrix of parameter estimates obtained from the inverse of Hessian matrix. 
 }
 \item{varcov.robust}{
-Robust `sandwich' variance-covariance matrix of parameter estimates when \code{robust=TRUE}. 
+Robust `sandwich' variance-covariance matrix of parameter estimates when \code{robust = TRUE}. 
 }
 \item{se}{
 Standard errors of parameter estimates obtained from the inverse of Hessian matrix.
 }
 \item{se.robust}{
-Robust `sandwich' standard errors of parameter estimates when \code{robust=TRUE}.
+Robust `sandwich' standard errors of parameter estimates when \code{robust = TRUE}.
 }
 \item{logLik}{Loglikelihood value for the fitted penetrance model.}
 \item{AIC}{Akaike information criterion (AIC) value of the model; AIC = 2*k - 2*logLik, where k is the number of parameters used in the model.}

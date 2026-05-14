@@ -26,10 +26,11 @@ Vector of cuts that define the intervals where the hazard function is constant. 
  Data frame generated from \code{\link{simfam}} or data frame containing specific variables: \code{famID}, \code{indID}, \code{gender}, \code{currentage}, \code{mgene}, \code{time}, \code{status} and \code{weight} with \code{attr(data,"agemin")} specified.
 }
 \item{design}{
-Study design of the family data. Possible choices are: \code{"pop"}, \code{"pop+"}, \code{"cli"}, \code{"cli+"} or \code{"twostage"}, where \code{"pop"} is for the population-based design with affected probands whose mutation status can be either carrier or non-carrier, \code{"pop+"} is similar to \code{"pop"} but with mutation carrier probands, \code{"cli"} is for the clinic-based design that includes affected probands with at least one parent and one sib affected, \code{"cli+"} is similar to \code{"cli"} but with mutation carrier probands, and \code{"twostage"} is for the two-stage design with oversampling of high risks families. Default is \code{"pop"}.
+Study design of the family data. Possible choices are \code{"pop"}, \code{"pop+"}, \code{"cli"}, \code{"cli+"} and \code{"twostage"}, where \code{"pop"} is for a population-based design with affected probands whose mutation status can be either carrier or non-carrier; \code{"pop+"} is similar to \code{"pop"} but with mutation carrying probands; \code{"cli"} is for a clinic-based design that includes affected probands with at least one affected parent and one affected sibling; \code{"cli+"} is similar to \code{"cli"} but with mutation carrying probands; and \code{"twostage"} is for a two-stage design with oversampling of high risks families. Default is \code{"pop"}.
 	}
+
  \item{base.dist}{
-Choice of baseline hazard distributions to fit. Possible choices are: \code{"Weibull"}, \code{"loglogistic"}, \code{"Gompertz"}, \code{"lognormal"}, \code{"gamma"}, \code{"logBurr"}, or \code{"piecewise"}. Default is \code{"Weibull"}.
+Choice of baseline hazard distributions to fit. Possible choices are \code{"Weibull"}, \code{"loglogistic"}, \code{"Gompertz"}, \code{"lognormal"}, \code{"gamma"}, \code{"logBurr"}, and \code{"piecewise"}. Default is \code{"Weibull"}.
 }
 \item{agemin}{
 Minimum age of disease onset or minimum age. Default is \code{NULL}.
@@ -38,13 +39,13 @@ Minimum age of disease onset or minimum age. Default is \code{NULL}.
 Logical; if \code{TRUE}, the robust `sandwich' standard errors and variance-covariance matrix are provided, otherwise the conventional standard errors and variance-covariance matrix are provided.
  }
  \item{method}{
-Choice of methods for calculating the carrier probabilities for individuals with missing mutation status. Possible choices are \code{"data"} for empirical calculation of the carrier probabilities based on the observed carriers' statuses in the entire sample, specific to generation and proband's mutation status or \code{"mendelian"} for calculating carrier probabilities based on Mendelian transmission probabilies with the given allele frequency and mutation statuses observed in the family. Default is \code{"data"}.
+Choice of methods for calculating the carrier probabilities for individuals with missing mutation status. Possible choices are \code{"data"} for empirical calculation of the carrier probabilities based on the observed carriers' statuses in the entire sample, specific to generation and proband's mutation status and \code{"mendelian"} for calculating carrier probabilities based on Mendelian transmission probabilies with the given allele frequency and mutation statuses observed in the family. Default is \code{"data"}.
  
  If \code{method = "mendelian"}, specify both \code{mode} of the inheritance and the allele frequency \code{q}. 
  
 }
  \item{mode}{
-Choice of modes of inheritance for calculating carrier probabilies for individuals with missing mutation status. Possible choices are \code{"dominant"} for dominant model or \code{"recessive"} for recessive model. Default is \code{"dominant"}.
+Choice of modes of inheritance for calculating carrier probabilies for individuals with missing mutation status. Possible choices are \code{"dominant"} for dominant model and \code{"recessive"} for recessive model. Default is \code{"dominant"}.
 }
  \item{q}{
 Frequency of the disease causing allele used for calculating carrier pobabilities. The value should be between 0 and 1. If \code{NULL}, the estimated allele frequency from data will be used. Default value  is \code{0.02}.
@@ -53,12 +54,16 @@ Frequency of the disease causing allele used for calculating carrier pobabilitie
 }
 \details{
 
-The expectation and maximization (EM) algorithm is applied for making inference about the missing genotypes. In the expectation step, for individuals with unknown carrier status, we first compute their carrier probabilities given their family's observed phenotype and genotype information based on current estimates of parameters \ifelse{html}{\out{&theta;}}{\eqn{\theta}{theta}} as follows,
-\ifelse{html}{\out{w<sub>fi</sub> = P(X<sub>fi</sub> = 1 | Y<sub>fi</sub>, X<sub>f</sub><sup>o</sup>), }}{\deqn{ w_{fi} = P(X_{fi}=1|Y_{fi}, X^o_f),}{ w(i,f) = P( X(i,f) = 1 | Y(i,f), Xo(f) ), }}
-where  \ifelse{html}{\out{X<sub>fi</sub>}}{\eqn{X_{fi}}{w(i,f)}} represents the mutation carrier status and \ifelse{html}{\out{Y<sub>fi</sub>}}{ \eqn{Y_{fi}}{Y(i,f)}} represents the phenotype in terms of age at onset \ifelse{html}{\out{t<sub>fi</sub>}}{\eqn{t_{fi}}{t(i,f)}} and disease status \ifelse{html}{\out{&delta;<sub>fi</sub>}}{\eqn{\delta_{fi}}{\delta(i,f)}} for individual \ifelse{html}{\out{i, i = 1, ..., n<sub>f</sub>,}}{\eqn{i, i = 1, \ldots, n_f,}{i, i = 1, ..., nf}} in family \eqn{f, f = 1, ..., n,} and \ifelse{html}{\out{X<sub>f</sub><sup>o</sup>}}{\eqn{X^o_f}{Xo(f)}} represents the observed genotypes in family \eqn{f}.
+The expectation and maximization (EM) algorithm is applied for making inference about the missing genotypes. In the expectation step, for individuals with unknown carrier status, we first compute their carrier probabilities given their family's observed phenotype and genotype information based on current estimates of parameters \eqn{\theta}{theta} as follows,
+
+\deqn{ w_{fi} = P(X_{fi}=1|Y_{fi}, X^o_f),}{ w(i,f) = P( X(i,f) = 1 | Y(i,f), Xo(f) ),}
+
+where  \eqn{X_{fi}}{X(i,f)} represents the mutation carrier status and \eqn{Y_{fi}}{Y(i,f)} represents the phenotype in terms of age at onset \eqn{t_{fi}}{t(i,f)} and disease status \eqn{\delta_{fi}}{delta(i,f)} for individual \eqn{i, i = 1, \ldots, n_f,}{i, i = 1, ..., nf} in family \eqn{f, f = 1, \ldots, n,}{f, f = 1, ..., n,} and \eqn{X^o_f}{Xo(f)} represents the observed genotypes in family \eqn{f}{f}.
 
 Then, we obtain the conditional expectation of the log-likelihood function (\eqn{\ell}{l}) of the complete data given the observed data as a weighted log-likelihood, which has the form
-\ifelse{html}{\out{ E<sub>&theta;</sub> [ l (&theta; | Y, X<sup>o</sup>) ] =  &sum;<sub>f</sub> &sum;<sub>i</sub> l <sub> fi</sub> (&theta; | X<sub>fi</sub> = 1) * w<sub>fi</sub> +  l<sub>fi</sub> (&theta; | X<sub>fi</sub> = 0) * ( 1 - w<sub>fi</sub> ). }}{ \deqn{ E_{\theta} [\ell (\theta | Y, X^o)] =  \sum_f^n \sum_i^{n_f} \ell_{fi}(\theta | X_{fi}=1) w_{fi} +  \ell_{fi}(\theta | X_{fi}=0) (1-w_{fi}). }{ E [ l (\theta | Y, Xo) ] =  \sum \sum l(\theta | X(i,f) = 1) * w(i,f) +  l(\theta | X(i,f) = 0) * (1 - w(i,f)). }}
+
+\deqn{ E_{\theta} [\ell (\theta | Y, X^o)] =  \sum_f^n \sum_i^{n_f} \ell_{fi}(\theta | X_{fi}=1) w_{fi} +  \ell_{fi}(\theta | X_{fi}=0) (1-w_{fi}). }{ E [ l (\theta | Y, Xo) ] =  \sum \sum l(\theta | X(i,f) = 1) * w(i,f) +  l(\theta | X(i,f) = 0) * (1 - w(i,f)). }
+
 In the maximization step, the updated parameter estimates are obtained by maximizing the weighted log likelihood computed in the E-step. These expectation and maximization steps iterate until convergence to obtain the maximum likelihood estimates. See more details in Choi and Briollais (2011) or Choi et al. (2014).
 
 Note that the baseline parameters include \code{lambda} and \code{rho}, which represent the scale and shape parameters, respectively, and \code{eta}, additional parameter to specify for \code{"logBurr"} distribution. For the \code{"lognormal"} baseline distribution, \code{lambda} and \code{rho} represent the location and scale parameters for the normally distributed logarithm, where \code{lambda} can take any real values and \code{rho} > 0. For the other baselinse distributions, \code{lambda} > 0, \code{rho} > 0, and \code{eta} > 0. When a piecewise constant distribution is specified for the baseline hazards, \code{base.dist="piecewise"}, \code{baseparm} should specify the initial interval-constant values, one more than the cut points specified by\code{cuts}.
@@ -113,7 +118,7 @@ fam <- simfam(N.fam = 100, design = "pop+", base.dist = "Weibull", base.parms = 
 # EM algorithm for fitting family data with missing genotypes
 
 fit <- penmodelEM(Surv(time, status) ~ gender + mgene, cluster = "famID", gvar = "mgene", 
-       parms = c(0.01, 3, 1, 2), data = fam, design="pop+", robust = TRUE, 
+       parms = c(0.01, 3, 1, 2), data = fam, design = "pop+", robust = TRUE, 
        base.dist = "Weibull", method = "mendelian", mode = "dominant", q = 0.02)
 
 # Summary of the model parameter estimates from the model fit by penmodelEM 

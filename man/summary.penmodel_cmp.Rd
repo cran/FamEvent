@@ -21,7 +21,7 @@ An object class of \code{'penmodel_cmp'}, a fitted model by \code{\link{penmodel
 
 \value{
 Returns the object of class \code{'summary.penmodel_cmp'}, including the following summary values:
-\item{estimates}{List of parameter estimates of transformed baseline parameters and regression coefficients, their standard errors, their robust standard errors if \code{robust=TRUE} was selected when fitting the penetrance model, \eqn{t}-statistics and corresponding two-sided \eqn{p}-values.}
+\item{estimates}{List of parameter estimates of transformed baseline parameters and regression coefficients, their standard errors, their robust standard errors if \code{robust = TRUE} was selected when fitting the penetrance model, \eqn{t}{t}-statistics and corresponding two-sided \eqn{p}{p}-values.}
 \item{varcov}{Variance-covariance matrix of the parameter estimates.}
 \item{varcov.robust}{Robust variance-covariance matrix of the parameter estimates if \code{robust = TRUE} was selected when fitting the penetrance model.}
 \item{correlation}{Correlation matrix obtained from the variance-covariance matrix.}
@@ -36,18 +36,18 @@ set.seed(4321)
 fam1 <- simfam_cmp(N.fam = 300, design = "pop+", variation = "frailty", competing=TRUE,
               base.dist = "Weibull", frailty.dist = "gamma", depend=c(0.5, 1), 
               allelefreq = 0.02, base.parms = list(c(0.01, 3), c(0.01, 3)), 
-              vbeta = list(c(-1.13, 2.35),c(-1, 2)))
+              vbeta = list(c(-1.13, 2.35), c(-1, 2)))
 
-# Penetrance model fit for the simulated family data
+# Fit a competing risk model for the simulated family data
 
 fit <- penmodel_cmp(
-       formula1 = Surv(time, status==1) ~ gender + mgene, 
-       formula2 = Surv(time, status==2) ~ gender + mgene, 
+       formula1 = Surv(time, status == 1) ~ gender + mgene, 
+       formula2 = Surv(time, status == 2) ~ gender + mgene, 
        cluster = "famID", 
        parms = list(c(0.01, 3, -1.13, 2.35), c(0.01, 3, -1, 2)),
        data = fam1, design = "pop+", base.dist = "Weibull")
 
-# Summary of the model parameter and penetrance estimates from model fit
+# Summary of the model parameter and penetrance estimates from the fitted model
 
 summary(fit)
 }

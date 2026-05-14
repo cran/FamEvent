@@ -20,11 +20,14 @@ simfam_cmp(N.fam, design = "pop+", variation = "none", interaction = FALSE,
   \item{N.fam}{
 Number of families to generate.
 }
-  \item{design}{
-Family based study design used in the simulations. Possible choices are: \code{"pop"}, \code{"pop+"}, \code{"cli"}, \code{"cli+"} or \code{"twostage"}, where \code{"pop"} is for the population-based design that families are ascertained by affected probands, \code{"pop+"} is similar to \code{"pop"} but with mutation carrier probands, \code{"cli"} is for the clinic-based design that includes affected probands with at least one parent and one sib affected, \code{"cli+"} is similar to \code{"cli"} but with mutation carrier probands and \code{"twostage"} for two-stage design that randomly samples families from the population in the first stage and oversamples high risk families in the second stage that include at least two affected members in the family. Default is \code{"pop+"}.
+\item{design}{
+Family-based study design used in the simulations. Possible choices are \code{"pop"}, \code{"pop+"}, \code{"cli"}, \code{"cli+"}, \code{"twostage"}, and \code{"noasc"}.  
+
+\code{"pop"} is a population-based design with affected probands; \code{"pop+"} is similar to \code{"pop"} but with mutation-carrying probands; \code{"cli"} is a clinic-based design with affected probands and at least one affected parent and one affected sibling; \code{"cli+"} is similar to \code{"cli"} but with mutation-carrying probands; \code{"twostage"} is a two-stage design that oversamples high-risk families (with at least two affected members); and \code{"noasc"} corresponds to simple random sampling without ascertainment correction. Default is \code{"pop"}.
 }
+
   \item{variation}{
-Source of residual familial correlation.  Possible choices are: \code{"frailty"} for frailty shared within families, \code{"secondgene"} for second gene variation, or \code{"none"} for no residual familial correlation. Default is \code{"none"}.
+Source of residual familial correlation.  Possible choices are \code{"frailty"} for frailty shared within families, \code{"secondgene"} for a second gene variation, and \code{"none"} for no residual familial correlation. Default is \code{"none"}.
 }
  \item{interaction}{
 Logical; if \code{TRUE}, allows the interaction between gender and mutation status. Two logical values should be specified for each competing event; if only one logical value is provided, the same logical value will be assumed for both events. Default is \code{FALSE}.
@@ -33,15 +36,15 @@ Logical; if \code{TRUE}, allows the interaction between gender and mutation stat
 Two values shoud be specified for each competing event when \code{frailty.dist = "gamma"} or \code{frailty.dist = "lognormal"}, three values should be specified with \code{frailty.dist = "cgamma"} or \code{frailty.dist = "clognormal"}. The first two values represent the inverse of the variance for each competing event and the third value represents the correlation between the two events.
 }
 \item{base.dist}{
-Choice of baseline hazard distribution.  Possible choices are: \code{"Weibull"}, \code{"loglogistic"}, \code{"Gompertz"}, \code{"lognormal"} \code{"gamma"}, \code{"logBurr"}. Default is \code{"Weibull"}. Two distributions should be specified for each competing event. If only one distribution is specified, the same distribution will be assumed for both events.
+Choice of baseline hazard distribution. Possible choices are \code{"Weibull"}, \code{"loglogistic"}, \code{"Gompertz"}, \code{"lognormal"} \code{"gamma"}, and \code{"logBurr"}. Default is \code{"Weibull"}. Two distributions should be specified for each competing event. If only one distribution is specified, the same distribution will be assumed for both events.
 }
 \item{frailty.dist}{
-Choice of frailty distribution. Possible choices are \code{"gamma"} for independent gamma, \code{"lognormal"} for independent lognormal, \code{"cgamma"} for correlated gamma, or \code{"clognormal"} for correlated lognormal distribution. Default is \code{NULL}.
+Choice of frailty distribution. Possible choices are \code{"gamma"} for independent gamma, \code{"lognormal"} for independent lognormal, \code{"cgamma"} for correlated gamma, and \code{"clognormal"} for correlated lognormal distribution. Default is \code{NULL}.
 }
   \item{base.parms}{
-The list of two vectors of baseline parameters for each event should be specified. For example, \code{base.parms=list(c(lambda1, rho1), c(lambda2, rho2))} should be specified for \code{base.dist=c("Weibull", "Weibull")}.
+The list of two vectors of baseline parameters for each event should be specified. For example, \code{base.parms = list(c(lambda1, rho1), c(lambda2, rho2))} should be specified for \code{base.dist = c("Weibull", "Weibull")}.
 
-Two parameters \code{base.parms=c(lambda, rho)} should be specified for \code{base.dist="Weibull"}, \code{"loglogistic"}, \code{"Gompertz"}, \code{"gamma"}, and \code{"lognormal"}, and three parameters should be specified \code{base.parms = c(lambda, rho, eta)} for \code{base.dist="logBurr"}. 
+Two parameters \code{base.parms = c(lambda, rho)} should be specified for \code{base.dist = "Weibull"}, \code{"loglogistic"}, \code{"Gompertz"}, \code{"gamma"}, and \code{"lognormal"}, and three parameters should be specified \code{base.parms = c(lambda, rho, eta)} for \code{base.dist="logBurr"}. 
 }  	
 \item{vbeta}{
 List of two vectors of regression coefficients for each event should be specified. 
@@ -55,7 +58,7 @@ Vector of population allele frequencies for major and second disease genes shoul
 \item{mrate}{
 Proportion of missing genotypes, value between 0 and 1. Default value is 0.}
   \item{hr}{
-Proportion of high risk families, which include at least two affected members, to be sampled from the two stage sampling. This value should be specified when \code{design="twostage"}. Default value is 0. Value should lie between 0 and 1.
+Proportion of high risk families, which include at least two affected members, to be sampled from the two stage sampling. This value should be specified when \code{design = "twostage"}. Default value is 0. Value should lie between 0 and 1.
 }
 \item{probandage}{
 Vector of mean and standard deviation for the proband age. Default values are mean of 45 years and standard deviation of 2 years, \code{probandage = c(45, 2)}.
@@ -74,47 +77,35 @@ Maximum age of disease onset or maximum age. Default is 100 years of age.
 
 Event 1:
 
-\ifelse{html}{
-\out{<p style="text-align:center"> h<sub>1</sub>(t|X,Z) = h<sub>01</sub>(t - t<sub>0</sub>) Z<sub>1</sub> exp(&beta;<sub>s1</sub> * x<sub>s</sub> + &beta;<sub>g1</sub> * x<sub>g</sub>), </p>}}{	
-		\deqn{ h(t|X,Z_1) = h_{01}(t - t_0) Z \exp(\beta_{s1} x_s+\beta_{g1} x_g) ,}{ h(g|X,Z) = h01(t - t0) * Z1 * exp(\beta s1 * xs + \beta g1 * xg) ,}}
+\deqn{ h(t|X,Z_1) = h_{01}(t - t_0) Z \exp(\beta_{s1} x_s+\beta_{g1} x_g),}{ h(g|X,Z) = h01(t - t0) * Z1 * exp(\beta s1 * xs + \beta g1 * xg),}
 
 Event 2:
 
-\ifelse{html}{
-\out{<p style="text-align:center"> h<sub>2</sub>(t|X,Z) = h<sub>02</sub>(t - t<sub>0</sub>) Z<sub>2</sub> exp(&beta;<sub>s2</sub> * x<sub>s</sub> + &beta;<sub>g2</sub> * x<sub>g</sub>), </p>}}{	
-		\deqn{ h(t|X,Z_1) = h_{02}(t - t_0) Z \exp(\beta_{s2} x_s+\beta_{g2} x_g) ,}{ h(g|X,Z) = h02(t - t0) * Z1 * exp(\beta s2 * xs + \beta g2 * xg) ,}}
+\deqn{ h(t|X,Z_1) = h_{02}(t - t_0) Z \exp(\beta_{s2} x_s+\beta_{g2} x_g),}{ h(g|X,Z) = h02(t - t0) * Z1 * exp(\beta s2 * xs + \beta g2 * xg),}
 		
-where \ifelse{html}{\out{h<sub>01</sub>(t)}}{\eqn{h_{01}(t)}{h01(t)}} and \ifelse{html}{\out{h<sub>02</sub>(t)}}{\eqn{h_{02}(t)}{h02(t)}} are the baseline hazard functions for event 1 and event 2, respectively, \ifelse{html}{\out{t<sub>0</sub>}}{\eqn{t_0}{t0}} is a minimum age of disease onset, \ifelse{html}{\out{Z<sub>1</sub>}}{\eqn{Z_1}{Z1}} and \ifelse{html}{\out{Z<sub>2</sub>}}{\eqn{Z_2}{Z2}} are frailties shared within families for each event and follow either a gamma, log-normal, correlateg gamma, or correlated log-normal distributions, \ifelse{html}{\out{x<sub>x</sub>}}{\eqn{x_s}{xs}} and \ifelse{html}{\out{x<sub>g</sub>}}{\eqn{x_g}{xg}} indicate male (1) or female (0) and carrier (1) or non-carrier (0) of a main gene of interest, respectively.
+where \eqn{h_{01}(t)}{h01(t)} and \eqn{h_{02}(t)}{h02(t)} are the baseline hazard functions for event 1 and event 2, respectively, \eqn{t_0}{t0} is a minimum age of disease onset, \eqn{Z_1}{Z1} and \eqn{Z_2}{Z2} are frailties shared within families for each event and follow either a gamma, log-normal, correlateg gamma, or correlated log-normal distributions, \eqn{x_s}{xs} and \eqn{x_g}{xg} indicate male (1) or female (0) and carrier (1) or non-carrier (0) of a main gene of interest, respectively.
 
 \emph{Choice of frailty distributions for competing risk models}
 
-\code{frailty.dist = "gamma"} shares the frailties within families generated from a gamma distribution independently for each competing event, where
-\ifelse{html}{\out{Z<sub>j</sub>}}{\eqn{Z_j}{Zj}} follows Gamma(\ifelse{html}{\out{k<sub>j</sub>}}{\eqn{k_j}{kj}}, \ifelse{html}{\out{1/k<sub>j</sub>}}{\eqn{1/k_j}{1/kj}}). 
+\code{frailty.dist = "gamma"} shares the frailties within families generated from a gamma distribution independently for each competing event, where \eqn{Z_j}{Zj} follows Gamma(\eqn{k_j}{kj}, \eqn{1/k_j}{1/kj}). 
 
-\code{frailty.dist = "lognormal"} shares the frailties within families generated from a log-normal distribution independently for each competing event, where 
-\ifelse{html}{\out{Z<sub>j</sub>}}{\eqn{Z_j}{Zj}} follows log-normal distribution with mean 0 and variance (\ifelse{html}{\out{1/k<sub>j</sub>}}{\eqn{1/k_j}{1/kj}}.
+\code{frailty.dist = "lognormal"} shares the frailties within families generated from a log-normal distribution independently for each competing event, where \eqn{Z_j}{Zj} follows log-normal distribution with mean 0 and variance \eqn{1/k_j}{1/kj}.
 
-\code{frailty.dist = "cgamma"} shares the frailties within families generated from a correlated gamma distribution to allow the frailties between two events to be correlated, where the correlated gamma frailties (\ifelse{html}{\out{Z<sub>1</sub>, Z<sub>2</sub>}}{\eqn{Z_1, Z_2}{Z1, Z2}}) are generated with three independent gamma frailties (\ifelse{html}{\out{Y<sub>0</sub>, Y<sub>1</sub>, Y<sub>2</sub>}}{\eqn{Y_0, Y_1, Y_2}{Y0, Y1, Y2}}) as follows:
+\code{frailty.dist = "cgamma"} shares the frailties within families generated from a correlated gamma distribution to allow the frailties between two events to be correlated, where the correlated gamma frailties (\eqn{Z_1, Z_2}{Z1, Z2}) are generated with three independent gamma frailties (\eqn{Y_0, Y_1, Y_2}{Y0, Y1, Y2}) as follows:
 
-\ifelse{html}{\out{Z<sub>1</sub> = k<sub>0</sub>/(k<sub>0</sub> + k<sub>1</sub>) Y<sub>0</sub> + Y<sub>1</sub>} }{\eqn{Z_1 = (k_0/(k_0 + k_1) Y_0 + Y_1}{Z1 = k0/(k0+k1)Y0 + Y1} }
+\deqn{Z_1 = (k_0/(k_0 + k_1) Y_0 + Y_1; Z_2 = (k_0/(k_0 + k_2) Y_0 + Y_2,}{Z1 = k0/(k0+k1)Y0 + Y1; Z2 = k0/(k0+k2)Y0 + Y2,} 
 
-\ifelse{html}{\out{Z<sub>2</sub> = k<sub>0</sub>/(k<sub>0</sub> + k<sub>2</sub>) Y<sub>0</sub> + Y<sub>2</sub>} }{\eqn{Z_2 = (k_0/(k_0 + k_2) Y_0 + Y_2}{Z2 = k0/(k0+k2)Y0 + Y2} }
+where \eqn{Y_0}{Y0} from Gamma(\eqn{k_0}{k0}, \eqn{1/k_0}{1/k0}), \eqn{Y_1}{Y1} from Gamma(\eqn{k_1}{k1}, \eqn{1/(k_0+k_1)}{1/(k0+k1)}), and \eqn{Y_2}{Y2} from Gamma(\eqn{k_2}{k2}, \eqn{1/(k_0+k_2)}{1/(k0+k2)}).
 
-where \ifelse{html}{\out{Y<sub>0</sub>}}{\eqn{Y_0}{Y0}} from Gamma(\ifelse{html}{\out{k<sub>0</sub>}}{\eqn{k_0}{k0}}, \ifelse{html}{\out{1/k<sub>0</sub>}}{\eqn{1/k_0}{1/k0}});
-
-\ifelse{html}{\out{Y<sub>1</sub>}}{\eqn{Y_1}{Y1}} from Gamma(\ifelse{html}{\out{k<sub>1</sub>}}{\eqn{k_1}{k1}}, \ifelse{html}{\out{1/(k<sub>0</sub> + k<sub>1</sub>)}}{\eqn{1/(k_0+k_1)}{1/(k0+k1)}});
-
-\ifelse{html}{\out{Y<sub>2</sub>}}{\eqn{Y_2}{Y2}} from Gamma(\ifelse{html}{\out{k<sub>2</sub>}}{\eqn{k_2}{k2}}, \ifelse{html}{\out{1/(k<sub>0</sub> + k<sub>2</sub>)}}{\eqn{1/(k_0+k_2)}{1/(k0+k2)}}).
-
-\code{frailty.dist = "clognormal"} shares the frailties within families generated from a correlated log-normal distribution where 
-\ifelse{html}{\out{log(Z<sub>j</sub>)}}{\eqn{log(Z_j)}{log(Zj)}} follows  a normal distribution with mean 0, variance \ifelse{html}{\out{1/k<sub>j</sub>}}{\eqn{1/k_j}{1/kj}} and correlation between two events \ifelse{html}{\out{k<sub>0</sub>}}{\eqn{k_0}{k0}}.
+\code{frailty.dist = "clognormal"} shares the frailties within families generated from a correlated log-normal distribution where \eqn{log(Z_j)}{log(Zj)} follows  a normal distribution with mean 0, variance \eqn{1/k_j}{1/kj} and correlation between two events \eqn{k_0}{k0}.
 
 \code{depend} should specify the values of related frailty parameters: \code{c(k1, k2)} with \code{frailty.dist = "gamma"} or \code{frailty.dist = "lognormal"}; \code{c(k1, k2, k0)} for \code{frailty.dist = "cgamma"} or \code{frailty.dist = "clognormal"}. 
 
 
 The current ages for each generation are simulated assuming normal distributions. However, the probands' ages are generated using a left truncated normal distribution as their ages cannot be less than the minimum age of onset. The average age difference between each generation and their parents is specified as 20 years apart. 
 
-The \code{design} argument defines the type of family based design to be simulated. Two variants of the population-based and clinic-based design can be chosen: \code{"pop"} when proband is affected, \code{"pop+"} when proband is affected mutation carrier, \code{"cli"} when proband is affected and at least one parent and one sibling are affected, \code{"cli+"} when proband is affected mutation-carrier and at least one parent and one sibling are affected. The two-stage design, \code{"twostage"}, is used to oversample high risk families, where the proportion of high risks families to include in the sample is specified by \code{hr}. High risk families often include multiple (at least two) affected members in the family.
+The \code{design} argument specifies the type of family based design to be simulated. Two variants of the population-based and clinic-based design can be chosen: \code{"pop"}, where the proband is affected; \code{"pop+"}, where the proband is affected and a mutation carrier; \code{"cli"}, where the proband is affected and at least one parent and one sibling are also affected; \code{"cli+"}, where the proband is affected, is a mutation carrier, and has at least one affected parent and one affected sibling. 
+The two-stage design, \code{"twostage"}, is used to oversample high risk families, where the proportion of high risks families included in the sample is specified by \code{hr}. High risk families often include multiple (at least two) affected members. Finally, \code{design = "noasc"} specifies a design with no ascertainment criteria applied.
 
 Note that simulating family data under the clinic-based designs (\code{"cli"} or \code{"cli+"}) or the two-stage design can be slower since the ascertainment criteria for the high risk families are difficult to meet in such settings. Especially, \code{"cli"} design could be slower than \code{"cli+"} design since the proband's mutation status is randomly selected from a disease population in \code{"cli"} design, so his/her family members are less likely to be mutation carriers and have less chance to be affected, whereas the probands are all mutation carriers, their family members have higher chance to be carriers and affected by disease. Therefore, \code{"cli"} design requires more iterations to sample high risk families than \code{"cli+"} design. 
 }
@@ -126,9 +117,9 @@ Returns an object of class \code{'simfam'}, a data frame which contains:
 \item{motherID}{Mother ID numbers.}
 \item{fatherID}{Father ID numbers.}
 \item{proband}{Proband indicators: 1 if the individual is the proband, 0 otherwise.}
-\item{generation}{Individuals generation: 1=parents of probands,2=probands and siblings, 3=children of probands and siblings.}
-\item{majorgene}{Genotypes of major gene: 1=AA, 2=Aa, 3=aa where A is disease gene.}
-\item{secondgene}{Genotypes of second gene: 1=BB, 2=Bb, 3=bb where B is disease gene.}
+\item{generation}{Individuals generation: 1 = parents of probands, 2 = probands and siblings, 3 = children of probands and siblings.}
+\item{majorgene}{Genotypes of major gene: 1 = AA, 2 = Aa, 3 = aa where A is disease gene.}
+\item{secondgene}{Genotypes of second gene: 1 = BB, 2 = Bb, 3 = bb where B is disease gene.}
 \item{ageonset}{Ages at disease onset in years.}
 \item{currentage}{Current ages in years.}
 \item{time}{Ages at disease onset for the affected or ages of last follow-up for the unaffected. }

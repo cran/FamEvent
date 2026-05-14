@@ -6,7 +6,6 @@ function(N.fam, design="pop", variation="none", interaction=FALSE,
          allelefreq=0.02, dominant.m=TRUE, dominant.s=TRUE, mrate=0, hr=0, 
          probandage=c(45, 2), agemin = 20, agemax = 100)
 {
-	
 if(!is.element(variation, c("none", "frailty", "secondgene", "kinship"))) stop("Unrecognized variation; variation should be one of none, frailty, kinship, or secondgene")
 
 if(agemin > 70) warning("agemin might be too high.")

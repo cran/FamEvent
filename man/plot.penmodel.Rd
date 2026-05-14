@@ -67,7 +67,7 @@ Yun-Hee Choi
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-\code{\link{penmodel}, \link{print.penmodel}, \link{penmodelEM}, \link{summary.penmodel},\link{print.summary.penmodel}}, 
+\code{\link{penmodel}, \link{print.penmodel}, \link{penmodelEM}, \link{summary.penmodel}, \link{print.summary.penmodel}}, 
 \code{\link{simfam}	}
 }
 \examples{
@@ -75,13 +75,15 @@ Yun-Hee Choi
 # Simulated family data  
 
 set.seed(4321)
-fam <- simfam(N.fam = 300, design = "pop+", base.dist = "Weibull", variation = "none",
-       base.parms = c(0.01,3), vbeta = c(-1.13, 2.35), allelefreq = 0.02, agemin = 20)
+fam <- simfam(N.fam = 300, design = "pop+", base.dist = "Weibull", 
+       variation = "none", base.parms = c(0.01,3), vbeta = c(-1.13, 2.35), 
+       allelefreq = 0.02, agemin = 20)
  
 # Fit family data
 
-fit <- penmodel(Surv(time, status) ~ gender + mgene, cluster = "famID", design = "pop+",
-parms = c(0.01, 3, -1.13, 2.35), data = fam, base.dist = "Weibull", robust = TRUE)       
+fit <- penmodel(Surv(time, status) ~ gender + mgene, cluster = "famID", 
+       design = "pop+", parms = c(0.01, 3, -1.13, 2.35), data = fam, 
+       base.dist = "Weibull", robust = TRUE)       
 
 # Plot penetrance function curves with 95% CIs
 

@@ -7,22 +7,28 @@ xage <- agemin:agemax
 t0 <- xage - agemin
 cuts0 <- cuts - agemin
 if(variation=="frailty"){
+  np <- length(vbeta)
+  depend <- exp(vbeta[np]) 
+  vbeta <- vbeta[-np]
  if(!any(frailty.dist==c("lognormal",  "gamma")))  stop("Unrecognized frailty distribution; frailty.dist should be either \"gamma\" or \"lognormal\" ")
  else if(depend <= 0) stop("Invalid depend value; depend should be > 0.")
   
-  if(length(vbeta)==2) xbeta <- c( vbeta %*% t(expand.grid(c(1,0),c(1,0)) ) )
+  if(length(vbeta)==1) xbeta <- c(vbeta, 0)
+  else if(length(vbeta)==2) xbeta <- c( vbeta %*% t(expand.grid(c(1,0),c(1,0)) ) )
   else if(length(vbeta)==3) xbeta <- c( vbeta %*% t(cbind(expand.grid(c(1,0),c(1,0)),c(1,0,0,0))) ) 
   else stop("vbeta should be a vector of length 2.")
   
 } 
 else if(variation=="secondgene") {
-  if(length(vbeta)==3) xbeta <- c( vbeta %*% t(expand.grid(c(1,0),c(1,0), c(1,0))) )
+  if(length(vbeta)==2) xbeta <- c( vbeta %*% t(expand.grid(c(1,0),c(1,0)) ) )
+  else if(length(vbeta)==3) xbeta <- c( vbeta %*% t(expand.grid(c(1,0),c(1,0), c(1,0))) )
   else if(length(vbeta)<3) stop("vbeta should include a second gene effect.")
   else stop("vbeta should be a vector of length 3.")
 } 
 else if(variation=="none") {
-  if(!is.null(frailty.dist)) stop("frailty.dist should be NULL")
-  if(length(vbeta)==2) xbeta <- c( vbeta %*% t(expand.grid(c(1,0),c(1,0)) ) )
+#  if(!is.null(frailty.dist) | frailty.dist!="none") stop("frailty.dist should be NULL")
+  if(length(vbeta)==1) xbeta <- c(vbeta, 0)
+  else if(length(vbeta)==2) xbeta <- c( vbeta %*% t(expand.grid(c(1,0),c(1,0)) ) )
   else if(length(vbeta)==3) xbeta <- c( vbeta %*% t(cbind(expand.grid(c(1,0),c(1,0)),c(1,0,0,0))) ) 
   else stop("vbeta should be a vector of length 2.")
 }
@@ -40,12 +46,13 @@ par(mfrow=c(1,2))
                                paste("Second gene noncarriers \n", base.dist, "baseline"))
   }
   else main <- ""
+  
   if(is.null(ylim)) ylim <- c(0, max(pen))
 	plot(xage, pen[,1], ylab=ylab, xlab=xlab, type="l", lty=lty[1], col=col[1], ylim=ylim, main=main[1], ...)
   lines(xage, pen[,2], lty=lty[2], col=col[2], ...)
-  lines(xage, pen[,3], lty=lty[3], col=col[3], ...)
-  lines(xage, pen[,4], lty=lty[4], col=col[4], ...)
-  if(add.legend) legend(x, y, c("male carrier", "female carrier", "male noncarrier", "female noncarrier"), bty="n", lty=lty, col=col)
+    lines(xage, pen[,3], lty=lty[3], col=col[3], ...)
+    lines(xage, pen[,4], lty=lty[4], col=col[4], ...)
+    if(add.legend) legend(x, y, c("male carrier", "female carrier", "male noncarrier", "female noncarrier"), bty="n", lty=lty, col=col)
 
   if(length(col)==4) col <- rep(col,2)
   if(length(lty)==4) lty <- rep(lty,2)
@@ -60,16 +67,21 @@ par(mfrow=c(1,2))
 else if(variation=="frailty"){
   par(mfrow=c(1,1))
   if(add.title){ 
-    if(is.null(main)) main <- paste("Penetrance curves \n", base.dist, "baseline and ", frailty.dist,"frailty")
+    if(is.null(main)) main <- paste("Penetrance curves\n", base.dist, "baseline and", frailty.dist,"frailty")
   }
   else main <- ""
   
   if(is.null(ylim)) ylim <- c(0, max(pen))
   plot(xage,pen[,1], ylab=ylab, xlab=xlab, type="l", lty=lty[1], col=col[1], ylim=ylim, main=main, ...)
   lines(xage, pen[,2], lty=lty[2], col=col[2], ...)
-  lines(xage, pen[,3], lty=lty[3], col=col[3], ...)
-  lines(xage, pen[,4], lty=lty[4], col=col[4], ...)
-  if(add.legend) legend(x, y, c("male carrier", "female carrier", "male noncarrier", "female noncarrier"), bty="n", lty=lty, col=col)
+  if(dim(pen)[2]==4) {
+    lines(xage, pen[,3], lty=lty[3], col=col[3], ...)
+    lines(xage, pen[,4], lty=lty[4], col=col[4], ...)
+    if(add.legend) legend(x, y, c("male carrier", "female carrier", "male noncarrier", "female noncarrier"), bty="n", lty=lty, col=col)
+  }
+  else if(dim(pen)[2]==2){
+    if(add.legend) legend(x, y, c("x = 1", "x = 0"), bty="n", lty=lty, col=col)
+  }
 }
 else {
   par(mfrow=c(1,1))
@@ -81,13 +93,24 @@ else {
   plot(xage, pen[,1], ylab=ylab, xlab=xlab, type="l", lty=lty[1], col=col[1], main=main, ylim=ylim, ...)
   #plot(xage, pen[,1], type="l", lty=lty[1], col=col[1], ...)
   lines(xage, pen[,2], lty=lty[2], col=col[2], ...)
+  if(dim(pen)[2]==4){
   lines(xage, pen[,3], lty=lty[3], col=col[3], ...)
   lines(xage, pen[,4], lty=lty[4], col=col[4], ...)
   if(add.legend) legend(x, y, c("male carrier", "female carrier", "male noncarrier", "female noncarrier"), bty="n", lty=lty, col=col)
+  }
+  else if(dim(pen)[2]==2) {
+    if(add.legend) legend(x, y, c("x = 1", "x = 0"), bty="n", lty=lty, col=col)
+  }
 }
 
+if(dim(pen)[2] == 4){
 pen70=pen[xage==70, 1:4]
 names(pen70)<-c("male-carrier","female-carrier","male-noncarr","female-noncarr")
+}
+else if(dim(pen)[2] == 2){
+  pen70=pen[xage==70, 1:2]
+  names(pen70)<-c("x = 1","x = 0")
+}
 
 if(variation=="secondgene"){ 
   pen2 = pen[xage==70, 5:8]
@@ -96,7 +119,10 @@ if(variation=="secondgene"){
   colnames(pen) <- rep(c("male-carrier","female-carrier","male-noncarr","female-noncarr"),2)
   pen <- list('secondgene=1'=pen[,1:4], 'secondgene=0'=pen[,5:8])
   }
-else colnames(pen) <- c("male-carrier","female-carrier","male-noncarr","female-noncarr")
+else {
+  if(dim(pen)[2] == 4) colnames(pen) <- c("male-carrier","female-carrier","male-noncarr","female-noncarr")
+  else if(dim(pen)[2] == 2) colnames(pen) <- c("x = 1", "x = 0")
+}
 
 if(print){
   if(variation=="frailty") cat("Call:", frailty.dist, "frailty with", base.dist, "baseline \n") 

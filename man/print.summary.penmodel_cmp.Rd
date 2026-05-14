@@ -9,7 +9,7 @@
 }
 \usage{
 \method{print}{summary.penmodel_cmp}(x, digits = max(3, getOption("digits") - 3),
-  signif.stars=TRUE, \ldots)
+  signif.stars = TRUE, \ldots)
 }
 \arguments{
   \item{x}{
@@ -20,7 +20,7 @@
 }
 
 \value{
-Prints a summary of parameter estimates, their standard errors, \eqn{t}-statistics and corresponding two-sided \eqn{p}-values and additionally indicates significance stars if \code{signif.stars} is \code{TRUE}.
+Prints a summary of parameter estimates, their standard errors, \eqn{t}{t}-statistics and corresponding two-sided \eqn{p}{p}-values and additionally indicates significance stars if \code{signif.stars} is \code{TRUE}.
 
 Also prints penetrance estimates for each event by age 70 specific to gender and mutation-status subgroups along with their standard errors and 95\% confidence intervals.
 

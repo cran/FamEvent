@@ -5,6 +5,7 @@ function (i, cumind = cumind, m.carrier = 1, variation = "none", interaction = F
           vbeta = c(1, 1), allelefreq = 0.02, dominant.m = TRUE, dominant.s = TRUE, 
           mrate = 0, probandage = c(45, 2), agemin = 20, agemax = 100)
 {
+  
 tmpdata <- numeric()
 indID <- c(cumind+1,cumind+2)
 motherID <- c(0,0) 
@@ -17,13 +18,15 @@ relation <- c(4,4)  #1=proband, 2=sib, 3=child, 4=parent, 5=sibchild, 6=hasband,
 
 ## number of sibs in second generation be 2 to 5 
 ## truncated negative binomial (>=2 and <=5) with prob=sibprob=0.4551, and rr=1
+
 SecNum <-sample(c(2,3,4,5), 1, replace=TRUE,prob=c(0.4991, 0.2720, 0.1482, 0.0807)) 
-    
+# SecNum <- sample(c(2,3), 1, replace=TRUE,prob=c(0.5, 0.5)) 
+
 ## generate gender by prob=0.5      
     
-tmpgender<-sample(c(1,0), SecNum, replace=TRUE, prob=c(0.5,0.5))
+tmpgender <- sample(c(1,0), SecNum, replace=TRUE, prob=c(0.5,0.5))
     
-SecNum<-length(tmpgender)
+SecNum <- length(tmpgender)
     
 if (SecNum > 0) { ## at least one sample in second generation
       
@@ -36,6 +39,7 @@ if (SecNum > 0) { ## at least one sample in second generation
     if (j==1){ # first one is assigned as the proband
       proband <- c(proband, c(1,0))
       relation <- c(relation, c(1,6))
+      tmpgender[j] <- 0 # keep proband as female
     }
     else {
       proband<-c(proband, c(0,0))
@@ -45,13 +49,13 @@ if (SecNum > 0) { ## at least one sample in second generation
     fatherID<-c(fatherID, c(cumind+1,0))
     motherID<-c(motherID, c(cumind+2,0))
         
-    if (tmpgender[j]==0) gender<-c(gender, c(1,0)) 
-    else gender<-c(gender, c(0,1))
+    if (tmpgender[j]==0) gender<-c(gender, c(0,1)) 
+    else gender<-c(gender, c(1,0))
      
     generation<-c(generation, c(2,0)) 
         
     ThiNum<-sample(c(2,3,4,5), 1, replace=TRUE, prob=c(0.4991, 0.2720, 0.1482, 0.0807)) 
-      
+#    ThiNum <- sample(c(1,2), 1, replace=TRUE, prob=c(0.5, 0.5)) 
     for (k in 1:ThiNum) {
       proband<-c(proband,0)
       indID<- c(indID, NumMem+k)
@@ -74,7 +78,7 @@ if (SecNum > 0) { ## at least one sample in second generation
         NumMem<-NumMem+ThiNum  
         
     } #Close for  for (j in 1:SecNum)
-      
+     
   nIndi <- length(indID)     
   famID <- rep(i, nIndi)    
   ageonset <- rep(0, nIndi)      ## age at onset

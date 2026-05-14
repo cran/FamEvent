@@ -71,16 +71,18 @@ Yun-Hee Choi
 # Simulate family data  
 set.seed(4321)
 fam2 <- simfam_cmp(N.fam = 500, design = "pop+", variation = "frailty", 
-                  base.dist = "Weibull", frailty.dist = "cgamma", depend=c(2, 2, 2), 
-                  allelefreq = 0.02, base.parms = list(c(0.01, 3), c(0.01, 3)), 
+                  base.dist = "Weibull", frailty.dist = "cgamma", 
+                  depend=c(2, 2, 2), allelefreq = 0.02, 
+                  base.parms = list(c(0.01, 3), c(0.01, 3)), 
                   vbeta = list(c(-1.13, 2.35),c(-1, 2)))
 
 # Fit family data
 fit2 <- penmodel_cmp(formula1 = Surv(time, status==1)~ gender + mgene, 
-                   formula2 = Surv(time, status==2)~ gender + mgene, 
-                   cluster = "famID", gvar = "mgene", frailty.dist = "cgamma",
-                   parms=list(c(0.01, 3, -1, 2.3), c(0.01, 3, -1, 2), c(2, 2, 2)), 
-                   data=fam2, design="pop+", base.dist="Weibull", robust=TRUE)
+              formula2 = Surv(time, status==2)~ gender + mgene, 
+              cluster = "famID", gvar = "mgene", frailty.dist = "cgamma",
+              parms = list(c(0.01, 3, -1, 2.3), c(0.01, 3, -1, 2), c(2, 2, 2)), 
+              data = fam2, design = "pop+", base.dist = "Weibull", 
+              robust = TRUE)
 
 # Plot penetrance function curves with 95% CIs
 plot(fit2, conf.int=TRUE, MC=200, ylim=c(0, 0.7))

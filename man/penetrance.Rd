@@ -26,28 +26,31 @@
   }
   \item{MC}{
     Number of simulated samples used to calculate confidence intervals with a Monte-Carlo method. 
-    If \code{MC=0}, no confidence intervals will be calculated. Default value is 100.
+    If \code{MC = 0}, no confidence intervals will be calculated. Default value is 100.
   }
 
 }
 \details{
   The penetrance function is defined as the probability of developing a disease by age \eqn{t} given fixed values of covariates \eqn{x}, 
-\deqn{ P(T < t | x) = 1 - S(t; x),}
-where \eqn{t} is greater than the minimum age \ifelse{html}{\out{t<sub>0</sub>}}{\eqn{t_0}{t0}} and \eqn{S(t; x)}  is the survival distribution based on a proportional hazards model with a specified baseline hazard distribution.
+
+\deqn{ P(T < t | x) = 1 - S(t; x),}{ P(T < t | x ) = 1 - S(t; x),}
+
+where \eqn{t}{t} is greater than the minimum age \eqn{t_0}{t0} and \eqn{S(t; x)}{S(t; x)}  is the survival distribution based on a proportional hazards model with a specified baseline hazard distribution. 
 
 The proportional hazards model is specified as:
-\ifelse{html}{\out{h(t|x) = h<sub>0</sub>(t) exp(&beta;*x),}}{
-\deqn{ h(t|x) = h_0(t) \exp(\beta x) ,}{h(t|x) = h0(t) exp(b*x) ,}}
-where \ifelse{html}{\out{h<sub>0</sub>(t)}}{\eqn{h_0(t)}{h0(t)}} is the baseline hazards function, \eqn{x} is the vector of covariates and \ifelse{html}{\out{&beta;}}{\eqn{\beta}{b}} is the vector of corresponding regression coefficients.
 
-  Calculations of standard errors of the penetrance estimates and 95\% confidence intervals (CIs) for the penetrance at a given age are based on Monte-Carlo simulations of the estimated penetrance model. 
+\deqn{ h(t|x) = h_0(t) \exp(\beta x) ,}{h(t|x) = h0(t) exp(b*x),}
+
+where \eqn{h_0(t)}{h0(t)} is the baseline hazards function, \eqn{x}{x} is the vector of covariates and \eqn{\beta}{b} is the vector of corresponding regression coefficients. 
+
+Calculations of standard errors of the penetrance estimates and 95\% confidence intervals (CIs) for the penetrance at a given age are based on Monte-Carlo simulations of the estimated penetrance model. 
   
   A multivariate normal distribution is assumed for the parameter estimates, and \code{MC = n} sets of the parameters are generated from the multivariate normal distribution with the parameter estimates and their variance-covariance matrix.
   For each simulated set, a penetrance estimate is calculated at a given age by substituting the simulated parameters into the penetrance function.
   
-  The standard error of the penetrance estimate at a given age is calculated by the standard deviation of penetrance estimates obtained from \eqn{n} simulations.
+  The standard error of the penetrance estimate at a given age is calculated by the standard deviation of penetrance estimates obtained from \eqn{n}{n} simulations.
   
-  The 95\% CI for the penetrance at a given age is calculated using the 2.5th and 97.5th percentiles of the penetrance estimates obtained from \eqn{n} simulations.
+  The 95\% CI for the penetrance at a given age is calculated using the 2.5th and 97.5th percentiles of the penetrance estimates obtained from \eqn{n}{n} simulations.
 }
 \value{
   Returns the following values:

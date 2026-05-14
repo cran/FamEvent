@@ -11,8 +11,6 @@ penmodelEM <- function(formula, cluster="famID", gvar="mgene", parms, cuts=NULL,
   
   if(sum(data$time <=  agemin, na.rm = TRUE) > 0) cat("Individuals with time < agemin (", agemin,") were removed from the analysis.\n")
   data <- data[data$time >=  agemin, ]
-  
-  data <- data[data$time >  agemin, ]
   data$famID.byuser <- data[, cluster]
   m <- model.frame(formula, data)
   Terms <- attr(m, "terms")
@@ -22,7 +20,7 @@ penmodelEM <- function(formula, cluster="famID", gvar="mgene", parms, cuts=NULL,
   type <- attr(Y, "type")
   if (type == "counting") stop("start-stop type Surv objects are not supported.")
   if (type == "mright" || type == "mcounting") stop("multi-state survival is not supported.")
-
+  
   X <- model.matrix(Terms, m)
   
   n <- nrow(X)
@@ -33,15 +31,15 @@ penmodelEM <- function(formula, cluster="famID", gvar="mgene", parms, cuts=NULL,
   
   #number of parameters for baseline
   nbase <- ifelse(base.dist=="logBurr", 3, ifelse(base.dist=="piecewise", length(cuts)+1, 2)) 
-
+  
   colnames(X) <- var.names
   vbeta <- parms[-c(1:nbase)]
-
+  
   if(length(parms) != (nvar+nbase) ) stop("The size of parms is incorrect.")
   if(is.null(data$weight)) data$weight <- 1
-
-  newdata <- carrierprobgeno(data, method=method, mode=mode, q=q)
- 
+  
+  data <- carrierprobgeno(data, method=method, mode=mode, q=q)
+  
   X0 <- X1 <- X
   
   X0[, gvar] <- 0
@@ -50,13 +48,13 @@ penmodelEM <- function(formula, cluster="famID", gvar="mgene", parms, cuts=NULL,
   est0 <- est <- parms
   dd <- lval0 <- lval <- 1
   i <- 0
-  lval <- loglikem(X=X, X0=X0, X1=X1, Y=Y, theta=est, theta0=est0, cuts=cuts, nbase=nbase, data=newdata, design=design, base.dist=base.dist, agemin=agemin, vec=FALSE)
+  lval <- loglikem(X=X, X0=X0, X1=X1, Y=Y, theta=est, theta0=est0, cuts=cuts, nbase=nbase, data=data, design=design, base.dist=base.dist, agemin=agemin, vec=FALSE)
   cat("Iterations = ")
   while(dd>0.00001){
     i <- i+1
     est0 <- est
     lval0 <- lval
-    nlm.est <- optim(est0, loglikem, X=X, X0=X0, X1=X1, Y=Y, theta0=est0, cuts=cuts, nbase=nbase, data=newdata, design=design, base.dist=base.dist, agemin=agemin, vec=FALSE)
+    nlm.est <- optim(est0, loglikem, X=X, X0=X0, X1=X1, Y=Y, theta0=est0, cuts=cuts, nbase=nbase, data=data, design=design, base.dist=base.dist, agemin=agemin, vec=FALSE)
     lval <- nlm.est$value
     est <- nlm.est$par
     dd <- abs(lval0-lval)
@@ -64,10 +62,10 @@ penmodelEM <- function(formula, cluster="famID", gvar="mgene", parms, cuts=NULL,
     #print(c(i, dd, lval, est))
     cat(i, " ")
   }
-
+  
   logLik <- -lval
   EST <- nlm.est$par
-  H <- hessian(loglikem, nlm.est$par, X=X, X0=X0, X1=X1, Y=Y, theta0=nlm.est$par, cuts=cuts, nbase=nbase, data=newdata, design=design, base.dist=base.dist, agemin=agemin, vec=FALSE)
+  H <- hessian(loglikem, nlm.est$par, X=X, X0=X0, X1=X1, Y=Y, theta0=nlm.est$par, cuts=cuts, nbase=nbase, data=data, design=design, base.dist=base.dist, agemin=agemin, vec=FALSE)
   Var <- try(solve(H), TRUE)
   
   if(!is.null(attr(Var,"class"))) stop("Model didn't converge.\n  Try again with different initial values")
@@ -82,14 +80,14 @@ penmodelEM <- function(formula, cluster="famID", gvar="mgene", parms, cuts=NULL,
     parms.se.robust <- NULL
     names(EST) <- names(parms.se)  <- rownames(parms.cov) <- colnames(parms.cov) <- c(bparms.name[1:nbase], colnames(X))
     
-  	if(robust){
-  	  grad <- jacobian(loglikem, nlm.est$par, X=X, X0=X0, X1=X1, Y=Y, theta0=nlm.est$par, cuts=cuts, nbase=nbase, data=newdata, design=design, base.dist=base.dist, agemin=agemin, vec=TRUE)
-  	  Jscore <- t(grad)%*%grad
-  	  parms.cov.robust <- Var%*%(Jscore)%*%Var
-  	  parms.se.robust <- sqrt(diag(parms.cov.robust))
-  	  rownames(parms.cov.robust) <- colnames(parms.cov.robust) <- c(bparms.name[1:nbase], colnames(X))
-  	
-  	}
+    if(robust){
+      grad <- jacobian(loglikem, nlm.est$par, X=X, X0=X0, X1=X1, Y=Y, theta0=nlm.est$par, cuts=cuts, nbase=nbase, data=data, design=design, base.dist=base.dist, agemin=agemin, vec=TRUE)
+      Jscore <- t(grad)%*%grad
+      parms.cov.robust <- Var%*%(Jscore)%*%Var
+      parms.se.robust <- sqrt(diag(parms.cov.robust))
+      rownames(parms.cov.robust) <- colnames(parms.cov.robust) <- c(bparms.name[1:nbase], colnames(X))
+      
+    }
   }
   
   aic = 2*length(EST) - 2*logLik
@@ -111,4 +109,4 @@ penmodelEM <- function(formula, cluster="famID", gvar="mgene", parms, cuts=NULL,
   
   invisible(out)
   
-  }
+}
